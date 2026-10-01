@@ -9,6 +9,7 @@
     "lint": "pnpm --filter @waypoint/web lint",
     "test": "pnpm --filter @waypoint/web test",
     "db:generate": "pnpm --filter @waypoint/database generate",
-    "db:migrate": "pnpm --filter @waypoint/database migrate"
+    "db:migrate": "pnpm --filter @waypoint/database migrate",
+    "db:seed": "pnpm --filter @waypoint/database seed"
   }
 }

@@ -20,6 +20,7 @@
 .form { width: min(100%, 400px); }
 .form h2 { margin: 50px 0 0; color: var(--brand); font-size: 36px; }
 .form > p { margin: 6px 0 32px; color: var(--muted); }
+.form > .error { margin: 12px 0; padding: 10px; border: 1px solid #d39b8c; border-radius: 8px; color: var(--critical-ink); background: var(--critical); font-size: 13px; line-height: 1.4; }
 .form label { display: block; margin: 20px 0 8px; font-size: 14px; font-weight: 700; }
 .form input:not([type="checkbox"]) { width: 100%; padding: 13px 14px; border: 1px solid #b5b2a8; border-radius: 8px; background: #fffdf8; }
 .form small { display: block; margin-top: 7px; color: var(--muted); font-size: 12px; }

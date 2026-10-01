@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { APP_NAME, roleLabels, type UserRole } from "@waypoint/domain";
+import { requireRole } from "@/lib/auth";
+import { signOut } from "@/app/sign-in/actions";
 import styles from "./workspace-shell.module.css";
 
 const navigation: Record<UserRole, readonly string[]> = {
@@ -18,7 +20,8 @@ function hrefFor(role: UserRole, item: string) {
   return `/workspace/${role}`;
 }
 
-export function WorkspaceShell({ role, active, children }: Readonly<{ role: UserRole; active: string; children: React.ReactNode }>) {
+export async function WorkspaceShell({ role, active, children }: Readonly<{ role: UserRole; active: string; children: React.ReactNode }>) {
+  const session = await requireRole(role);
   const isDriver = role === "driver";
   return (
     <div className={isDriver ? styles.driverShell : styles.shell}>
@@ -28,9 +31,9 @@ export function WorkspaceShell({ role, active, children }: Readonly<{ role: User
           {navigation[role].map((item) => <Link className={item === active ? styles.active : ""} href={hrefFor(role, item)} key={item}>{item}</Link>)}
         </nav>
         <div className={styles.sidebarFooter}>
-          <strong>{roleLabels[role]}</strong>
+          <strong>{session.displayName}</strong>
           <span>{role === "store_manager" ? "OUT010 · Fresh" : role === "dispatcher" || role === "loader" ? "Peliyagoda depot" : "VEH012"}</span>
-          <Link href="/sign-in">Sign out</Link>
+          <form action={signOut}><button className={styles.signOut} type="submit">Sign out</button></form>
         </div>
       </aside>}
       <div className={styles.content}>
