@@ -1,0 +1,12 @@
+{
+  "name": "waypoint",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.11.0",
+  "scripts": {
+    "dev": "pnpm --filter @waypoint/web dev",
+    "build": "pnpm --filter @waypoint/web build",
+    "lint": "pnpm --filter @waypoint/web lint",
+    "test": "pnpm --filter @waypoint/web test"
+  }
+}

@@ -1,0 +1,27 @@
+:root {
+  --canvas: #f7f3ea;
+  --surface: #fffdf8;
+  --surface-muted: #f1eadc;
+  --ink: #202522;
+  --muted: #66706a;
+  --border: #e7dcc8;
+  --brand: #214e3b;
+  --brand-active: #2f6b52;
+  --success: #dce8de;
+  --warning: #f8ead0;
+  --warning-ink: #7a5210;
+  --critical: #f6ddd6;
+  --critical-ink: #9e3b2a;
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }

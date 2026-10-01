@@ -1,0 +1,30 @@
+.hero { min-height: 585px; padding: 24px clamp(24px, 8vw, 120px) 72px; color: #fffdf8; background: linear-gradient(120deg, #173b2d 0%, #214e3b 50%, #315f49 100%); }
+.nav { display: flex; align-items: center; gap: 10px; max-width: 1200px; margin: auto; }
+.logo { display: grid; width: 32px; height: 32px; place-items: center; border: 2px solid currentColor; border-radius: 50%; font-weight: 800; }
+.brand { font-weight: 700; }
+.navLinks { display: flex; align-items: center; gap: 24px; margin-left: auto; font-size: 14px; }
+.signIn, .primary { padding: 11px 18px; border-radius: 8px; color: var(--brand); background: #fffdf8; font-weight: 700; }
+.heroContent { max-width: 720px; margin: 120px auto 0; text-align: center; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .1em; }
+.hero h1 { margin: 12px 0 20px; font-size: clamp(42px, 5vw, 72px); line-height: 1.04; letter-spacing: -.05em; }
+.lede { max-width: 660px; margin: auto; font-size: 18px; line-height: 1.6; color: #e9f0eb; }
+.actions { display: flex; justify-content: center; gap: 12px; margin-top: 32px; }
+.secondary { padding: 10px 18px; border: 1px solid #a7c4b3; border-radius: 8px; }
+.section { max-width: 1200px; margin: auto; padding: 80px 24px; }
+.section > .eyebrow { color: var(--brand-active); }
+.section h2 { margin: 8px 0; font-size: clamp(30px, 4vw, 46px); letter-spacing: -.04em; }
+.sectionLead { max-width: 680px; color: var(--muted); line-height: 1.6; }
+.roleGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 32px; }
+.roleCard { min-height: 255px; padding: 24px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); transition: transform .15s ease, box-shadow .15s ease; }
+.roleCard:hover { transform: translateY(-3px); box-shadow: 0 12px 24px #214e3b1a; }
+.roleIcon { color: var(--brand-active); font-size: 24px; }
+.roleCard h3 { margin: 20px 0 10px; }
+.roleCard p { min-height: 72px; color: var(--muted); line-height: 1.5; }
+.device { color: var(--brand); font-size: 13px; font-weight: 700; }
+.steps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; padding: 0; list-style: none; }
+.steps li { padding: 20px 12px; border-top: 2px solid var(--brand-active); }
+.steps span { color: var(--brand-active); font-weight: 800; }
+.steps h3 { margin: 12px 0 8px; font-size: 15px; }
+.steps p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.45; }
+@media (max-width: 850px) { .roleGrid { grid-template-columns: repeat(2, 1fr); } .steps { grid-template-columns: repeat(2, 1fr); } .heroContent { margin-top: 80px; } }
+@media (max-width: 560px) { .hero { padding: 20px 20px 56px; } .navLinks a:not(.signIn) { display: none; } .roleGrid, .steps { grid-template-columns: 1fr; } .heroContent { margin-top: 64px; text-align: left; } .actions { justify-content: flex-start; } }
