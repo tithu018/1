@@ -3,9 +3,10 @@ import { config } from "dotenv";
 import { resolve } from "node:path";
 
 config({ path: resolve(import.meta.dirname, "../../../.env"), override: true });
+if (process.env.DATABASE_URL?.includes("@localhost:5432")) process.env.DATABASE_URL = process.env.DATABASE_URL.replace("@localhost:5432", "@127.0.0.1:5433");
 const { PrismaClient, Brand, Role, VehicleTemperature, VehicleType } = await import("@prisma/client");
 
-const prisma = new PrismaClient({ datasources: { db: { url: process.env.DATABASE_URL } } });
+const prisma = new PrismaClient({ datasources: { db: { url: process.env.DATABASE_URL.replace("@localhost:", "@127.0.0.1:") } } });
 const accounts = [
   { email: "store@waypoint.demo", displayName: "Store Manager", role: Role.STORE_MANAGER, outletId: "OUT010", password: "Store123!" },
   { email: "dispatcher@waypoint.demo", displayName: "Dispatcher", role: Role.DISPATCHER, depotId: "Peliyagoda", password: "Dispatch123!" },
