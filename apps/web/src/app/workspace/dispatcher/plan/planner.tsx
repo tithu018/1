@@ -3,6 +3,7 @@
 import { suggestAllocation, type AllocationOrder, type AllocationVehicle } from "@waypoint/allocation";
 import { useMemo, useState } from "react";
 import styles from "./planner.module.css";
+import { publishAssistedPlan } from "./actions";
 
 const vehicles: AllocationVehicle[] = [
   { id: "VEH005", depot: "Peliyagoda", type: "truck", temperature: "reefer", weightCapacityKg: 6840, volumeCapacityM3: 33.4 },
@@ -23,8 +24,17 @@ export function DispatcherPlan() {
   const [generated, setGenerated] = useState(false);
   const [published, setPublished] = useState(false);
   const [deferralReasonRecorded, setDeferralReasonRecorded] = useState(false);
+  const [publishError, setPublishError] = useState<string | null>(null);
   const result = useMemo(() => suggestAllocation(vehicles, orders), []);
   const hardFailures = result.deferred.length > 0 && !deferralReasonRecorded ? result.deferred.length : 0;
+
+  async function publish() {
+    setPublishError(null);
+    try {
+      await publishAssistedPlan(result.trips.map((trip) => ({ vehicleId: trip.vehicleId, orderIds: trip.orders.map((order) => order.id), brand: trip.orders[0].brand.toUpperCase() as "FRESH" | "STYLE" | "TECH", district: trip.orders[0].district })));
+      setPublished(true);
+    } catch (error) { setPublishError(error instanceof Error ? error.message : "The plan could not be published."); }
+  }
 
   return <section>
     <header className={styles.heading}><div><h1>Plan · Wed 25 Mar 2026</h1><p>{generated ? "Assisted plan generated · review, fix and approve before publishing" : "Peliyagoda · Queue closed at 16:00"}</p></div><span className={published ? styles.published : styles.draft}>{published ? "Published v1" : generated ? "Draft v1" : "Queue closed"}</span></header>
