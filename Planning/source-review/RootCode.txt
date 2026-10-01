@@ -1,0 +1,809 @@
+=== PAGE 1 ===
+System Requirements Specification (FR & NFR)
+
+Sep 29, 2026 · @Sanjeevan
+
+Introduction
+
+This specification merges the four separately-written role documents (Store Manager, Dispatcher,
+Loader, Driver) for Waypoint, the delivery-coordination system built for Tech-Triathlon 2026, into one
+consistent functional and non-functional requirements baseline.
+
+Waypoint coordinates deliveries from two depots (Peliyagoda, Kandy) to 120 outlets across three
+brands with very different rhythms: Fresh (80 outlets, near-daily chilled + dry goods, must arrive
+before 8 AM), Style (25 outlets, weekly, half inside mall access windows), and Tech (15 outlets,
+as-needed, high-value/fragile single items). A fleet of 60 vehicles runs up to two trips a day.
+
+The challenge booklet names four problems the system must fix: planning is fragmented (orders
+arrive by phone or message and are re-entered by hand); deferrals lack a clear record (the same
+outlet can go unserved on consecutive runs, unnoticed); communication doesn't support feedback
+(no reliable proof of delivery or issue record); and demand is difficult to anticipate. Every
+requirement below traces back to one of these problems, to an explicit operating constraint, or is
+flagged as a team-proposed addition that closes a gap the brief implies but never states.
+
+Four roles carry the workflow from order to resolution: the Store Manager places orders and
+confirms receipt, the Dispatcher turns the order queue into a feasible, constraint-respecting delivery
+plan, the Loader loads vehicles against that plan and flags shortfalls before departure, and the Driver
+executes the trip and records what actually happened. This document first sets out the requirements
+that cut across all four roles, then documents each role in turn, and closes with the additional
+features and shared data model that tie the roles together.
+
+System Actors
+
+Role                    Device / environment    Primary responsibility    Key constraint
+
+Store Manager           Outlet counter, desktop  Places orders, tracks      Zero-training retail
+                        or phone                    arrival, confirms            staff; account scoped to
+                                                       receipt, reports issues   one outlet_id
+
+Dispatcher              Planning office           Closes the order queue,  Every decision must be
+                         (Peliyagoda/Kandy),      allocates 60 vehicles      explainable, auditable
+                       desktop                 across 120 outlets,      and consistent
+                                                   defers over-capacity      regardless of who is on
+                                                 orders with a reason,      shift
+                                                  publishes and monitors
+                                               the plan, forecasts
+                                                   future capacity
+
+Loader                Depot dock, shared      Loads vehicles against    Shared device, no
+                          tablet/terminal          the published stop       personal login; must
+                                              sequence, flags
+
+=== PAGE 2 ===
+Role                    Device / environment    Primary responsibility    Key constraint
+
+                                            missing/damaged       work fast, one-handed,
+                                               items before departure   under time pressure
+
+Driver              On the road, personal    Executes the assigned     Safety-first minimal
+                    phone                        trip, records delivery      interaction while
+                                         outcome and proof,      moving; must degrade
+                                                  reports issues, works     gracefully offline
+                                              through connectivity
+                                              gaps
+
+The four roles share one workflow: an order placed by a Store Manager is allocated and published by
+the Dispatcher, loaded and flagged by the Loader, delivered and recorded by the Driver, and finally
+confirmed (or disputed) by the Store Manager — closing the loop back to the Dispatcher.
+
+Overall Functional Requirements (System-Wide)
+
+These requirements are not owned by a single role — they hold the four role-specific portals
+together as one consistent system.
+
+ID                            Requirement                   Spans
+
+OFR1                                   All confirmed orders arrive in      Store → Dispatcher
+                           one Dispatcher queue,
+                                  eliminating phone/message
+                                  re-entry into a spreadsheet.
+
+OFR2                     One shared status vocabulary is    All roles
+                             used everywhere: Submitted →
+                               Confirmed/Received →
+                                  Allocated → Loaded → Out for
+                                delivery/Departed → Delivered,
+                                or Deferred, plus an issue-case
+                                       lifecycle (Reported →
+                             Acknowledged → Under review
+              → Resolved).
+
+OFR3                         Each role gets one adaptive         All roles
+                                     portal, not brand-forked apps:
+                                 Fresh/Style/Tech differences are
+                                  conditional content driven by
+                                  outlet.brand and
+                                  vehicle.temperature, never
+                                separate applications.
+
+OFR4                         Order confirmations, deferral     Store ↔ Dispatcher ↔ Loader
+                                  notices with reason,      ↔ Driver
+                                   arrival-time/ETA changes, loader
+                                      shortfall flags, delivery
+                            outcomes and issue updates are
+
+=== PAGE 3 ===
+ID                            Requirement                   Spans
+
+                            pushed automatically between
+                                    roles (in-app plus SMS/push for
+                                      time-critical items), never left to
+                              a phone call.
+
+OFR5                           Every complaint becomes a        Store, Loader, Driver, Dispatcher
+                                 tracked issue case with
+                                 evidence, a responsible stage
+                            and a fair, auditable outcome. A
+                               three-way count comparison
+                                 (loader-confirmed × driver
+                                   proof-of-delivery × store
+                                 received-count) locates which
+                                 stage a shortfall happened at, so
+                                 only verified, stage-attributed
+                                 cases affect that stage's
+                              performance record (for
+                               example, only a verified
+                                    driver-attributed case affects a
+                                      driver's score).
+
+OFR6                           Deferred orders carry a           Dispatcher → Store
+                             mandatory reason code, are
+                                 flagged automatically when an
+                                   outlet is skipped on consecutive
+                                   runs, and roll over to the next
+                                   run's queue with priority
+                                 preserved.
+
+OFR7                           Calendar data (festival, payday,    Store, Dispatcher
+                            monsoon, holiday flags) is
+                               shared across the ordering
+                                  screen, the demand forecast
+                            and the capacity plan, so all
+                                three reflect the same
+                               known-future demand shifts.
+
+OFR8                              Outlet, vehicle, order and route    All roles
+                                      identifiers match one shared
+                              master dataset exactly, with no
+                                  reformatting, across all four role
+                                  views.
+
+OFR9                           Every order, allocation, deferral,    All roles
+                                load confirmation, delivery and
+                                   issue action is timestamped and
+                               recorded as part of one audit
+                                            trail spanning all roles,
+
+=== PAGE 4 ===
+ID                            Requirement                   Spans
+
+                                supporting dispute resolution
+                           end to end.
+
+
+Overall Non-Functional Requirements (System-Wide)
+
+Category                                     Requirement
+
+Consistency                                       Status labels, colour tokens, icons and
+                                               terminology ("Deferred", "Confirmed",
+                                                     "Allocated", "Loaded") are identical across all four
+                                                      role interfaces; the same event looks the same
+                                            everywhere it appears.
+
+Accessibility                                        Text contrast meets WCAG AA (≥ 4.5:1). Every
+                                                     status or category is conveyed by colour and icon
+                                         and text label together — never colour alone.
+
+Localization                                 The system supports Sinhala, Tamil and English,
+                                                    selectable per account; all times use
+                                             Asia/Colombo and the 24-hour clock; dates
+                                                     display as "Wed 30 Sep".
+
+Auditability                                      Every plan change, order, allocation, load
+                                                  confirmation, delivery, deferral and issue action is
+                                           timestamped and immutable — corrections are
+                                          added as new entries, never edited in place.
+
+Role-scoped security                           Each account or shared device sees only its own
+                                                       outlet, depot or assigned data; a Store Manager
+                                              never sees other outlets or fleet data, a Loader
+                                              never sees Dispatcher planning controls or the
+                                                other depot, a Dispatcher is depot-scoped unless
+                                               granted cross-depot access.
+
+Resilience, tiered by role                             Driver: full offline operation for core delivery
+                                               work, with sync and conflict-flagging on reconnect
+                                                    (highest need — en route with a personal phone).
+                                                  Store Manager: drafts kept on-device in
+                                                   low-connectivity districts. Loader: brief dock
+                                            network drops must not lose in-progress checklist
+                                                         state. Dispatcher: all plan state is server-persisted
+                                              so a browser crash or refresh loses nothing.
+
+No silent failure                                  Every submission — an order, a load
+                                                  confirmation, an issue report, a delivery record —
+                                            ends in a clear success state with an ID, or a clear,
+                                                    retryable failure state. Nothing is ever silently
+                                              accepted or silently lost.
+
+=== PAGE 5 ===
+Category                                     Requirement
+
+Context-matched usability                         Store Manager: plain language, zero training,
+                                            desktop/phone parity. Loader: large touch
+                                                        targets, minimal typing, high contrast for a shared
+                                                      tablet in a noisy, variably-lit warehouse. Driver: a
+                                                minimal, glanceable "Drive Mode" with detailed
+                                                     interaction available only after the vehicle has
+                                                       safely stopped. Dispatcher: a dense,
+                                               keyboard-operable desktop planning view with
+                                                   shortcuts for high-frequency actions.
+
+Performance                                The assisted-allocation engine produces a full
+                                                    day's plan (up to 200 orders, 60 vehicles) within
+                                          30 seconds; the live board reflects a
+                                                  driver-recorded event within 10 seconds; UI
+                                                       transitions and filters complete within 1 second.
+
+Scalability & maintainability                    The allocation engine sits behind a replaceable
+                                                      internal API; deferral priority rules are stored as
+                                                   editable configuration, not hard-coded logic; the
+                                             system supports adding a third depot without
+                                                      structural changes.
+
+
+Store Manager
+
+Works at the outlet counter on a desktop or phone; one account is tied to one outlet_id, which
+carries one brand (Fresh, Style or Tech). The portal is brand-aware, not brand-forked: six main pages
+(Dashboard, Place/Manage Order, Order Status, Receive, History & Issues, Settings) plus a
+Notifications panel adapt their content to the outlet's brand.
+
+Functional requirements
+
+ID                            Requirement                        Priority
+
+FR1                              Place an order before the 4 PM   Must
+                                     cutoff; the form adapts to brand
+                                    (Fresh: dry + chilled tabs; Style:
+                           one weekly order; Tech:
+                                   single-item form with
+                                      value/fragility notes).
+
+FR2                              Cutoff countdown shown        Must
+                                     persistently; after 16:00 a new
+                                order is clearly labelled for the
+                                next run.
+
+FR3                          Immediate order confirmation    Must
+                               with ID and timestamp; status
+                              then progresses Submitted →
+                               Received → Allocated → Out
+
+=== PAGE 6 ===
+ID                            Requirement                        Priority
+
+                                     for delivery →
+                                 Delivered/Deferred.
+
+FR4                          See the planned arrival time and  Must
+                                   delivery window once the
+                                 Dispatcher publishes the plan.
+
+FR5                              Proactive deferral notice with    Must
+                                 plain-language reason and new
+                                   delivery date; a consecutive-skip
+                              warning if the outlet was also
+                                deferred last run.
+
+FR6                           Confirm receipt: received in full   Must
+                                     / received short or damaged /
+                                   (Tech) accept with reservation
+                              pending inspection.
+
+FR7                            Report an issue: affected lines,   Must
+                                   issue type, quantity, optional
+                               note/photo; creates a tracked
+                                   issue case.
+
+FR8                          See the outlet's order and       Must
+                                   delivery history, with
+                                consecutive deferrals
+                                    highlighted.
+
+FR9                                Edit or cancel a submitted order   Should
+                                       until the 16:00 cutoff.
+
+FR10                          Report a store closure or access   Should
+                             change (mall event, roadworks,
+                              bay closed).
+
+FR11                         See a plain-language live         Should
+                                   delivery status once the vehicle
+                                  departs.
+
+FR12                         See the resolution outcome of    Must
+                              any reported issue
+                                (replacement, credit, or not
+                              upheld with a reason); confirm
+                                or reopen once.
+
+FR13                         See an expected-shortfall flag     Should
+                                before the truck arrives, if the
+                              Loader flagged a
+
+=== PAGE 7 ===
+ID                            Requirement                        Priority
+
+                             missing/damaged item at
+                                 departure.
+
+FR14                      One notifications centre for      Must
+                                every message to the store,
+                             each acknowledgeable.
+
+Non-functional requirements
+
+ID                                           Requirement
+
+NFR1                                               Zero-training usability: plain language, no fleet
+                                                     jargon, one short form per action.
+
+NFR2                                        Desktop and phone parity — both must work
+                                                   equally well.
+
+NFR3                                              Proactive notification (in-app plus SMS/push) for
+                                                        deferrals, arrival-time changes and expected
+                                                           shortfalls.
+
+NFR4                                 No silent submission failure, especially near the
+                                              16:00 cutoff.
+
+NFR5                                           Every status shown with colour, icon and text
+                                                   together; contrast ≥ 4.5:1.
+
+NFR6                                              Status names, colours and icons match the
+                                                    Dispatcher, Loader and Driver faces exactly.
+
+NFR7                                           Every order, edit, receipt confirmation and issue
+                                                  report is timestamped and cannot be altered
+                                                       after submission.
+
+NFR8                                           Outlet-scoped access only — never other outlets,
+                                                    vehicle capacity or dispatcher tools.
+
+NFR9                                        Brand differences are conditional content on
+                                                    outlet.brand, not separate applications.
+
+NFR10                                                 Arrival times shown as planned time plus window,
+                                              never false precision.
+
+NFR11                                                 Resilient to weak rural/hill-country connectivity
+                        — drafts kept on-device until reconnected.
+
+NFR12                                               Sinhala, Tamil and English; Asia/Colombo, 24-hour
+                                                       clock.
+
+Degradation is designed for explicitly: an Order Deferred screen (the direct fix for "no clear notice
+when an order is deferred") and a submission-fails-near-cutoff flow that saves the draft, retries
+automatically, and never reports a false success.
+
+=== PAGE 8 ===
+Dispatcher
+
+Works from a large desktop screen at the Peliyagoda or Kandy planning office. The operational
+backbone of the daily cycle: closes the order queue, builds a constraint-respecting delivery plan for
+60 vehicles and 120 outlets, decides and justifies every deferral, publishes to loaders/drivers/stores,
+monitors live progress, and plans future fleet capacity. This is the largest role by requirement count
+— 105 functional and 23 non-functional requirements (80 Must-have) — grouped into 16 functional
+areas below.
+
+Functional requirement areas
+
+Area                           Covers                        Must-have highlights
+
+App frame & navigation           Persistent Plan / Live Board /     Only operating days (Mon–Sat)
+                                   Deferral Log / Capacity Forecast   selectable
+                                   navigation; depot and date
+                                  context; operating-day calendar
+
+Order intake & queue              Collecting all confirmed orders    Cutoff enforced; late orders
+                                    into one queue, enforcing the 4   auto-routed to the next run;
+                     PM cutoff                        unusual-quantity flags
+
+Planning & allocation             Assigning every in-scope order    Assisted planning (system
+                                 to one vehicle and trip            suggests, dispatcher approves)
+                                                                                           is the required default; manual
+                                                                   overrides re-check constraints
+                                                                          instantly
+
+Constraint enforcement          Weight, volume, temperature,     Publishing is blocked while any
+                                 van-only outlets, mall windows,   hard constraint is violated
+                                   delivery windows, fuel quota,
+                                  depot/brand/district matching,
+                               whole-order integrity
+
+Capacity shortfall & deferrals      Identifying orders that don't fit,  No order may be deferred
+                                   requiring a reason for every       without a recorded reason;
+                                     deferral, protecting against        consecutive-skip protection is
+                                consecutive skips              mandatory
+
+Publish & hand-off               Pushing the finished plan to       Publishing is blocked on
+                                   loaders, drivers and stores;       unresolved hard-constraint
+                                   re-publishing on change            violations; every
+                                                                     publish/re-publish is versioned
+
+Live board                       Real-time progress per route,      Reflects driver-recorded
+                                sync status, planned-vs-actual    outcomes immediately; legend
+                                 timing                         never colour-only
+
+Issues & alerts              A single "needs attention" feed     Critical alerts (breakdown,
+                                     for every operational exception    vehicle loss) are visually distinct
+                                                        and resolved with a mandatory
+                                                             note
+
+=== PAGE 9 ===
+Area                           Covers                        Must-have highlights
+
+Communication               Automated ETA, deferral and       All messages sent and logged
+                                      shortfall notices to                in-system, replacing verbal
+                                   loaders/drivers/stores             instructions
+
+Deferral log & outlet history     A searchable, exportable record   Consecutive-deferral outlets
+                                  of every deferral and its           highlighted automatically
+                           outcome
+
+Capacity forecast               Weekly demand vs. available       Shortfall weeks and
+                                      fleet by depot and brand, with   recommended extra vehicles are
+                                calendar markers                 surfaced
+
+Reference data management      Outlets, vehicles, operating         All 120 outlets and 60 vehicles
+                                   calendar, vehicle workshop         visible with their governing
+                                   status                              attributes
+
+Offline records (dispatcher side)   Merging driver-side offline         Conflicting server/offline state is
+                                 records safely on reconnect       surfaced, never silently
+                                                                 overwritten
+
+Audit, records & disputes           Full audit trail;                   Audit trail is immutable
+                                 loader–driver–store count
+                              comparison for delivered orders
+
+Shift continuity                Handover notes,        — (Should-have)
+                                  multi-dispatcher trip locking
+
+Degradation scenarios           Peak-day overload, vehicle        Peak-day overload flow (priority
+                              breakdown, workshop loss,        rules, swap suggestions, bulk
+                                   flooding, extended offline, office  defer) is required
+                           power loss
+
+Non-functional requirements
+
+Category                                     Requirement
+
+Performance                                        Full-day plan for 200 orders/60 vehicles within
+                                                   30s; manual-override constraint re-check within
+                                                       3s; live board refresh within 10s; UI transitions
+                                                  within 1s; forecast charts load within 5s.
+
+Reliability & data integrity                               All plan state server-persisted on every save;
+                                                         offline merges use device timestamps and flag
+                                                          conflicts; the audit trail is immutable;
+                                                     proof-of-delivery assets retained ≥ 90 days.
+
+Usability & accessibility                              Desktop-first, data-dense, no horizontal scrolling;
+                                 WCAG AA contrast; status never colour-only;
+                                                every control keyboard-operable with shortcuts
+                                                       for high-frequency actions; every automated
+
+=== PAGE 10 ===
+Category                                     Requirement
+
+                                                   decision explained in one plain-language line;
+                                                           explicit empty/loading states.
+
+Consistency & terminology                         Status labels, colours, icons and identifiers
+                                                       identical across all four roles and matching the
+                                              shared datasets exactly.
+
+Security & access                               Only authenticated Dispatcher accounts may
+                                                     plan, publish, defer or change vehicle status;
+                                              depot-scoped by default; sessions time out on
+                                                            inactivity.
+
+Internationalisation                                  Sinhala, Tamil, English; recipient-preferred
+                                              language on outgoing messages.
+
+Scalability & maintainability                         Allocation engine replaceable behind an internal
+                                                     API; deferral priority rules are editable
+                                                     configuration; a third depot can be added without
+                                                      structural change.
+
+
+Driver
+
+On the road with a personal phone; connectivity may drop, especially in hill country and the Kandy
+corridor. Executes the dispatcher's assigned trip, follows the planned stop sequence, records each
+delivery outcome with proof, and reports issues — feeding real events back into the system.
+
+Functional requirements
+
+ID                            Requirement                        Priority
+
+DR01                        View the assigned trip and its    Must
+                                    stops.
+
+DR02                               Start the selected trip (an       Must
+                                       explicit state change into
+                                      "active").
+
+DR03                     A minimal "Drive Mode" view    Must
+                                while travelling — next stop,
+                                 ETA, window — kept
+                                   deliberately glanceable.
+
+DR04                      Show next stop, planned        Must
+                                   arrival/ETA and delivery
+                             window.
+
+DR05                          Record each delivery stop's      Must
+                             outcome.
+
+=== PAGE 11 ===
+ID                            Requirement                        Priority
+
+DR06                          Capture proof of delivery        Must
+                                 (photo, signature or recipient
+                              name).
+
+DR07                          Report delivery issues (missing,   Must
+                            damaged, wrong item, late,
+                                    other).
+
+DR08                         Operate offline for core delivery  Must
+                            work when connectivity drops.
+
+DR09                           Synchronize offline records      Must
+                                  automatically when connectivity
+                                   returns, flagging any conflict
+                               with the server state.
+
+DR10                      Show sync status and allow retry  Should
+                                  of a failed synchronization.
+
+DR11                         Pause and resume an active trip   Should
+                                     for a legitimate temporary stop,
+                               without ending it.
+
+DR12                           Receive dispatch updates         Should
+                                  (route/stop changes),
+                                reviewable once safely stopped
+                                  rather than mid-drive.
+
+DR13                      Show completed-stop /          Should
+                                remaining-stop progress for the
+                                  run.
+
+DR14                       End the trip and show its final    Should
+                                     status.
+
+Non-functional requirements
+
+Category                                     Requirement
+
+Usability                                          Simple, low-step interaction; key information
+                                          must be understandable at a glance.
+
+Safety                                            Detailed delivery actions are only available after
+                                               the Driver indicates they have safely stopped —
+                                                  Drive Mode stays minimal while moving.
+
+Performance                                 Opening the current stop and recording an
+                                         outcome must be fast.
+
+Reliability                                            Offline delivery records and proof must never be
+                                                          lost when connectivity drops.
+
+=== PAGE 12 ===
+Category                                     Requirement
+
+Offline availability                              Core delivery execution must keep working with
+                                        no connection at all — the highest offline priority
+                                                   of any role.
+
+Data integrity                                Outcome, proof, issue and timestamp stay linked
+                                                  to the correct delivery.
+
+Security / access                             The Driver sees only their own trip, delivery and
+                                              account information.
+
+Responsive design                                   Phone-first; next stop, ETA/window, status and
+                                                sync state are highly visible on a small screen.
+
+Consistency                                       Status terms and delivery states match the
+                                                    Dispatcher, Loader and Store Manager faces
+                                                         exactly.
+
+The design principle carried through every screen is Drive → Stop → Interact → Drive:
+safety-relevant interaction only happens once the vehicle is stopped. The one required degradation
+scenario is connectivity loss during an active trip — the Driver keeps working from cached trip data,
+records outcomes locally, and syncs automatically on reconnection, with failed records left retryable
+rather than lost.
+
+Loader
+
+Works at the Peliyagoda or Kandy warehouse dock on a shared tablet or terminal — no personal
+login. Loads vehicles against the Dispatcher's published stop sequence and flags missing or damaged
+items before a vehicle leaves, the first problem-report in the pipeline. Role begins once goods are
+already staged at the depot; inbound receiving is out of scope.
+
+Functional requirements
+
+ID                            Requirement                        Priority
+
+FR1                         View all trips assigned to the     Must
+                             depot for the day; Fresh (pre-8
+                         AM) trips are visually distinct
+                             from more flexible Style/Tech
+                                         trips.
+
+FR2                         View the planned stop sequence  Must
+                               per trip — generally the reverse
+                                  of delivery order, for
+                                        last-in/first-out unloading.
+
+FR3                         View order details per stop:      Must
+                                     outlet, brand, weight/volume,
+                              temperature requirement, dock
+                                  type.
+
+=== PAGE 13 ===
+ID                            Requirement                        Priority
+
+FR4                           Confirm individual orders/items  Must
+                                 as physically loaded (checklist).
+
+FR5                               Flag missing or damaged items   Must
+                               with a type, optional
+                                note/photo, reaching the
+                                 Dispatcher in near real time.
+
+FR6                             Receive live plan updates — the  Must
+                                    direct fix for outdated printed
+                                 loading lists.
+
+FR7                           Confirm a trip fully loaded, the   Must
+                                 hand-off that makes it visible to
+                               the Driver.
+
+FR8                          Complete a trip's load even with  Must
+                          some items flagged
+                             missing/damaged — a
+                            documented shortfall, never a
+                              hard block.
+
+FR9                               Distinguish Trip 1 from Trip 2 for   Could
+                              a vehicle running twice in a day.
+
+FR10                          Un-check a mis-tapped item or   Must
+                              withdraw a flag any time before
+                               the trip is confirmed loaded.
+
+FR11                                   Filter and sort the trip queue by  Must
+                                 urgency, vehicle or loading
+                                     status.
+
+FR12                               Alert the Loader if the          Must
+                                 Dispatcher reassigns or modifies
+                              a trip after it was already
+                               confirmed loaded, so it can be
+                             reopened and re-verified.
+
+Non-functional requirements
+
+ID                                           Requirement
+
+NFR1                                          Usable on a shared device — no persistent
+                                                 personal login, large touch targets, minimal
+                                                     typing.
+
+NFR2                                      Speed / low friction — every action completable
+                                                        in a few taps, especially before Fresh's 8 AM
+                                                  departures.
+
+=== PAGE 14 ===
+ID                                           Requirement
+
+NFR3                                            Real-time / near-real-time data sync, so the
+                                              Loader is never working from a stale plan.
+
+NFR4                                               Legible in a noisy, variably-lit warehouse: high
+                                                      contrast, large text, clear icons over dense tables.
+
+NFR5                                      The flag mechanism is highly reliable, with no
+                                                          silent failures and clear on-screen confirmation.
+
+NFR6                                           Every load confirmation, flag and correction is
+                                           timestamped and recorded.
+
+NFR7                                                  Resilient to brief interruption — in-progress
+                                                       checklist state survives a locked tablet or a shift
+                                               change.
+
+NFR8                                           Shares visual language (colours, icons, status)
+                                               with the Dispatcher and Driver faces — judged
+                                            under cross-role coherence.
+
+NFR9                                                Tablet/mobile-first layout — vertical,
+                                               thumb-reachable, no wide desktop-style tables.
+
+NFR10                                              Tolerates brief connectivity hiccups at the dock
+                                               without losing checklist state (lower priority than
+                                               the Driver's full offline need).
+
+NFR11                                           Role-scoped: the shared terminal exposes only its
+                                    own depot's trips, never Dispatcher controls or
+                                               the other depot.
+
+NFR12                                          Every status conveyed by icon or text label as well
+                                                 as colour.
+
+
+Additional Features (Cross-Role, Beyond the Explicit Brief)
+
+Each role document proposed features that go beyond what the challenge booklet states outright,
+but close a gap the booklet implies. Kept here together because none belongs to one role alone —
+each feeds at least one other role.
+
+Feature                          Closes                         Feeds
+
+Issue case & fair-attribution       "Disputes depend on memory";   Store, Loader, Driver, Dispatcher
+accountability                     unfair blame between stages   — the central cross-role
+                                                       mechanism
+
+Missing-order reminder        A busy Store Manager missing     Dispatcher (fewer missing
+                               the 4 PM cutoff by accident       orders, fewer urgent exceptions)
+
+=== PAGE 15 ===
+Feature                          Closes                         Feeds
+
+Calendar-aware order guidance   "Demand is difficult to            Dispatcher (earlier, more
+                                    anticipate", addressed at the       realistic ordering ahead of
+                                 point orders are placed           peaks)
+
+Delivery feedback for driver     A trustworthy signal into driver    Driver points system, Dispatcher
+service quality                    scoring from the receiving end     service reports
+
+Outlet knowledge contribution    Operational knowledge living      Driver stop details, Dispatcher
+(gate codes, unloading notes)     only in one dispatcher's head      outlet knowledge cards
+
+Receiving hours &                 Deliveries planned for times no    Dispatcher plan validity
+delivery-window management    one is there to receive them
+
+Critical-need signal (lowest      An urgent single-item need, e.g.   Dispatcher priority rules only —
+priority, may be cut)             "out of infant formula"           never a binding allocation
+
+Swap suggestions &            Manual deferral decisions made   Dispatcher deferral workflow
+knock-on-effect preview          without seeing the consequence
+
+Predicted service time / lateness  Planning against a fixed time      Dispatcher trip planning, Live
+per stop                          instead of a realistic one         Board
+
+Brand service-share fairness     One brand being quietly          Dispatcher capacity decisions
+summary                          deprioritised every day
+
+Capacity what-if tool               Fleet-hiring decisions made       Dispatcher capacity forecast
+                               without a testable scenario
+
+Partial loads with documented   A trip blocked entirely by one     Loader, Driver, Store
+shortfall                         missing item                      (expected-shortfall flag)
+
+Post-confirmation change alert   A race condition between         Loader, Dispatcher
+                              Loader hand-off and a late
+                                 Dispatcher edit
+
+Pause / resume an active trip    A driver's legitimate short stop    Driver
+                               ending the whole trip record
+
+
+Shared Data Entities
+
+All four roles read and write the same underlying records: Outlet (brand, district, depot, dock type,
+mall/delivery window), Vehicle (type, temperature capability, weight/volume limits, fuel quota,
+depot), Order/Delivery (outlet, brand, type, temperature requirement, units/weight/volume, status
+history), Trip/Route (vehicle, stop sequence, planned times), Delivery Outcome and Proof of
+Delivery (photo, signature, receiver name, timestamp), Issue Case (lifecycle, attributed stage,
+evidence, outcome), and Sync Record (for offline reconciliation). Keeping one definition of each
+entity, referenced identically by every role's screens, is what makes the four separate documents
+behave as a single consistent system rather than four separate apps that happen to share a name.
+
+=== PAGE 16 ===
+End-to-End Flow
+Store places an order → Dispatcher allocates it to a vehicle and trip and publishes the plan (or defers
+it, with a reason, back to the Store) → Loader loads the vehicle against the published sequence and
+flags any shortfall → Driver executes the trip and records the delivery outcome with proof → Store
+confirms receipt or reports an issue → any issue is resolved through the fair-attribution process,
+feeding outlet service-health metrics and driver scoring back into the Dispatcher's view. This loop,
+and the requirement that every step in it is visible to the roles it affects, is the throughline connecting
+all four documents.
