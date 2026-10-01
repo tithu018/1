@@ -41,7 +41,7 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
         </div>
       </section>
       <section className={styles.formArea}>
-        <form className={styles.form} action="#">
+        <form className={styles.form} action={`/workspace/${role}`} method="get">
           <Link href="/sign-in" className={styles.back}>← Choose a different role</Link>
           <h2>Sign in</h2>
           <p>to the {roleLabels[role]} workspace</p>
