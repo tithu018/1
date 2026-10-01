@@ -10,6 +10,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@waypoint/allocation':
+        specifier: workspace:*
+        version: link:../../packages/allocation
       '@waypoint/domain':
         specifier: workspace:*
         version: link:../../packages/domain
@@ -47,6 +50,8 @@ importers:
       vitest:
         specifier: 4.0.15
         version: 4.0.15(@types/node@24.10.1)(jiti@2.7.0)
+
+  packages/allocation: {}
 
   packages/database:
     dependencies:
