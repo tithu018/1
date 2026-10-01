@@ -98,3 +98,23 @@ export const demoOrders: DeliveryOrder[] = [
     expectedShortfall: "2 units flagged short before departure"
   }
 ];
+
+export interface CatalogProduct {
+  code: string;
+  name: string;
+  category: "Dry" | "Chilled";
+  pack: string;
+  unitWeightKg: number;
+  unitVolumeM3: number;
+}
+
+export const freshCatalog: CatalogProduct[] = [
+  { code: "FR-D01", name: "Basmati rice", category: "Dry", pack: "4 × 5 kg bag", unitWeightKg: 20.4, unitVolumeM3: 0.042 },
+  { code: "FR-D02", name: "Red lentils (dhal)", category: "Dry", pack: "10 × 1 kg pack", unitWeightKg: 10.3, unitVolumeM3: 0.014 },
+  { code: "FR-D03", name: "White sugar", category: "Dry", pack: "10 × 1 kg pack", unitWeightKg: 10.2, unitVolumeM3: 0.013 },
+  { code: "FR-D04", name: "Wheat flour", category: "Dry", pack: "10 × 1 kg pack", unitWeightKg: 10.3, unitVolumeM3: 0.017 },
+  { code: "FR-D07", name: "Instant noodles", category: "Dry", pack: "12 × 5-pack", unitWeightKg: 4.2, unitVolumeM3: 0.046 },
+  { code: "FR-D08", name: "Cream crackers", category: "Dry", pack: "12 × 490 g pack", unitWeightKg: 6.4, unitVolumeM3: 0.048 },
+  { code: "FR-C01", name: "Fresh milk", category: "Chilled", pack: "12 × 1 L carton", unitWeightKg: 12.8, unitVolumeM3: 0.018 },
+  { code: "FR-C02", name: "Set yoghurt", category: "Chilled", pack: "48 × 80 g cup", unitWeightKg: 4.6, unitVolumeM3: 0.014 }
+];

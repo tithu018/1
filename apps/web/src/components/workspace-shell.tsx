@@ -9,6 +9,11 @@ const navigation: Record<UserRole, readonly string[]> = {
   driver: ["Today", "Active trip", "Sync"]
 };
 
+function hrefFor(role: UserRole, item: string) {
+  if (role === "store_manager" && item === "Place order") return "/workspace/store_manager/orders";
+  return `/workspace/${role}`;
+}
+
 export function WorkspaceShell({ role, active, children }: Readonly<{ role: UserRole; active: string; children: React.ReactNode }>) {
   const isDriver = role === "driver";
   return (
@@ -16,7 +21,7 @@ export function WorkspaceShell({ role, active, children }: Readonly<{ role: User
       {!isDriver && <aside className={styles.sidebar}>
         <Link href="/" className={styles.logo}><span>W</span>{APP_NAME}</Link>
         <nav aria-label={`${roleLabels[role]} navigation`}>
-          {navigation[role].map((item) => <a className={item === active ? styles.active : ""} href="#" key={item}>{item}</a>)}
+          {navigation[role].map((item) => <Link className={item === active ? styles.active : ""} href={hrefFor(role, item)} key={item}>{item}</Link>)}
         </nav>
         <div className={styles.sidebarFooter}>
           <strong>{roleLabels[role]}</strong>
