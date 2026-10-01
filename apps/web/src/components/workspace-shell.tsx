@@ -11,6 +11,7 @@ const navigation: Record<UserRole, readonly string[]> = {
 
 function hrefFor(role: UserRole, item: string) {
   if (role === "store_manager" && item === "Place order") return "/workspace/store_manager/orders";
+  if (role === "dispatcher" && item === "Plan") return "/workspace/dispatcher/plan";
   return `/workspace/${role}`;
 }
 
