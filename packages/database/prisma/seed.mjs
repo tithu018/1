@@ -1,7 +1,11 @@
-import { PrismaClient, Brand, Role, VehicleTemperature, VehicleType } from "@prisma/client";
 import { hash } from "bcryptjs";
+import { config } from "dotenv";
+import { resolve } from "node:path";
 
-const prisma = new PrismaClient();
+config({ path: resolve(import.meta.dirname, "../../../.env"), override: true });
+const { PrismaClient, Brand, Role, VehicleTemperature, VehicleType } = await import("@prisma/client");
+
+const prisma = new PrismaClient({ datasources: { db: { url: process.env.DATABASE_URL } } });
 const accounts = [
   { email: "store@waypoint.demo", displayName: "Store Manager", role: Role.STORE_MANAGER, outletId: "OUT010", password: "Store123!" },
   { email: "dispatcher@waypoint.demo", displayName: "Dispatcher", role: Role.DISPATCHER, depotId: "Peliyagoda", password: "Dispatch123!" },

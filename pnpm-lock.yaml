@@ -73,6 +73,9 @@ importers:
       bcryptjs:
         specifier: 3.0.3
         version: 3.0.3
+      dotenv:
+        specifier: 16.6.1
+        version: 16.6.1
     devDependencies:
       prisma:
         specifier: 6.19.0
