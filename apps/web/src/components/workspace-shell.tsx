@@ -13,6 +13,7 @@ function hrefFor(role: UserRole, item: string) {
   if (role === "store_manager" && item === "Place order") return "/workspace/store_manager/orders";
   if (role === "dispatcher" && item === "Plan") return "/workspace/dispatcher/plan";
   if (role === "loader" && item === "Active load") return "/workspace/loader/load";
+  if (role === "driver" && item === "Active trip") return "/workspace/driver/trip";
   return `/workspace/${role}`;
 }
 
