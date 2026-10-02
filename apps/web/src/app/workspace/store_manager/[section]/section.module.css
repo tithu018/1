@@ -1,44 +1,45 @@
-.page {
-  width: min(100%, 810px);
-}
-
-.page h1 {
-  margin: 0;
-  color: #215742;
-  font-size: 26px;
-  line-height: 1.08;
-}
-
-.page p {
-  margin: 8px 0 18px;
-  color: #68746d;
-  font-size: 12px;
-}
-
-.card {
-  padding: 18px;
-  border: 1px solid #e6dac6;
-  border-radius: 11px;
-  background: #fffdf9;
-  box-shadow: 0 12px 24px #29201012;
-}
-
-.card article {
-  display: grid;
-  gap: 5px;
-  padding: 14px 0;
-  border-bottom: 1px solid #e6dac6;
-  font-size: 12px;
-}
-
-.card article:last-child {
-  border-bottom: 0;
-}
-
-.card strong {
-  color: #202522;
-}
-
-.card span {
-  color: #68746d;
-}
+.page { width: min(100%, 1080px); }
+.heading { margin-bottom: 24px; }
+.heading h1 { margin: 0; color: #215742; font-size: 34px; line-height: 1.12; letter-spacing: -.035em; }
+.heading p { margin: 8px 0 0; color: #68746d; font-size: 15px; }
+.card { margin-bottom: 24px; padding: 24px; border: 1px solid #e6dac6; border-radius: 16px; background: #fffdf9; box-shadow: 0 12px 28px #2920100c; }
+.card h2 { margin: 0 0 14px; color: #202522; font-size: 22px; }
+.cardTitle { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.cardTitle h2 { margin: 0; }
+.tableWrap { overflow-x: auto; border: 1px solid #ddceb7; border-radius: 12px; }
+.tableWrap table { width: 100%; border-collapse: collapse; color: #202522; font-size: 14px; }
+.tableWrap th { height: 39px; padding: 0 14px; background: #f1eadc; color: #68746d; font-size: 12px; font-weight: 700; text-align: left; white-space: nowrap; }
+.tableWrap td { height: 61px; padding: 0 14px; border-top: 1px solid #ddceb7; white-space: nowrap; }
+.tableWrap tbody tr:first-child td { border-top: 0; }
+.tableWrap td a { color: #226045; font-weight: 800; }
+.badge { display: inline-flex; min-height: 26px; align-items: center; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; white-space: nowrap; }
+.neutral { color: #202522; background: #e7ddca; }
+.warning { color: #8a5b10; background: #f8ead0; }
+.success { color: #226045; background: #dce8de; }
+.caption { margin: 18px 0 0; color: #68746d; font-size: 14px; line-height: 1.5; }
+.highlightRow td { background: #fbedce; }
+.notificationList { padding: 0; overflow: hidden; }
+.notificationList article { position: relative; display: grid; min-height: 94px; grid-template-columns: 40px 1fr auto; align-items: center; gap: 14px; padding: 18px 22px; border-top: 1px solid #e6dac6; }
+.notificationList article:first-child { border-top: 0; }
+.notificationList article.unread { background: #f6f2e8; }
+.notificationIcon { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 50%; color: #4f8b67; background: #dce8de; font-size: 11px; }
+.notificationList strong { color: #202522; font-size: 15px; }
+.notificationList p { margin: 5px 0; color: #68746d; font-size: 14px; }
+.notificationList small { color: #8b948e; font-size: 12px; }
+.notificationList i { width: 9px; height: 9px; border-radius: 50%; background: #9d3e2e; }
+.settingsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.definitionList { margin: 0; }
+.definitionList div { display: flex; min-height: 48px; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #e6dac6; font-size: 14px; }
+.definitionList dt { color: #68746d; }
+.definitionList dd { margin: 0; font-weight: 800; text-align: right; }
+.toggleRow { display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid #e6dac6; }
+.toggleRow span { display: grid; gap: 4px; }
+.toggleRow small { color: #68746d; font-size: 12px; }
+.toggleRow input { width: 42px; height: 22px; accent-color: #215742; }
+.accountRow { display: flex; align-items: center; gap: 14px; }
+.avatar { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; color: #215742; background: #dce8de; font-size: 13px; font-weight: 800; }
+.accountRow div { flex: 1; }
+.accountRow p { margin: 4px 0 0; color: #68746d; font-size: 13px; }
+.accountRow button { height: 40px; padding: 0 15px; border: 1px solid #ddceb7; border-radius: 8px; color: #215742; background: #fffdf9; font-weight: 800; }
+@media (max-width: 900px) { .settingsGrid { grid-template-columns: 1fr; gap: 0; } }
+@media (max-width: 640px) { .heading h1 { font-size: 30px; } .card { padding: 16px; border-radius: 12px; } .cardTitle, .accountRow { align-items: flex-start; flex-direction: column; } }
