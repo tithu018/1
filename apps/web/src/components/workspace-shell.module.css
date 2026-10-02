@@ -5,7 +5,7 @@
   background: var(--canvas);
 }
 
-.loaderShell {
+.novaShell {
   grid-template-columns: 210px 1fr;
   background: #f6f1e8;
 }
@@ -19,11 +19,22 @@
   background: var(--brand);
 }
 
-.loaderSidebar {
+.novaSidebar {
   position: relative;
   width: 210px;
   padding: 18px 12px 24px;
+}
+
+.loaderSidebar {
   background: #1f523f url("/Image/loader.webp") center 78% / 198px auto no-repeat;
+}
+
+.storeSidebar {
+  background: #1f523f url("/Image/store-manager.webp") center 70% / 198px auto no-repeat;
+}
+
+.dispatcherSidebar {
+  background: #1f523f url("/Image/dispatcher.webp") center 76% / 198px auto no-repeat;
 }
 
 .logo {
@@ -34,7 +45,7 @@
   font-weight: 700;
 }
 
-.loaderSidebar .logo {
+.novaSidebar .logo {
   width: max-content;
   height: 42px;
   margin: 0 0 27px;
@@ -51,12 +62,12 @@
   border-radius: 50%;
 }
 
-.loaderSidebar .logo img {
+.novaSidebar .logo img {
   width: 47px;
   height: auto;
 }
 
-.loaderSidebar .logo .logoText {
+.novaSidebar .logo .logoText {
   display: inline;
   width: auto;
   height: auto;
@@ -84,7 +95,7 @@
   line-height: 1;
 }
 
-.loaderSidebar nav a {
+.novaSidebar nav a {
   min-height: 32px;
   padding: 9px 12px;
   border-radius: 7px;
@@ -104,6 +115,14 @@
   width: 13px;
   height: 13px;
   flex: 0 0 13px;
+}
+
+.navDot {
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
+  border: 1.5px solid currentColor;
+  border-radius: 3px;
 }
 
 .clipboard {
@@ -146,7 +165,7 @@
   font-size: 12px;
 }
 
-.loaderSidebar .sidebarFooter {
+.novaSidebar .sidebarFooter {
   margin-top: auto;
   padding: 12px;
   border-radius: 7px;
@@ -213,7 +232,7 @@
   background: #fffdf8;
 }
 
-.loaderHeader {
+.novaHeader {
   min-height: 54px;
   padding: 0 28px 0 30px;
   background: #fffdf8;
@@ -264,7 +283,7 @@
   font-size: 13px;
 }
 
-.loaderHeader .headerRight {
+.novaHeader .headerRight {
   gap: 18px;
   color: #202522;
   font-size: 12px;
@@ -331,7 +350,7 @@
   padding: 36px 40px;
 }
 
-.loaderShell .main {
+.novaShell .main {
   padding: 30px 30px 40px;
 }
 
@@ -399,7 +418,7 @@
 
 @media (max-width: 850px) {
   .shell,
-  .loaderShell {
+  .novaShell {
     grid-template-columns: 1fr;
   }
 
@@ -408,12 +427,12 @@
   }
 
   .header,
-  .loaderHeader {
+  .novaHeader {
     padding: 12px 20px;
   }
 
   .main,
-  .loaderShell .main {
+  .novaShell .main {
     padding: 24px 20px;
   }
 }

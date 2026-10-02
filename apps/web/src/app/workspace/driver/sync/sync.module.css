@@ -1,0 +1,62 @@
+.sync h1 {
+  margin: 10px 0 16px;
+  color: #215742;
+  font-size: 24px;
+}
+
+.sync header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sync header span,
+.sync section b {
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #226045;
+  background: #dce8de;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.sync aside,
+.sync section {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid #e6dac6;
+  border-radius: 11px;
+  background: #fffdf9;
+}
+
+.sync aside {
+  color: #215742;
+  background: #eef5eb;
+}
+
+.sync aside p {
+  margin: 6px 0 0;
+  color: #68746d;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.sync article {
+  display: grid;
+  gap: 5px;
+  padding: 13px 0;
+  border-bottom: 1px solid #e6dac6;
+  font-size: 12px;
+}
+
+.sync article:last-child {
+  border-bottom: 0;
+}
+
+.sync article span {
+  color: #68746d;
+}
+
+.sync section b {
+  width: fit-content;
+}

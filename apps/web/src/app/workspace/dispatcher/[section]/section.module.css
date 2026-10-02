@@ -1,0 +1,44 @@
+.page {
+  width: min(100%, 810px);
+}
+
+.page h1 {
+  margin: 0;
+  color: #215742;
+  font-size: 26px;
+  line-height: 1.08;
+}
+
+.page p {
+  margin: 8px 0 18px;
+  color: #68746d;
+  font-size: 12px;
+}
+
+.card {
+  padding: 18px;
+  border: 1px solid #e6dac6;
+  border-radius: 11px;
+  background: #fffdf9;
+  box-shadow: 0 12px 24px #29201012;
+}
+
+.card article {
+  display: grid;
+  gap: 5px;
+  padding: 14px 0;
+  border-bottom: 1px solid #e6dac6;
+  font-size: 12px;
+}
+
+.card article:last-child {
+  border-bottom: 0;
+}
+
+.card strong {
+  color: #202522;
+}
+
+.card span {
+  color: #68746d;
+}
