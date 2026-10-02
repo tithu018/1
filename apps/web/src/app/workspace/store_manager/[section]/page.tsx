@@ -11,6 +11,7 @@ export default async function StoreSectionPage({ params }: { params: Promise<{ s
   if (!session.outletId) notFound();
   const outlet = await prisma.outlet.findUnique({ where: { id: session.outletId }, include: { orders: { include: { issues: true, statusEvents: true }, orderBy: { updatedAt: "desc" }, take: 20 } } });
   if (!outlet) notFound();
+  const notifications = await prisma.notification.findMany({ where: { recipientId: session.accountId }, orderBy: { createdAt: "desc" }, take: 30 });
   const latestOrder = outlet.orders[0];
   const title = section === "status" ? (latestOrder ? `${latestOrder.id} - ${latestOrder.temperatureRequired === "REEFER" ? "Chilled" : "Dry"}` : "Order status") : section === "history" ? `Orders and issue cases for ${outlet.id}` : section === "notifications" ? "Notifications" : "Notifications and outlet details";
   const subtitle = section === "status" ? (latestOrder ? `Delivery window ${latestOrder.deliveryWindowOpen}-${latestOrder.deliveryWindowClose}` : "No orders have been submitted yet") : section === "history" ? "Shared order history and issue resolution" : section === "notifications" ? `${outlet.id} - ${outlet.orders.length} recent order events` : `${outlet.district} - Peliyagoda depot`;
@@ -19,7 +20,7 @@ export default async function StoreSectionPage({ params }: { params: Promise<{ s
     : section === "history"
       ? outlet.orders.flatMap((order) => [[order.id, `${order.status.replaceAll("_", " ")} - ${order.units} units`], ...order.issues.map((issue) => [issue.id, `${issue.summary} - ${issue.status.replaceAll("_", " ")}`])])
       : section === "notifications"
-        ? outlet.orders.flatMap((order) => order.statusEvents.slice(-2).map((event) => [`${order.id} ${event.status.replaceAll("_", " ")}`, event.reason ?? "Status update from the shared delivery record"]))
+        ? notifications.map((notification) => [notification.title, `${notification.body}${notification.readAt ? " - Read" : " - Unread"}`])
         : [["Outlet", `${outlet.id} - ${outlet.brand}`], ["Delivery window", `${outlet.windowOpenTime}-${outlet.windowCloseTime}`], ["Dock", outlet.dockType], ["Parking", outlet.parkingConstraint], ["Planned closure", "No closure recorded"]];
 
   return (

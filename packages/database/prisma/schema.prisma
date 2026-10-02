@@ -55,6 +55,32 @@ enum IssueStatus {
   REOPENED
 }
 
+enum NotificationType {
+  ORDER
+  PLAN
+  LOAD
+  DELIVERY
+  ISSUE
+  SYSTEM
+}
+
+enum ProofType {
+  PHOTO
+  SIGNATURE
+}
+
+enum DeliveryOutcome {
+  DELIVERED
+  CANNOT_DELIVER
+}
+
+enum SyncOperationStatus {
+  PENDING
+  ACKNOWLEDGED
+  CONFLICT
+  FAILED
+}
+
 model Depot {
   id       String    @id
   name     String
@@ -107,6 +133,14 @@ model Account {
   locale      String    @default("en")
   outlet      Outlet?   @relation(fields: [outletId], references: [id])
   events      AuditEvent[]
+  notifications Notification[]
+  issueEvents IssueEvent[]
+  proofAssets ProofAsset[]
+  syncOperations SyncOperation[]
+  openedIssues IssueCase[] @relation("IssueOpenedBy")
+  deliveryOutcomes DeliveryOutcomeRecord[]
+  createdLoadIssues LoadIssue[]
+  confirmedReceipts ReceiptRecord[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }
@@ -128,6 +162,10 @@ model Order {
   allocations         Allocation[]
   statusEvents        OrderStatusEvent[]
   issues              IssueCase[]
+  deliveryOutcome     DeliveryOutcomeRecord?
+  receipt             ReceiptRecord?
+  proofAssets         ProofAsset[]
+  loadIssues          LoadIssue[]
   createdAt           DateTime     @default(now())
   updatedAt           DateTime     @updatedAt
 }
@@ -171,6 +209,7 @@ model Trip {
   plan        Plan         @relation(fields: [planId], references: [id], onDelete: Cascade)
   vehicle     Vehicle      @relation(fields: [vehicleId], references: [id])
   allocations Allocation[]
+  loadIssues LoadIssue[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
 
@@ -205,9 +244,127 @@ model IssueCase {
   orderId   String
   status    IssueStatus @default(REPORTED)
   summary   String
+  openedById String?
   order     Order       @relation(fields: [orderId], references: [id])
+  openedBy  Account?     @relation("IssueOpenedBy", fields: [openedById], references: [id])
+  events    IssueEvent[]
+  loadIssue LoadIssue?
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+}
+
+model IssueEvent {
+  id        String      @id @default(cuid())
+  issueId   String
+  from      IssueStatus?
+  to        IssueStatus
+  note      String?
+  actorId   String?
+  createdAt DateTime    @default(now())
+  issue     IssueCase   @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  actor     Account?    @relation(fields: [actorId], references: [id])
+
+  @@index([issueId, createdAt])
+}
+
+model Notification {
+  id         String           @id @default(cuid())
+  recipientId String
+  type       NotificationType
+  title      String
+  body       String
+  entityType String?
+  entityId   String?
+  readAt     DateTime?
+  createdAt  DateTime         @default(now())
+  recipient  Account          @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, readAt, createdAt])
+}
+
+model ProofAsset {
+  id         String   @id @default(cuid())
+  orderId    String
+  capturedById String?
+  type       ProofType
+  storageKey String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  capturedBy Account? @relation(fields: [capturedById], references: [id])
+
+  @@index([orderId, createdAt])
+}
+
+model DeliveryOutcomeRecord {
+  id           String          @id @default(cuid())
+  orderId      String          @unique
+  driverId     String
+  outcome      DeliveryOutcome
+  receiverName String?
+  note         String?
+  recordedAt   DateTime        @default(now())
+  order        Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  driver       Account         @relation(fields: [driverId], references: [id])
+}
+
+model ReceiptRecord {
+  id            String   @id @default(cuid())
+  orderId       String   @unique
+  confirmedById String
+  expectedUnits Int
+  receivedUnits Int
+  outcome       String
+  note          String?
+  confirmedAt   DateTime @default(now())
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  confirmedBy   Account  @relation(fields: [confirmedById], references: [id])
+}
+
+model SyncOperation {
+  id             String              @id @default(cuid())
+  operationId    String              @unique
+  accountId      String
+  entityType     String
+  entityId       String
+  status         SyncOperationStatus @default(PENDING)
+  payload        Json
+  serverPayload  Json?
+  createdAt      DateTime            @default(now())
+  acknowledgedAt DateTime?
+  account        Account             @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  conflict       SyncConflict?
+
+  @@index([accountId, status, createdAt])
+}
+
+model SyncConflict {
+  id             String        @id @default(cuid())
+  operationId    String        @unique
+  localPayload   Json
+  serverPayload  Json
+  resolution     String?
+  resolvedAt     DateTime?
+  operation      SyncOperation @relation(fields: [operationId], references: [operationId], onDelete: Cascade)
+}
+
+model LoadIssue {
+  id         String    @id @default(cuid())
+  tripId     String
+  orderId    String
+  issueId    String?   @unique
+  summary    String
+  quantity   Int?
+  note       String?
+  createdById String
+  createdAt  DateTime  @default(now())
+  trip       Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  order      Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  issue      IssueCase? @relation(fields: [issueId], references: [id])
+  createdBy  Account   @relation(fields: [createdById], references: [id])
+
+  @@index([tripId, createdAt])
+  @@index([orderId, createdAt])
 }
 
 model AuditEvent {

@@ -35,6 +35,9 @@ export async function publishAssistedPlan(trips: { vehicleId: string; orderIds: 
         await tx.orderStatusEvent.create({ data: { orderId, status: "ALLOCATED" } });
       }
     }
+    const outletIds = [...new Set(orders.map((order) => order.outletId))];
+    const recipients = await tx.account.findMany({ where: { OR: [{ depotId: session.depotId }, { outletId: { in: outletIds } }] }, select: { id: true } });
+    await tx.notification.createMany({ data: recipients.filter((recipient) => recipient.id !== session.accountId).map((recipient) => ({ recipientId: recipient.id, type: "PLAN", title: `Plan v${plan.version} published`, body: `A new delivery plan is active for ${plan.serviceDate.toLocaleDateString("en-GB")}.`, entityType: "Plan", entityId: plan.id })) });
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Plan", entityId: plan.id, action: "published", payload: { version: plan.version } } });
     return plan.version;
   });

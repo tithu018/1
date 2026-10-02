@@ -16,6 +16,9 @@ export async function confirmTripLoaded(tripId: string, orderIds: string[]) {
       await tx.order.update({ where: { id: orderId }, data: { status: "LOADED" } });
       await tx.orderStatusEvent.create({ data: { orderId, status: "LOADED", reason: `Confirmed by loader on ${trip.vehicleId}` } });
     }
+    const orders = await tx.order.findMany({ where: { id: { in: orderIds } }, select: { outletId: true } });
+    const recipients = await tx.account.findMany({ where: { OR: [{ depotId: session.depotId }, { outletId: { in: orders.map((order) => order.outletId) } }] }, select: { id: true } });
+    await tx.notification.createMany({ data: recipients.filter((recipient) => recipient.id !== session.accountId).map((recipient) => ({ recipientId: recipient.id, type: "LOAD", title: `${trip.vehicleId} loaded`, body: `${orderIds.length} orders are ready for Driver handoff.`, entityType: "Trip", entityId: trip.id })) });
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Trip", entityId: trip.id, action: "load_confirmed", payload: { orderIds, vehicleId: trip.vehicleId } } });
     return trip.id;
   });
