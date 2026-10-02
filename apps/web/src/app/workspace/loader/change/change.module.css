@@ -1,0 +1,200 @@
+.changePage {
+  width: min(100%, 810px);
+}
+
+.back {
+  display: inline-block;
+  margin: 0 0 14px;
+  color: #226045;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.heading h1 {
+  margin: 0;
+  color: #215742;
+  font-size: 26px;
+  line-height: 1.08;
+}
+
+.heading p {
+  margin: 8px 0 18px;
+  color: #68746d;
+  font-size: 12px;
+}
+
+.alert {
+  display: grid;
+  gap: 5px;
+  min-height: 58px;
+  margin-bottom: 18px;
+  padding: 12px 15px;
+  border: 1px solid #ef796a;
+  border-radius: 8px;
+  background: #fde1dc;
+  color: #202522;
+  font-size: 11px;
+}
+
+.alert b {
+  color: #202522;
+}
+
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.compare article {
+  padding: 21px 18px 19px;
+  border: 1px solid #e6dac6;
+  border-radius: 11px;
+  background: #f1eadc;
+  box-shadow: 0 10px 22px #29201010;
+}
+
+.compare .now {
+  border: 2px solid #2f795d;
+  background: #fffdf9;
+}
+
+.compare h2,
+.whatToDo h2 {
+  margin: 0 0 14px;
+  color: #215742;
+  font-size: 18px;
+}
+
+.before h2 {
+  color: #6c756f;
+}
+
+.compare dl {
+  margin: 0;
+}
+
+.compare dl div {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #ddceb7;
+  font-size: 11px;
+}
+
+.compare dt {
+  color: #68746d;
+}
+
+.compare dd {
+  margin: 0;
+  font-weight: 800;
+  text-align: right;
+}
+
+.whatToDo {
+  padding: 18px;
+  border: 1px solid #e6dac6;
+  border-radius: 11px;
+  background: #fffdf9;
+  box-shadow: 0 10px 22px #29201012;
+}
+
+.whatToDo table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border: 1px solid #e4d8c5;
+  border-radius: 8px;
+  font-size: 10px;
+}
+
+.whatToDo th {
+  height: 28px;
+  padding: 0 10px;
+  background: #f1eadc;
+  color: #68746d;
+  font-size: 8px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.whatToDo td {
+  height: 39px;
+  padding: 0 10px;
+  border-top: 1px solid #e6dac6;
+}
+
+.whatToDo td:first-child {
+  font-weight: 800;
+}
+
+.moveRow td {
+  background: #fbedce;
+}
+
+.moveBadge,
+.loadBadge {
+  display: inline-flex;
+  min-height: 20px;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.moveBadge {
+  color: #9a6414;
+  background: transparent;
+}
+
+.loadBadge {
+  color: #343832;
+  background: #eee7d7;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 18px;
+}
+
+.actions a {
+  display: inline-flex;
+  min-width: 193px;
+  height: 37px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  background: #215742;
+  color: #fffdf8;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.actions span {
+  color: #68746d;
+  font-size: 10px;
+}
+
+@media (max-width: 900px) {
+  .compare {
+    grid-template-columns: 1fr;
+  }
+
+  .whatToDo {
+    overflow: auto;
+  }
+
+  .whatToDo table {
+    min-width: 760px;
+  }
+}

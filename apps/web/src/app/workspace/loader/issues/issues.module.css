@@ -1,0 +1,117 @@
+.issues {
+  width: min(100%, 810px);
+}
+
+.heading h1 {
+  margin: 0;
+  color: #215742;
+  font-size: 26px;
+  line-height: 1.08;
+}
+
+.heading p {
+  margin: 8px 0 18px;
+  color: #68746d;
+  font-size: 12px;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.filters button {
+  height: 28px;
+  padding: 0 15px;
+  border: 1px solid #ddceb7;
+  border-radius: 999px;
+  background: #fffdf9;
+  color: #202522;
+  font-size: 12px;
+}
+
+.filters .activeFilter {
+  border-color: #215742;
+  background: #215742;
+  color: #fffdf8;
+}
+
+.tableCard {
+  padding: 18px;
+  border: 1px solid #e6dac6;
+  border-radius: 11px;
+  background: #fffdf9;
+  box-shadow: 0 12px 24px #29201014;
+}
+
+.tableCard table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border: 1px solid #e4d8c5;
+  border-radius: 8px;
+  font-size: 10px;
+}
+
+.tableCard th {
+  height: 29px;
+  padding: 0 11px;
+  background: #f1eadc;
+  color: #68746d;
+  font-size: 8px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.tableCard td {
+  height: 39px;
+  padding: 0 11px;
+  border-top: 1px solid #e6dac6;
+  color: #202522;
+  white-space: nowrap;
+}
+
+.tableCard td:first-child {
+  font-weight: 800;
+}
+
+.badge {
+  display: inline-flex;
+  min-height: 21px;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.reported {
+  color: #343832;
+  background: #eee7d7;
+}
+
+.resolved {
+  color: #226045;
+  background: #dce8de;
+}
+
+.tableCard p {
+  margin: 11px 0 0;
+  color: #68746d;
+  font-size: 9px;
+}
+
+@media (max-width: 900px) {
+  .tableCard {
+    overflow: auto;
+  }
+
+  .tableCard table {
+    min-width: 760px;
+  }
+}
