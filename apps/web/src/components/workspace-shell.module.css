@@ -6,7 +6,7 @@
 }
 
 .novaShell {
-  grid-template-columns: 210px 1fr;
+  grid-template-columns: 280px 1fr;
   background: #f6f1e8;
 }
 
@@ -21,20 +21,20 @@
 
 .novaSidebar {
   position: relative;
-  width: 210px;
-  padding: 18px 12px 24px;
+  width: 280px;
+  padding: 24px 16px;
 }
 
 .loaderSidebar {
-  background: #1f523f url("/Image/loader.webp") center calc(100% - 168px) / 190px auto no-repeat;
+  background: #214e3b url("/Image/loader.png") center calc(100% - 154px) / 264px auto no-repeat;
 }
 
 .storeSidebar {
-  background: #1f523f url("/Image/store-manager.webp") center calc(100% - 210px) / 190px auto no-repeat;
+  background: #214e3b url("/Image/store-manager.png") center calc(100% - 152px) / 274px auto no-repeat;
 }
 
 .dispatcherSidebar {
-  background: #1f523f url("/Image/dispatcher.webp") center calc(100% - 188px) / 190px auto no-repeat;
+  background: #214e3b url("/Image/dispatcher.png") center calc(100% - 154px) / 270px auto no-repeat;
 }
 
 .logo {
@@ -47,9 +47,9 @@
 
 .novaSidebar .logo {
   width: max-content;
-  height: 42px;
-  margin: 0 0 27px;
-  gap: 8px;
+  height: 36px;
+  margin: 0 0 28px;
+  gap: 10px;
   color: #fffdf8;
 }
 
@@ -63,8 +63,8 @@
 }
 
 .novaSidebar .logo img {
-  width: 47px;
-  height: 32px;
+  width: 66px;
+  height: 36px;
 }
 
 .novaSidebar .logo .logoText {
@@ -74,7 +74,7 @@
   border: 0;
   border-radius: 0;
   color: #fffdf8;
-  font-size: 17px;
+  font-size: 22px;
   font-weight: 800;
 }
 
@@ -96,11 +96,11 @@
 }
 
 .novaSidebar nav a {
-  min-height: 32px;
-  padding: 9px 12px;
-  border-radius: 7px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 10px;
   color: #e1ece5;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
 }
 
@@ -112,9 +112,9 @@
 
 .navIcon {
   position: relative;
-  width: 13px;
-  height: 13px;
-  flex: 0 0 13px;
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
 }
 
 .clipboard {
@@ -306,9 +306,9 @@
 .novaSidebar .sidebarFooter {
   margin-top: auto;
   padding: 12px;
-  border-radius: 7px;
-  background: #327459;
-  font-size: 11px;
+  border-radius: 12px;
+  background: #2f6b52;
+  font-size: 14px;
 }
 
 .sidebarFooter span {
@@ -329,7 +329,7 @@
   color: #fffdf8;
   background: transparent;
   font: inherit;
-  font-size: 12px;
+  font-size: 14px;
   text-align: left;
   cursor: pointer;
 }
@@ -371,8 +371,8 @@
 }
 
 .novaHeader {
-  min-height: 54px;
-  padding: 0 28px 0 30px;
+  min-height: 72px;
+  padding: 0 40px;
   background: #fffdf8;
 }
 
@@ -392,11 +392,11 @@
   align-items: center;
   gap: 10px;
   color: #202522;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .headerSite strong {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 800;
 }
 
@@ -422,7 +422,7 @@
 }
 
 .novaHeader .headerRight {
-  gap: 18px;
+  gap: 16px;
   color: #202522;
   font-size: 12px;
 }
@@ -494,8 +494,8 @@
 
 .avatar {
   display: grid;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   place-items: center;
   border-radius: 50%;
   color: #1f5b42;
@@ -511,7 +511,7 @@
 
 .identity strong {
   color: #202522;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .identity small {
@@ -524,7 +524,7 @@
 }
 
 .novaShell .main {
-  padding: 30px 30px 40px;
+  padding: 32px 40px 48px;
 }
 
 .driverShell {
@@ -537,22 +537,37 @@
 }
 
 .driverHeader {
-  display: flex;
+  display: block;
   min-height: 104px;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 16px;
+  padding: 0;
   color: #fffdf8;
   background: var(--brand);
   font-size: 12px;
 }
 
-.driverHeader div:first-child {
-  display: grid;
-  gap: 7px;
+.driverStatusBar {
+  display: flex;
+  height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  font-weight: 600;
 }
 
-.driverHeader span {
+.driverTopBar {
+  display: flex;
+  height: 60px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px 0 16px;
+}
+
+.driverTopBar > div:first-child {
+  display: grid;
+  gap: 2px;
+}
+
+.driverTopBar > div:first-child span {
   color: #dce8de;
 }
 
@@ -560,6 +575,36 @@
   color: var(--brand);
   background: #dce8de;
 }
+
+.driverHeader .status::before {
+  border: 0;
+  content: "✓";
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.driverSettings {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  color: #fff;
+}
+
+.driverSettings > span,
+.driverSettings > span::before,
+.driverSettings > span::after {
+  display: block;
+  width: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.driverSettings > span { position: relative; }
+.driverSettings > span::before, .driverSettings > span::after { position: absolute; left: 0; content: ""; }
+.driverSettings > span::before { top: -6px; }
+.driverSettings > span::after { top: 6px; }
 
 .driverShell .main {
   padding: 16px;

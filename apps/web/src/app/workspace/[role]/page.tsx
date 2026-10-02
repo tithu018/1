@@ -23,7 +23,7 @@ function StoreDashboard() {
       <section className={styles.storePage}>
         <header className={styles.title}>
           <h1>Dashboard</h1>
-          <p>Tue 24 Mar 2026 - 15:40</p>
+          <p>Tue 24 Mar 2026 · 15:40</p>
         </header>
         <div className={styles.storeCards}>
           <article>
@@ -34,14 +34,14 @@ function StoreDashboard() {
           </article>
           <article>
             <small>NEXT PLANNED ARRIVAL</small>
-            <b>Wed 25 Mar - 05:00-07:30</b>
+            <b>Wed 25 Mar · 05:00–07:30</b>
             <span>Chilled orders ORD0096518 and ORD0096654 plus your dry order once submitted.</span>
             <em>△ Deferred → Wed 25 Mar</em>
           </article>
           <article>
             <small>AWAITING YOUR CONFIRMATION</small>
-            <b>ORD0096653 - Dry</b>
-            <span>Delivered today. 44 units expected - the loader flagged a shortfall before departure.</span>
+            <b>ORD0096653 · Dry</b>
+            <span>Delivered today. 44 units expected — the loader flagged a shortfall before departure.</span>
             <footer>
               <em>✓ Delivered</em>
               <Link href="/workspace/store_manager/receive">Confirm receipt</Link>
@@ -71,28 +71,32 @@ function StoreDashboard() {
 
 function DispatcherDashboard() {
   const rows = [
-    ["ORD0096515", "OUT008", "Fresh - Chilled", "33", "253.7 kg", "05:00-07:30", "2 days in a row"],
-    ["ORD0096650", "OUT008", "Fresh - Chilled", "31", "232.7 kg", "05:00-07:30", "2 days in a row"],
-    ["ORD0096518", "OUT010", "Fresh - Chilled", "40", "264.5 kg", "05:00-07:30", "2 days in a row"],
-    ["ORD0096654", "OUT010", "Fresh - Chilled", "40", "293.5 kg", "05:00-07:30", "2 days in a row"],
-    ["ORD0096520", "OUT011", "Fresh - Chilled", "36", "249.9 kg", "03:00-08:00", "2 days in a row"],
-    ["ORD0096647", "OUT006", "Fresh - Chilled", "66", "534.0 kg", "03:00-08:00", "Rolled over"],
-    ["ORD0096815", "OUT031", "Fresh - Chilled", "210", "1,183.9 kg", "03:00-08:00", "Unusual quantity"],
-    ["ORD0096797", "OUT010", "Fresh - Dry", "45", "359.0 kg", "05:00-07:30", "New"],
-    ["ORD0096821", "OUT035", "Style - Ambient", "40", "657.5 kg", "Mall 10:30-12:30", "Mall dock"]
+    ["ORD0096515", "OUT008", "Fresh · Chilled", "33", "253.7 kg", "05:00–07:30", "2 days in a row"],
+    ["ORD0096650", "OUT008", "Fresh · Chilled", "31", "232.7 kg", "05:00–07:30", "2 days in a row"],
+    ["ORD0096518", "OUT010", "Fresh · Chilled", "40", "264.5 kg", "05:00–07:30", "2 days in a row"],
+    ["ORD0096654", "OUT010", "Fresh · Chilled", "40", "293.5 kg", "05:00–07:30", "2 days in a row"],
+    ["ORD0096520", "OUT011", "Fresh · Chilled", "36", "249.9 kg", "03:00–08:00", "2 days in a row"],
+    ["ORD0096656", "OUT011", "Fresh · Chilled", "27", "198.2 kg", "03:00–08:00", "2 days in a row"],
+    ["ORD0096522", "OUT012", "Fresh · Chilled", "34", "263.3 kg", "05:30–08:00", "2 days in a row"],
+    ["ORD0096658", "OUT012", "Fresh · Chilled", "45", "292.1 kg", "05:30–08:00", "2 days in a row"],
+    ["ORD0096647", "OUT006", "Fresh · Chilled", "66", "534.0 kg", "03:00–08:00", "Rolled over"],
+    ["ORD0096652", "OUT009", "Fresh · Chilled", "43", "299.2 kg", "04:00–07:45", "Rolled over"],
+    ["ORD0096815", "OUT031", "Fresh · Chilled", "210", "1,183.9 kg", "03:00–08:00", "Unusual quantity"],
+    ["ORD0096797", "OUT010", "Fresh · Dry", "45", "359.0 kg", "05:00–07:30", "New"],
+    ["ORD0096821", "OUT035", "Style · Ambient", "40", "657.5 kg", "Mall 10:30–12:30", "Mall dock"]
   ];
 
   return (
     <WorkspaceShell role="dispatcher" active="Plan">
       <section className={styles.dispatchPage}>
         <header className={styles.title}>
-          <h1>Order queue - Wed 25 Mar</h1>
-          <p>Peliyagoda - Queue closed at 16:00 on Tue 24 Mar - all confirmed orders in one place</p>
+          <h1>Order queue · Wed 25 Mar</h1>
+          <p>Peliyagoda · Queue closed at 16:00 on Tue 24 Mar · all confirmed orders in one place</p>
         </header>
         <div className={styles.dispatchMetrics}>
-          <Metric value="90" label="Orders" detail="87 Fresh - 3 Style" />
+          <Metric value="90" label="Orders" detail="87 Fresh · 3 Style" />
           <Metric value="80" label="New" detail="Submitted before 16:00" />
-          <Metric value="10" label="Rolled over" detail="Deferred earlier - priority" />
+          <Metric value="10" label="Rolled over" detail="Deferred earlier · priority" />
           <Metric value="4" label="Protected outlets" detail="Deferred 2 days in a row" />
           <Metric value="1" label="Unusual quantity" detail="1.6x the outlet usual" />
         </div>
@@ -102,7 +106,7 @@ function DispatcherDashboard() {
           </div>
           <table>
             <thead>
-              <tr><th>Order</th><th>Outlet</th><th>Brand - temp</th><th>Units</th><th>Weight</th><th>Window</th><th>Flags</th></tr>
+              <tr><th>Order</th><th>Outlet</th><th>Brand · temp</th><th>Units</th><th>Weight</th><th>Window</th><th>Flags</th></tr>
             </thead>
             <tbody>
               {rows.map((row, index) => (
@@ -113,7 +117,7 @@ function DispatcherDashboard() {
             </tbody>
           </table>
           <footer>
-            <p>Showing 13 of 90 orders - priority first</p>
+            <p>Showing 13 of 90 orders · priority first</p>
             <Link href="/workspace/dispatcher/plan">Generate assisted plan</Link>
           </footer>
         </section>
@@ -128,18 +132,18 @@ function DriverDashboard() {
       <section className={styles.driverToday}>
         <h1>Today</h1>
         <section className={styles.tripSummary}>
-          <header><h2>Trip 1 - Colombo</h2><span>✓ Loaded</span></header>
+          <header><h2>Trip 1 · Colombo</h2><span>✓ Loaded</span></header>
           <dl>
-            <div><dt>Vehicle</dt><dd>VEH012 - ambient truck</dd></div>
+            <div><dt>Vehicle</dt><dd>VEH012 · ambient truck</dd></div>
             <div><dt>Departs</dt><dd>04:08</dd></div>
-            <div><dt>Stops</dt><dd>5 - 216 units</dd></div>
+            <div><dt>Stops</dt><dd>5 · 216 units</dd></div>
             <div><dt>Loaded</dt><dd>03:52 at Peliyagoda</dd></div>
           </dl>
         </section>
         <aside className={styles.driverNote}><b>ⓘ Loader note - OUT010</b><p>1 carton of Instant noodles was damaged and not loaded. The store already knows.</p></aside>
         <ol className={styles.mobileStops}>
           {["OUT008", "OUT010", "OUT009", "OUT011", "OUT014"].map((stop, index) => (
-            <li key={stop}><span>{index + 1}</span><strong>{stop}</strong><small>Window {index === 1 ? "05:00-07:30" : index === 2 ? "04:00-07:45" : "03:00-08:00"}</small><b>{["04:34", "04:57", "05:19", "05:43", "06:05"][index]}</b></li>
+            <li key={stop}><span>{index + 1}</span><strong>{stop}</strong><small>Window {index < 2 ? "05:00–07:30" : index === 2 ? "04:00–07:45" : index === 4 ? "05:30–08:00" : "03:00–08:00"}</small><b>{["04:34", "04:57", "05:19", "05:43", "06:05"][index]}</b></li>
           ))}
         </ol>
         <Link className={styles.startTrip} href="/workspace/driver/trip">Start trip</Link>

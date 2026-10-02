@@ -79,7 +79,7 @@ export async function WorkspaceShell({
           <Link href="/" className={styles.logo}>
             {usesNovaSidebar ? (
               <>
-                <Image src="/Image/logo-white.png" alt="" width={47} height={32} priority />
+                <Image src="/Image/logo-white-hq.png" alt="" width={66} height={36} priority />
                 <span className={styles.logoText}>{APP_NAME}</span>
               </>
             ) : (
@@ -93,7 +93,11 @@ export async function WorkspaceShell({
             {navigation[role].map((item) => (
               <Link className={item === active ? styles.active : ""} href={hrefFor(role, item)} key={item}>
                 {usesNovaSidebar && <NavIcon item={item} />}
-                {item}
+                {role === "store_manager" && item === "Notifications"
+                  ? "Notifications · 4"
+                  : role === "dispatcher" && item === "Needs Attention"
+                    ? "Needs Attention · 3"
+                    : item}
               </Link>
             ))}
           </nav>
@@ -115,8 +119,23 @@ export async function WorkspaceShell({
         </aside>
       )}
       <div className={styles.content}>
-        <header className={isDriver ? styles.driverHeader : `${styles.header} ${usesNovaSidebar ? styles.novaHeader : ""}`}>
-          {usesNovaSidebar ? (
+        {isDriver ? (
+          <header className={styles.driverHeader}>
+            <div className={styles.driverStatusBar}><span>03:58</span><span>4G&nbsp; ▮ ▮ ▮</span></div>
+            <div className={styles.driverTopBar}>
+              <div>
+                <strong>VEH012 · Trip 1</strong>
+                <span>Wed 25 Mar · Peliyagoda</span>
+              </div>
+              <div className={styles.headerRight}>
+                <span className={styles.status}>Up to date</span>
+                <Link className={styles.driverSettings} href="/workspace/driver/settings" aria-label="Driver settings"><span aria-hidden="true" /></Link>
+              </div>
+            </div>
+          </header>
+        ) : (
+          <header className={`${styles.header} ${usesNovaSidebar ? styles.novaHeader : ""}`}>
+            {usesNovaSidebar ? (
             <>
               <div className={styles.headerSite}>
                 <span className={styles.siteIcon} aria-hidden="true" />
@@ -135,19 +154,9 @@ export async function WorkspaceShell({
                 </span>
               </div>
             </>
-          ) : (
-            <>
-              <div>
-                <strong>{isDriver ? "VEH012 - Trip 1" : role === "store_manager" ? "OUT010 - Fresh outlet" : "Peliyagoda"}</strong>
-                <span>{isDriver ? "Wed 25 Mar - Peliyagoda" : role === "store_manager" ? "Colombo - Peliyagoda depot" : "Planning Wed 25 Mar"}</span>
-              </div>
-              <div className={styles.headerRight}>
-                <span className={styles.status}>Online</span>
-                <span>{roleLabels[role]}</span>
-              </div>
-            </>
-          )}
-        </header>
+            ) : null}
+          </header>
+        )}
         <main className={styles.main}>{children}</main>
       </div>
       {isDriver && (
