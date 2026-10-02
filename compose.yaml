@@ -1,6 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-waypoint}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-waypoint}
@@ -10,10 +11,33 @@ services:
     volumes:
       - waypoint-postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U waypoint -d waypoint"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-waypoint} -d ${POSTGRES_DB:-waypoint}"]
       interval: 5s
       timeout: 5s
       retries: 10
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-waypoint}:${POSTGRES_PASSWORD:-waypoint}@postgres:5432/${POSTGRES_DB:-waypoint}?schema=public
+      SESSION_SECRET: ${SESSION_SECRET:-replace-with-a-long-random-development-secret}
+      NODE_ENV: production
+      HOSTNAME: 0.0.0.0
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:3000/api/health >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
 
 volumes:
   waypoint-postgres:
