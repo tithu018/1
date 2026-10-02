@@ -1,5 +1,6 @@
 .shell { display: grid; min-height: 100vh; grid-template-columns: 280px 1fr; background: var(--canvas); }
 .sidebar { display: flex; min-height: 100vh; flex-direction: column; padding: 24px 16px 18px; color: #fffdf8; background: var(--brand); }
+.loaderSidebar { background: var(--brand) url("/Image/loader.webp") center 77% / 185px auto no-repeat; }
 .logo { display: flex; align-items: center; gap: 9px; margin: 0 8px 34px; font-weight: 700; }
 .logo span { display: grid; width: 28px; height: 28px; place-items: center; border: 2px solid currentColor; border-radius: 50%; }
 .sidebar nav { display: grid; gap: 4px; }

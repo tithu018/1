@@ -25,7 +25,7 @@ export async function WorkspaceShell({ role, active, children }: Readonly<{ role
   const isDriver = role === "driver";
   return (
     <div className={isDriver ? styles.driverShell : styles.shell}>
-      {!isDriver && <aside className={styles.sidebar}>
+      {!isDriver && <aside className={`${styles.sidebar} ${role === "loader" ? styles.loaderSidebar : ""}`}>
         <Link href="/" className={styles.logo}><span>W</span>{APP_NAME}</Link>
         <nav aria-label={`${roleLabels[role]} navigation`}>
           {navigation[role].map((item) => <Link className={item === active ? styles.active : ""} href={hrefFor(role, item)} key={item}>{item}</Link>)}
