@@ -1,6 +1,6 @@
 .heading { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 25px; }
-.heading h1 { margin: 0; color: var(--brand); font-size: 30px; letter-spacing: -.03em; }
-.heading p { margin: 7px 0 0; color: var(--muted); font-size: 13px; }
+.heading h1 { margin: 0; color: var(--brand); font-size: 34px; line-height: 1.12; letter-spacing: -.035em; }
+.heading p { margin: 7px 0 0; color: var(--muted); font-size: 15px; }
 .draft, .published { padding: 7px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
 .draft { color: var(--warning-ink); background: var(--warning); }
 .published { color: var(--brand); background: var(--success); }
