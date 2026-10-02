@@ -1,5 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
+import {
+  Bell,
+  ChartNoAxesColumnIncreasing,
+  ClipboardList,
+  Clock3,
+  LayoutDashboard,
+  LogOut,
+  Package,
+  Route,
+  SlidersHorizontal,
+  TriangleAlert,
+  Truck,
+  type LucideIcon
+} from "lucide-react";
 import { APP_NAME, roleLabels, type UserRole } from "@waypoint/domain";
 import { signOut } from "@/app/sign-in/actions";
 import { requireRole } from "@/lib/auth";
@@ -36,31 +50,28 @@ function hrefFor(role: UserRole, item: string) {
   return `/workspace/${role}`;
 }
 
-function LoaderIcon({ item }: Readonly<{ item: string }>) {
-  const icon = item === "Trip queue" ? "clipboard" : item === "Active load" ? "cube" : "alert";
-  return <span aria-hidden="true" className={`${styles.navIcon} ${styles[icon]}`} />;
-}
-
 function NavIcon({ item }: Readonly<{ item: string }>) {
-  if (item === "Trip queue" || item === "Active load" || item === "Loading issues") return <LoaderIcon item={item} />;
-
-  const iconByItem: Record<string, string> = {
-    Dashboard: "gridIcon",
-    "Place order": "clipboard",
-    "Order status": "truckIcon",
-    Receive: "cube",
-    "History & issues": "historyIcon",
-    Notifications: "bellIcon",
-    Settings: "slidersIcon",
-    Plan: "routeIcon",
-    "Live Board": "truckIcon",
-    "Needs Attention": "alert",
-    "Deferral Log": "historyIcon",
-    "Capacity Forecast": "chartIcon",
-    "Reference Data": "clipboard"
+  const iconByItem: Record<string, LucideIcon> = {
+    Dashboard: LayoutDashboard,
+    "Place order": ClipboardList,
+    "Order status": Truck,
+    Receive: Package,
+    "History & issues": Clock3,
+    Notifications: Bell,
+    Settings: SlidersHorizontal,
+    Plan: Route,
+    "Live Board": Truck,
+    "Needs Attention": TriangleAlert,
+    "Deferral Log": Clock3,
+    "Capacity Forecast": ChartNoAxesColumnIncreasing,
+    "Reference Data": ClipboardList,
+    "Trip queue": ClipboardList,
+    "Active load": Package,
+    "Loading issues": TriangleAlert
   };
+  const Icon = iconByItem[item] ?? LayoutDashboard;
 
-  return <span aria-hidden="true" className={`${styles.navIcon} ${styles[iconByItem[item] ?? "gridIcon"]}`} />;
+  return <Icon aria-hidden="true" className={styles.navIcon} strokeWidth={2} />;
 }
 
 export async function WorkspaceShell({
@@ -111,7 +122,7 @@ export async function WorkspaceShell({
             </span>
           </div>
           <form action={signOut} className={styles.signOutForm}>
-            <button className={styles.signOut} type="submit">Sign out</button>
+            <button className={styles.signOut} type="submit"><LogOut aria-hidden="true" />Sign out</button>
           </form>
         </aside>
       )}
