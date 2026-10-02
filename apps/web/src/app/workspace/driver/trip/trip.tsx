@@ -2,11 +2,30 @@
 
 import { useState } from "react";
 import styles from "./trip.module.css";
+import { recordDelivery, reportDeliveryException } from "./actions";
 
 type Mode = "drive" | "stopped" | "navigation" | "problem" | "recorded";
 
 export function DriverTrip() {
   const [mode, setMode] = useState<Mode>("drive");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function saveDelivery() {
+    setSaving(true);
+    setError(null);
+    try { await recordDelivery("ORD0096797", "Delivered after safe stop confirmation"); setMode("recorded"); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "Delivery could not be recorded."); }
+    finally { setSaving(false); }
+  }
+
+  async function saveProblem() {
+    setSaving(true);
+    setError(null);
+    try { await reportDeliveryException("ORD0096797", "Store closed"); setMode("recorded"); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "Problem could not be recorded."); }
+    finally { setSaving(false); }
+  }
 
   if (mode === "navigation") {
     return (
@@ -29,8 +48,8 @@ export function DriverTrip() {
       <section className={styles.problem}>
         <h1>Report a problem</h1>
         <p>For trip problems only. The store reports product shortages when confirming receipt.</p>
-        <button onClick={() => setMode("recorded")}>Store closed</button>
-        <button onClick={() => setMode("recorded")}>Access blocked</button>
+        <button disabled={saving} onClick={saveProblem}>Store closed</button>
+        <button disabled={saving} onClick={saveProblem}>Access blocked</button>
         <button onClick={() => setMode("stopped")} className={styles.secondary}>Back to stop</button>
       </section>
     );
@@ -67,9 +86,10 @@ export function DriverTrip() {
           </dl>
           <aside><strong>△ Expected shortfall</strong><p>1 carton of Instant noodles was damaged at loading and is not on the truck.</p></aside>
         </section>
-        <button className={styles.primary} onClick={() => setMode("recorded")}>Mark delivered</button>
+        <button className={styles.primary} disabled={saving} onClick={saveDelivery}>{saving ? "Saving..." : "Mark delivered"}</button>
         <button className={styles.secondary} onClick={() => setMode("problem")}>Cannot deliver</button>
         <button className={styles.linkButton} onClick={() => setMode("problem")}>Report a problem</button>
+        {error && <p role="alert">{error}</p>}
       </section>
     );
   }

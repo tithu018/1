@@ -1,45 +1,33 @@
 import { notFound } from "next/navigation";
+import { prisma } from "@waypoint/database";
 import { WorkspaceShell } from "@/components/workspace-shell";
+import { requireRole } from "@/lib/auth";
 import styles from "./section.module.css";
-
-const pages: Record<string, { active: string; title: string; subtitle: string; rows: string[][] }> = {
-  status: {
-    active: "Order status",
-    title: "ORD0096653 - Dry (ambient)",
-    subtitle: "Delivery Tue 24 Mar 2026 - window 05:00-07:30",
-    rows: [["Submitted", "Mon 23 Mar"], ["Confirmed", "Accepted into the dispatcher's planning queue"], ["Allocated", "Vehicle VEH022 - Route R026429"], ["Loaded", "Loader flagged 2 units short before departure"], ["Out for delivery", "Tue 24 Mar"], ["Delivered", "Waiting for your receipt confirmation"]]
-  },
-  history: {
-    active: "History & issues",
-    title: "Orders and issue cases for OUT010",
-    subtitle: "Shared order history and issue resolution",
-    rows: [["ISS-0417", "2 cartons of Cream crackers short - Reported"], ["ORD0096653", "Dry order - Delivered"], ["ORD0096654", "Chilled order - Deferred to Wed 25 Mar"]]
-  },
-  notifications: {
-    active: "Notifications",
-    title: "4 unread",
-    subtitle: "Notifications for OUT010",
-    rows: [["ORD0096654 moved to Wed 25 Mar", "Second deferral in a row"], ["ORD0096653 delivered", "Confirm receipt"], ["Payday reminder", "Consider increased demand"]]
-  },
-  settings: {
-    active: "Settings",
-    title: "Notifications and outlet details",
-    subtitle: "Colombo - Peliyagoda depot",
-    rows: [["Outlet", "OUT010 - Fresh"], ["Delivery window", "05:00-07:30"], ["Planned closure", "Notify the dispatcher in advance if the outlet will be closed"]]
-  }
-};
 
 export default async function StoreSectionPage({ params }: { params: Promise<{ section: string }> }) {
   const { section } = await params;
-  const page = pages[section];
-  if (!page) notFound();
+  if (!["status", "history", "notifications", "settings"].includes(section)) notFound();
+  const session = await requireRole("store_manager");
+  if (!session.outletId) notFound();
+  const outlet = await prisma.outlet.findUnique({ where: { id: session.outletId }, include: { orders: { include: { issues: true, statusEvents: true }, orderBy: { updatedAt: "desc" }, take: 20 } } });
+  if (!outlet) notFound();
+  const latestOrder = outlet.orders[0];
+  const title = section === "status" ? (latestOrder ? `${latestOrder.id} - ${latestOrder.temperatureRequired === "REEFER" ? "Chilled" : "Dry"}` : "Order status") : section === "history" ? `Orders and issue cases for ${outlet.id}` : section === "notifications" ? "Notifications" : "Notifications and outlet details";
+  const subtitle = section === "status" ? (latestOrder ? `Delivery window ${latestOrder.deliveryWindowOpen}-${latestOrder.deliveryWindowClose}` : "No orders have been submitted yet") : section === "history" ? "Shared order history and issue resolution" : section === "notifications" ? `${outlet.id} - ${outlet.orders.length} recent order events` : `${outlet.district} - Peliyagoda depot`;
+  const rows = section === "status" && latestOrder
+    ? latestOrder.statusEvents.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()).map((event) => [event.status.replaceAll("_", " "), event.reason ?? event.createdAt.toLocaleString("en-GB")])
+    : section === "history"
+      ? outlet.orders.flatMap((order) => [[order.id, `${order.status.replaceAll("_", " ")} - ${order.units} units`], ...order.issues.map((issue) => [issue.id, `${issue.summary} - ${issue.status.replaceAll("_", " ")}`])])
+      : section === "notifications"
+        ? outlet.orders.flatMap((order) => order.statusEvents.slice(-2).map((event) => [`${order.id} ${event.status.replaceAll("_", " ")}`, event.reason ?? "Status update from the shared delivery record"]))
+        : [["Outlet", `${outlet.id} - ${outlet.brand}`], ["Delivery window", `${outlet.windowOpenTime}-${outlet.windowCloseTime}`], ["Dock", outlet.dockType], ["Parking", outlet.parkingConstraint], ["Planned closure", "No closure recorded"]];
 
   return (
-    <WorkspaceShell role="store_manager" active={page.active}>
+    <WorkspaceShell role="store_manager" active={section === "status" ? "Order status" : section === "history" ? "History & issues" : section === "notifications" ? "Notifications" : "Settings"}>
       <section className={styles.page}>
-        <header><h1>{page.title}</h1><p>{page.subtitle}</p></header>
+        <header><h1>{title}</h1><p>{subtitle}</p></header>
         <section className={styles.card}>
-          {page.rows.map(([title, detail]) => <article key={title}><strong>{title}</strong><span>{detail}</span></article>)}
+          {rows.length ? rows.map(([rowTitle, detail], index) => <article key={`${rowTitle}-${index}`}><strong>{rowTitle}</strong><span>{detail}</span></article>) : <article><strong>Nothing to show yet</strong><span>New records will appear here after a server-confirmed action.</span></article>}
         </section>
       </section>
     </WorkspaceShell>

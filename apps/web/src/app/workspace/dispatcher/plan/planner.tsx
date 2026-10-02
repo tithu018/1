@@ -5,27 +5,12 @@ import { useMemo, useState } from "react";
 import styles from "./planner.module.css";
 import { publishAssistedPlan } from "./actions";
 
-const vehicles: AllocationVehicle[] = [
-  { id: "VEH005", depot: "Peliyagoda", type: "truck", temperature: "reefer", weightCapacityKg: 6840, volumeCapacityM3: 33.4 },
-  { id: "VEH012", depot: "Peliyagoda", type: "truck", temperature: "ambient", weightCapacityKg: 4200, volumeCapacityM3: 24 },
-  { id: "VEH036", depot: "Peliyagoda", type: "van", temperature: "reefer", weightCapacityKg: 1040, volumeCapacityM3: 7 },
-  { id: "VEH025", depot: "Peliyagoda", type: "truck", temperature: "ambient", weightCapacityKg: 3800, volumeCapacityM3: 22, inWorkshop: true }
-];
-
-const orders: AllocationOrder[] = [
-  { id: "ORD0096518", outletId: "OUT010", depot: "Peliyagoda", brand: "Fresh", district: "Colombo", temperature: "chilled", parkingConstraint: "normal", weightKg: 264.5, volumeM3: 1.683 },
-  { id: "ORD0096654", outletId: "OUT010", depot: "Peliyagoda", brand: "Fresh", district: "Colombo", temperature: "chilled", parkingConstraint: "normal", weightKg: 293.5, volumeM3: 1.683 },
-  { id: "ORD0096797", outletId: "OUT010", depot: "Peliyagoda", brand: "Fresh", district: "Colombo", temperature: "ambient", parkingConstraint: "normal", weightKg: 359, volumeM3: 1.878 },
-  { id: "ORD0096821", outletId: "OUT035", depot: "Peliyagoda", brand: "Style", district: "Colombo", temperature: "ambient", parkingConstraint: "mall_dock", weightKg: 657.5, volumeM3: 10.213 },
-  { id: "ORD0096862", outletId: "OUT075", depot: "Peliyagoda", brand: "Fresh", district: "Puttalam", temperature: "chilled", parkingConstraint: "van_only", weightKg: 1200, volumeM3: 40 }
-];
-
-export function DispatcherPlan() {
+export function DispatcherPlan({ vehicles, orders }: Readonly<{ vehicles: AllocationVehicle[]; orders: AllocationOrder[] }>) {
   const [generated, setGenerated] = useState(false);
   const [published, setPublished] = useState(false);
   const [deferralReasonRecorded, setDeferralReasonRecorded] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
-  const result = useMemo(() => suggestAllocation(vehicles, orders), []);
+  const result = useMemo(() => suggestAllocation(vehicles, orders), [orders, vehicles]);
   const hardFailures = result.deferred.length > 0 && !deferralReasonRecorded ? result.deferred.length : 0;
 
   async function publish() {
