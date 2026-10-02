@@ -10,7 +10,7 @@ export default function ResetPasswordPage() {
           <Image src="/Image/logo-green-hq.png" alt="Waypoint" width={66} height={36} priority />
           <span>Waypoint</span>
         </Link>
-        <Link href="/sign-in">← Back to sign in</Link>
+        <Link href="/#roles">← Back to sign in</Link>
       </header>
       <form className={styles.card}>
         <h1>Reset your password</h1>
@@ -19,7 +19,7 @@ export default function ResetPasswordPage() {
         <input id="reset-id" placeholder="Value" />
         <small>ⓘ Helper</small>
         <button type="button">Send reset instructions</button>
-        <Link href="/sign-in">← Back to sign in</Link>
+        <Link href="/#roles">← Back to sign in</Link>
       </form>
     </main>
   );

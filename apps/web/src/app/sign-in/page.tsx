@@ -1,30 +1,27 @@
 import Image from "next/image";
 import Link from "next/link";
 import { APP_NAME, roleLabels, type UserRole, userRoles } from "@waypoint/domain";
+import { redirect } from "next/navigation";
 import { signIn } from "./actions";
 import styles from "./sign-in.module.css";
 
 const validRoles = new Set<string>(userRoles);
 
-const roleCopy: Record<UserRole, { detail: string; device: string; image: string }> = {
+const roleCopy: Record<UserRole, { detail: string; image: string }> = {
   store_manager: {
     detail: "Place and track outlet orders, see planned arrivals and confirm receipt.",
-    device: "Desktop - Phone",
     image: "/Image/store-manager.png"
   },
   dispatcher: {
     detail: "Build feasible delivery plans, explain deferrals and monitor live execution.",
-    device: "Desktop",
     image: "/Image/dispatcher.png"
   },
   loader: {
     detail: "Load trips against the published plan and flag shortfalls before departure.",
-    device: "Tablet - Shared terminal",
     image: "/Image/loader.png"
   },
   driver: {
     detail: "Run your assigned route safely, capture proof of delivery and keep working offline.",
-    device: "Phone",
     image: "/Image/driver.png"
   }
 };
@@ -33,43 +30,9 @@ export default async function SignInPage({ searchParams }: { searchParams: Promi
   const { role: requestedRole, error } = await searchParams;
   const role = validRoles.has(requestedRole ?? "") ? (requestedRole as UserRole) : undefined;
 
-  if (!role) return <RoleChooser />;
+  if (!role) redirect("/#roles");
   if (role === "driver") return <DriverSignIn error={error} />;
   return <DesktopSignIn role={role} error={error} />;
-}
-
-function RoleChooser() {
-  return (
-    <main className={styles.chooser}>
-      <header className={styles.chooserTop}>
-        <Link href="/" className={styles.wordmark}>
-          <Image src="/Image/logo-green-hq.png" alt="" width={66} height={36} priority />
-          <span>{APP_NAME}</span>
-        </Link>
-        <Link href="/" className={styles.back}>← Back to home</Link>
-      </header>
-      <section className={styles.chooserIntro}>
-        <p>SIGN IN</p>
-        <h1>How are you signing in today?</h1>
-        <span>Choose your role. Each role signs in to its own workspace.</span>
-      </section>
-      <div className={styles.grid}>
-        {userRoles.map((item) => (
-          <Link key={item} href={`/sign-in?role=${item}`} className={styles.role}>
-            <span className={`${styles.roleIcon} ${styles[item]}`} aria-hidden="true" />
-            <h2>{roleLabels[item]}</h2>
-            <p>{roleCopy[item].detail}</p>
-            <b>{roleCopy[item].device}</b>
-            <i aria-hidden="true">→</i>
-          </Link>
-        ))}
-      </div>
-      <aside className={styles.notice}>
-        <strong>Not sure which role to choose?</strong>
-        <span>Your role is assigned by your Waypoint administrator. If you pick the wrong one, you will see a message explaining your access.</span>
-      </aside>
-    </main>
-  );
 }
 
 function DesktopSignIn({ role, error }: Readonly<{ role: UserRole; error?: string }>) {
@@ -102,7 +65,7 @@ function DriverSignIn({ error }: Readonly<{ error?: string }>) {
     <main className={styles.driverSignIn}>
       <header>
         <Image src="/Image/logo-green-hq.png" alt={APP_NAME} width={66} height={36} priority />
-        <Link href="/sign-in">← Back</Link>
+        <Link href="/#roles">← Back</Link>
       </header>
       <section className={styles.driverForm}>
         <span className={styles.driverPill}>▣ Signing in as Driver</span>
@@ -137,14 +100,11 @@ function SignInForm({ role, error, compact }: Readonly<{ role: UserRole; error?:
       </div>
       <small>ⓘ Passwords are case-sensitive.</small>
       <div className={styles.options}>
-        <label>
-          <input type="checkbox" /> Label
-        </label>
         <Link href="/sign-in/reset">Forgot password?</Link>
       </div>
       <button type="submit">Sign in</button>
       <hr />
-      <Link href={compact ? "/" : "/sign-in"} className={styles.choose}>← {compact ? "Back to start" : "Choose a different role"}</Link>
+      <Link href={compact ? "/" : "/#roles"} className={styles.choose}>← {compact ? "Back to start" : "Choose a different role"}</Link>
     </form>
   );
 }

@@ -3,33 +3,10 @@ import Link from "next/link";
 import styles from "./page.module.css";
 
 const roles = [
-  ["Store Manager", "Place and track outlet orders, see planned arrivals and confirm receipt.", "Desktop · Phone", "store_manager", "store"],
-  ["Dispatcher", "Build feasible delivery plans, explain deferrals and monitor live execution.", "Desktop", "dispatcher", "dispatch"],
-  ["Loader", "Load trips against the published plan and flag shortfalls before departure.", "Tablet · Shared terminal", "loader", "load"],
-  ["Driver", "Run your assigned route safely, capture proof of delivery and keep working offline.", "Phone", "driver", "drive"]
-] as const;
-
-const highlights = [
-  ["record", "One record, end to end", "Orders, plans, loading, delivery and receipt share a single history."],
-  ["access", "Role-based access", "Everyone sees only their outlet, depot or assigned trip."],
-  ["offline", "Keeps working offline", "Drivers can deliver without signal; records sync automatically."],
-  ["live", "Live status updates", "Plan changes and delivery events reach the right people as they happen."]
-] as const;
-
-const steps = [
-  ["Store order", "Outlet places and confirms an order before cutoff."],
-  ["Dispatcher plan", "Suggested plan is checked against vehicle and delivery rules, then published."],
-  ["Loader hand-off", "Trip loaded in sequence; shortfalls flagged early."],
-  ["Driver execution", "Guided stops with proof of delivery, online or offline."],
-  ["Store receipt", "Receipt confirmed in full, short or damaged."],
-  ["Issue resolution", "Evidence compared before any attribution."]
-] as const;
-
-const benefits = [
-  ["plan", "Plans you can explain", "Every suggested plan shows its reasons, and a dispatcher approves it before it’s published."],
-  ["check", "Nothing slips through", "Each order, load and delivery ends with a confirmation — or a clear way to retry."],
-  ["safe", "Safer on the road", "Drivers see detailed actions only once they’ve safely stopped."],
-  ["fair", "Fair issue resolution", "Loader counts, delivery proof and store receipts are compared before any decision."]
+  ["Store Manager", "Place and track outlet orders, see planned arrivals and confirm receipt.", "store_manager", "store"],
+  ["Dispatcher", "Build feasible delivery plans, explain deferrals and monitor live execution.", "dispatcher", "dispatch"],
+  ["Loader", "Load trips against the published plan and flag shortfalls before departure.", "loader", "load"],
+  ["Driver", "Run your assigned route safely, capture proof of delivery and keep working offline.", "driver", "drive"]
 ] as const;
 
 function Mark({ kind }: Readonly<{ kind: string }>) {
@@ -71,9 +48,7 @@ export default function HomePage() {
             <strong>Waypoint</strong>
           </Link>
           <div>
-            <a href="#how-it-works">How it works</a>
-            <a href="#roles">Roles</a>
-            <Link className={styles.navSignIn} href="/sign-in">Sign in</Link>
+            <a className={styles.navSignIn} href="#roles">Sign in</a>
           </div>
         </nav>
         <div className={styles.heroContent}>
@@ -81,8 +56,7 @@ export default function HomePage() {
           <h1>One shared workflow from outlet order to confirmed delivery.</h1>
           <p>Plan, load, deliver and confirm every outlet order in one connected workspace — with clear status for everyone involved.</p>
           <div className={styles.actions}>
-            <Link className={styles.primaryAction} href="/sign-in">Sign in</Link>
-            <a className={styles.secondaryAction} href="#how-it-works">See how it works</a>
+            <a className={styles.primaryAction} href="#roles">Sign in</a>
           </div>
           <div className={styles.statuses} aria-label="Shared status vocabulary">
             <b className={styles.success}>✓ Delivered</b>
@@ -93,65 +67,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className={styles.highlights} aria-label="Platform highlights">
-        {highlights.map(([kind, title, text]) => (
-          <article key={title}>
-            <div className={styles.cardTitle}><Mark kind={kind} /><strong>{title}</strong></div>
-            <p>{text}</p>
-          </article>
-        ))}
-      </section>
-
       <section className={styles.section} id="roles">
         <p className={styles.eyebrow}>ROLES</p>
         <h2>Four roles. One shared system.</h2>
         <p className={styles.lead}>Each role signs in to its own workspace, with the same status vocabulary, data and audit trail.</p>
         <div className={styles.cards}>
-          {roles.map(([title, text, device, role, kind]) => (
+          {roles.map(([title, text, role, kind]) => (
             <Link href={`/sign-in?role=${role}`} key={title}>
               <Mark kind={kind} />
               <h3>{title}</h3>
               <p>{text}</p>
-              <b>{device}<span aria-hidden="true">→</span></b>
+              <span className={styles.roleArrow} aria-hidden="true">→</span>
             </Link>
           ))}
         </div>
-      </section>
-
-      <section className={`${styles.section} ${styles.workflow}`} id="how-it-works">
-        <p className={styles.eyebrow}>HOW IT WORKS</p>
-        <h2>One loop from order to resolution</h2>
-        <div className={styles.steps}>
-          {steps.map(([title, text], index) => (
-            <article key={title}>
-              <i>{index + 1}</i>
-              <h3>{title}</h3>
-              <p>{text}</p>
-              {index < steps.length - 1 && <span aria-hidden="true">→</span>}
-            </article>
-          ))}
-        </div>
-        <small><Mark kind="audit" /> Every stage writes to one shared audit trail — changes are never silently overwritten.</small>
-      </section>
-
-      <section className={styles.section}>
-        <p className={styles.eyebrow}>WHY WAYPOINT</p>
-        <h2>Built for everyday delivery operations</h2>
-        <div className={styles.cards}>
-          {benefits.map(([kind, title, text]) => (
-            <article key={title}>
-              <Mark kind={kind} />
-              <h3>{title}</h3>
-              <p>{text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className={styles.cta}>
-        <h2>Ready to get started?</h2>
-        <p>Sign in with the account your administrator set up for you.</p>
-        <Link href="/sign-in">Sign in</Link>
       </section>
 
       <footer className={styles.footer}>
