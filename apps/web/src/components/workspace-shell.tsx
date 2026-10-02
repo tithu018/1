@@ -40,7 +40,24 @@ function LoaderIcon({ item }: Readonly<{ item: string }>) {
 
 function NavIcon({ item }: Readonly<{ item: string }>) {
   if (item === "Trip queue" || item === "Active load" || item === "Loading issues") return <LoaderIcon item={item} />;
-  return <span aria-hidden="true" className={styles.navDot} />;
+
+  const iconByItem: Record<string, string> = {
+    Dashboard: "gridIcon",
+    "Place order": "clipboard",
+    "Order status": "truckIcon",
+    Receive: "cube",
+    "History & issues": "historyIcon",
+    Notifications: "bellIcon",
+    Settings: "slidersIcon",
+    Plan: "routeIcon",
+    "Live Board": "truckIcon",
+    "Needs Attention": "alert",
+    "Deferral Log": "historyIcon",
+    "Capacity Forecast": "chartIcon",
+    "Reference Data": "clipboard"
+  };
+
+  return <span aria-hidden="true" className={`${styles.navIcon} ${styles[iconByItem[item] ?? "gridIcon"]}`} />;
 }
 
 export async function WorkspaceShell({
@@ -93,9 +110,7 @@ export async function WorkspaceShell({
             </span>
           </div>
           <form action={signOut} className={styles.signOutForm}>
-            <button className={styles.signOut} type="submit">
-              Sign out
-            </button>
+            <button className={styles.signOut} type="submit">Sign out</button>
           </form>
         </aside>
       )}
@@ -109,7 +124,9 @@ export async function WorkspaceShell({
                 <span>{isStore ? "Colombo - Peliyagoda depot" : isDispatcher ? "Tue 24 Mar 2026 - planning Wed 25 Mar" : "Loading for Wed 25 Mar 2026"}</span>
               </div>
               <div className={styles.headerRight}>
-                <span className={styles.status}>{isStore ? "△ Cutoff 16:00 - 20 min left" : isDispatcher ? "◷ Queue closed" : "✓ Online"}</span>
+                <span className={`${styles.status} ${isStore ? styles.warningStatus : isDispatcher ? styles.neutralStatus : styles.onlineStatus}`}>
+                  {isStore ? "Cutoff 16:00 - 20 min left" : isDispatcher ? "Queue closed" : "Online"}
+                </span>
                 <span className={styles.bell} aria-label="Notifications" role="img" />
                 <span className={styles.avatar}>{isStore ? "SM" : isDispatcher ? "DS" : "LD"}</span>
                 <span className={styles.identity}>
