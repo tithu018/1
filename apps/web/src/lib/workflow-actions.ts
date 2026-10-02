@@ -56,14 +56,17 @@ export async function recordDriverOutcome(input: { operationId: string; orderId:
   if (!session || session.role !== "driver" || !session.depotId) throw new Error("Driver access required.");
   return prisma.$transaction(async (tx) => {
     const existing = await tx.syncOperation.findUnique({ where: { operationId: input.operationId } });
-    if (existing) return existing.id;
+    if (existing) {
+      if (existing.accountId !== session.accountId) throw new Error("This sync operation belongs to another account.");
+      return { id: existing.id, status: existing.status };
+    }
     const order = await tx.order.findFirst({ where: { id: input.orderId, outlet: { depotId: session.depotId } }, include: { outlet: true } });
     if (!order || !["LOADED", "OUT_FOR_DELIVERY", "DELIVERED"].includes(order.status)) throw new Error("Order is not assigned and ready for Driver outcome.");
     const operation = await tx.syncOperation.create({ data: { operationId: input.operationId, accountId: session.accountId, entityType: "Order", entityId: order.id, payload: input } });
     if (input.clientUpdatedAt && order.updatedAt > new Date(input.clientUpdatedAt)) {
       await tx.syncConflict.create({ data: { operationId: operation.operationId, localPayload: input, serverPayload: { orderId: order.id, status: order.status, updatedAt: order.updatedAt.toISOString() } } });
       await tx.syncOperation.update({ where: { id: operation.id }, data: { status: "CONFLICT", serverPayload: { orderId: order.id, status: order.status, updatedAt: order.updatedAt.toISOString() } } });
-      return operation.id;
+      return { id: operation.id, status: "CONFLICT" as const };
     }
     await tx.deliveryOutcomeRecord.upsert({ where: { orderId: order.id }, update: { outcome: input.outcome, receiverName: input.receiverName, note: input.note }, create: { orderId: order.id, driverId: session.accountId, outcome: input.outcome, receiverName: input.receiverName, note: input.note } });
     if (input.photoKey) await tx.proofAsset.create({ data: { orderId: order.id, capturedById: session.accountId, type: "PHOTO", storageKey: input.photoKey } });
@@ -75,7 +78,7 @@ export async function recordDriverOutcome(input: { operationId: string; orderId:
     const recipients = await tx.account.findMany({ where: { OR: [{ outletId: order.outletId }, { depotId: session.depotId }] }, select: { id: true } });
     await tx.notification.createMany({ data: recipients.filter((recipient) => recipient.id !== session.accountId).map((recipient) => ({ recipientId: recipient.id, type: "DELIVERY", title: `${order.id} ${input.outcome === "DELIVERED" ? "delivered" : "needs attention"}`, body: input.note ?? "Driver outcome recorded.", entityType: "Order", entityId: order.id })) });
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Order", entityId: order.id, action: "driver_outcome_recorded", payload: { operationId: input.operationId, outcome: input.outcome, receiverName: input.receiverName ?? null, proof: Boolean(input.photoKey || input.signatureKey) } } });
-    return operation.id;
+    return { id: operation.id, status: "ACKNOWLEDGED" as const };
   });
 }
 
@@ -84,6 +87,11 @@ export async function resolveDriverSyncConflict(operationId: string, resolution:
   if (!session || session.role !== "driver") throw new Error("Driver access required.");
   const operation = await prisma.syncOperation.findFirst({ where: { operationId, accountId: session.accountId }, include: { conflict: true } });
   if (!operation?.conflict) throw new Error("Sync conflict not found.");
+  if (operation.conflict.resolvedAt) throw new Error("This conflict has already been resolved.");
+  if (resolution === "KEEP_LOCAL") {
+    const payload = operation.payload as { orderId: string; outcome: "DELIVERED" | "CANNOT_DELIVER"; receiverName?: string; note?: string };
+    await recordDriverOutcome({ ...payload, operationId: `${operationId}-resolved-local` });
+  }
   await prisma.$transaction(async (tx) => {
     await tx.syncConflict.update({ where: { operationId }, data: { resolution, resolvedAt: new Date() } });
     await tx.syncOperation.update({ where: { operationId }, data: { status: "ACKNOWLEDGED", acknowledgedAt: new Date() } });

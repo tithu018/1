@@ -1,0 +1,20 @@
+.page { display: grid; gap: 24px; color: #202522; }
+.page h1 { font-size: 28px; margin: 0 0 8px; }
+.page p { color: #66706a; line-height: 1.6; }
+.metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.metrics article, .form, .card { background: #fffdf8; border: 1px solid #e7dcc8; border-radius: 12px; padding: 24px; }
+.metrics strong { display: block; color: #214e3b; font-size: 30px; }
+.form fieldset { border: 0; padding: 12px 0; margin: 12px 0; }
+.form legend { font-weight: 700; }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.fields label { display: grid; gap: 8px; font-size: 14px; font-weight: 600; }
+.fields input, .fields select { width: 100%; min-height: 44px; border: 1px solid #cecfc5; background: white; border-radius: 6px; padding: 10px; color: #202522; }
+.fields small { color: #66706a; font-weight: 400; }
+.form button { background: #214e3b; color: white; border: 0; padding: 14px 20px; border-radius: 6px; cursor: pointer; }
+.form button:disabled { opacity: .6; cursor: wait; }
+.error { background: #fbece8; padding: 12px; color: #923d2e !important; }
+.success { background: #dce8de; padding: 12px; color: #214e3b !important; }
+.table { overflow-x: auto; }
+.table table { border-collapse: collapse; width: 100%; font-size: 14px; }
+.table th, .table td { padding: 14px 12px; text-align: left; border-bottom: 1px solid #e7dcc8; }
+@media (max-width: 700px) { .fields { grid-template-columns: 1fr; } .metrics { gap: 8px; } .metrics article { padding: 14px; } }

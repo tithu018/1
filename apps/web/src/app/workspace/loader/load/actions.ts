@@ -11,6 +11,7 @@ export async function confirmTripLoaded(tripId: string, orderIds: string[]) {
     if (!trip) throw new Error("This trip is no longer available for loading.");
     const allocated = new Set(trip.allocations.map((allocation) => allocation.orderId));
     if (orderIds.some((orderId) => !allocated.has(orderId))) throw new Error("The checklist does not match the published trip.");
+    if (new Set(orderIds).size !== allocated.size) throw new Error("Confirm every published stop before handoff.");
     await tx.trip.update({ where: { id: trip.id }, data: { status: "LOADED" } });
     for (const orderId of orderIds) {
       await tx.order.update({ where: { id: orderId }, data: { status: "LOADED" } });

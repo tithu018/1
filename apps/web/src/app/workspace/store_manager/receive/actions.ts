@@ -9,6 +9,8 @@ export async function recordReceipt(orderId: string, receivedUnits: number, expe
   return prisma.$transaction(async (tx) => {
     const order = await tx.order.findFirst({ where: { id: orderId, outletId: session.outletId }, include: { outlet: true } });
     if (!order) throw new Error("This order is not available to the signed-in outlet.");
+    if (expectedUnits !== order.units || !Number.isSafeInteger(receivedUnits)) throw new Error("Receipt quantities must match the order.");
+    if (outcome === "reservation" && order.outlet.brand !== "TECH") throw new Error("Reservation is available for Tech deliveries only.");
     if (!["DELIVERED", "OUT_FOR_DELIVERY"].includes(order.status)) throw new Error("Only an out-for-delivery order can be receipted.");
     await tx.receiptRecord.upsert({ where: { orderId }, update: { confirmedById: session.accountId, expectedUnits, receivedUnits, outcome, note: note.trim() || null, confirmedAt: new Date() }, create: { orderId, confirmedById: session.accountId, expectedUnits, receivedUnits, outcome, note: note.trim() || null } });
     const existing = await tx.issueCase.findFirst({ where: { orderId, summary: { startsWith: "Receipt:" } } });

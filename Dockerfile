@@ -37,4 +37,4 @@ COPY --from=builder /app ./
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "pnpm --filter @waypoint/database exec prisma migrate deploy && pnpm db:seed && pnpm --filter @waypoint/web start"]
+CMD ["sh", "-c", "pnpm --filter @waypoint/database exec prisma migrate deploy && pnpm --filter @waypoint/web start"]
