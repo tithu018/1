@@ -7,7 +7,7 @@ export default function ResetPasswordPage() {
     <main className={styles.reset}>
       <header>
         <Link href="/">
-          <Image src="/Image/logo-green.png" alt="Waypoint" width={47} height={32} priority />
+          <Image src="/Image/logo-green-hq.png" alt="Waypoint" width={66} height={36} priority />
           <span>Waypoint</span>
         </Link>
         <Link href="/sign-in">← Back to sign in</Link>

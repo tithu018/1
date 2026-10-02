@@ -1,12 +1,12 @@
-.page { max-width: 980px; }
+.page { width:min(100%,1080px); }
 .page header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:22px; }
 .page header p { margin:0 0 6px; color:#68746d; font-size:11px; letter-spacing:.08em; }
-.page h1 { margin:0; color:#215742; font-size:30px; }
+.page h1 { margin:0; color:#215742; font-size:34px; letter-spacing:-.035em; }
 .page header span { color:#68746d; font-size:13px; }
 .page header strong { padding:8px 12px; color:#7a5210; background:#f8ead0; text-transform:capitalize; }
-.grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-.card, .action { padding:20px; border:1px solid #e6dac6; background:#fffdf9; }
-.card h2, .action h2 { margin:0 0 16px; color:#215742; font-size:18px; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.card, .action { padding:24px; border:1px solid #e6dac6; border-radius:16px; background:#fffdf9; box-shadow:0 12px 28px #2920100c; }
+.card h2, .action h2 { margin:0 0 16px; color:#215742; font-size:22px; }
 .card ol { display:grid; gap:0; margin:0; padding:0; list-style:none; }
 .card li { display:grid; gap:5px; padding:14px 0 14px 16px; border-left:2px solid #b9d0bd; }
 .card li span, .card dd { color:#68746d; font-size:12px; }
@@ -16,7 +16,7 @@
 .card dd { margin:0; color:#202522; }
 .action { margin-top:20px; }
 .action textarea { display:block; width:100%; min-height:90px; padding:10px; border:1px solid #cfc3ae; box-sizing:border-box; }
-.action button { margin-top:12px; padding:11px 15px; border:0; color:#fffdf9; background:#214e3b; font-weight:700; }
+.action button { min-height:48px; margin-top:12px; padding:11px 18px; border:0; border-radius:9px; color:#fffdf9; background:#214e3b; font-weight:700; }
 .action p { color:#215742; font-size:13px; }
 .page > a { display:inline-block; margin-top:20px; color:#215742; font-weight:700; }
 @media (max-width:700px) { .page header { flex-direction:column; gap:12px; } .grid { grid-template-columns:1fr; } }

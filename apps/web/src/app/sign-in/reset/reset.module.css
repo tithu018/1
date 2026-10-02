@@ -1,95 +1,14 @@
-.reset {
-  min-height: 100vh;
-  background: #f6f1e8;
-}
-
-.reset header {
-  display: flex;
-  height: 54px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 64px;
-  border-bottom: 1px solid #e6dac6;
-}
-
-.reset header a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #226045;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.reset header a:first-child {
-  font-size: 18px;
-}
-
-.reset header img {
-  width: 47px;
-  height: auto;
-}
-
-.card {
-  width: 360px;
-  margin: 150px auto 0;
-  padding: 30px;
-  border: 1px solid #e6dac6;
-  border-radius: 11px;
-  background: #fffdf9;
-  box-shadow: 0 16px 28px #29201012;
-}
-
-.card h1 {
-  margin: 0 0 16px;
-  color: #215742;
-  font-size: 26px;
-  line-height: 1.08;
-}
-
-.card p {
-  color: #68746d;
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-.card label {
-  display: block;
-  margin: 18px 0 7px;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.card input {
-  width: 100%;
-  height: 38px;
-  padding: 0 13px;
-  border: 1px solid #a8a194;
-  border-radius: 7px;
-  background: #fffdf9;
-}
-
-.card small {
-  display: block;
-  margin-top: 6px;
-  color: #68746d;
-  font-size: 10px;
-}
-
-.card button {
-  width: 100%;
-  height: 37px;
-  margin: 16px 0 22px;
-  border: 0;
-  border-radius: 7px;
-  color: #fffdf8;
-  background: #215742;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.card a {
-  color: #226045;
-  font-size: 12px;
-  font-weight: 800;
-}
+.reset { min-height: 100vh; background: #f7f3ea; }
+.reset header { display: flex; height: 72px; align-items: center; justify-content: space-between; padding: 0 80px; border-bottom: 1px solid #e7dcc8; }
+.reset header a { display: flex; min-height: 40px; align-items: center; gap: 10px; color: #2f6b52; font-size: 14px; font-weight: 600; }
+.reset header a:first-child { color: #214e3b; font-size: 22px; font-weight: 800; }
+.reset header img { width: 66px; height: 36px; object-fit: contain; }
+.card { width: min(calc(100% - 40px),480px); margin: 112px auto 0; padding: 40px; border: 1px solid #e7dcc8; border-radius: 16px; background: #fffdf8; box-shadow: 0 4px 16px rgba(59,50,34,.07); }
+.card h1 { margin: 0 0 20px; color: #214e3b; font-size: 32px; line-height: 1.2; letter-spacing: -.5px; }
+.card p { margin: 0 0 20px; color: #66706a; font-size: 14px; line-height: 1.5; }
+.card label { display: block; margin: 16px 0 6px; color: #202522; font-size: 14px; font-weight: 500; }
+.card input { width: 100%; height: 48px; padding: 0 14px; border: 1px solid #8c8577; border-radius: 10px; color: #202522; background: #fffdf8; font-size: 16px; }
+.card small { display: block; margin-top: 6px; color: #66706a; font-size: 12px; }
+.card button { width: 100%; height: 48px; margin: 20px 0; border: 0; border-radius: 10px; color: #fff; background: #214e3b; font-size: 16px; font-weight: 600; }
+.card > a { display: inline-flex; min-height: 40px; align-items: center; color: #2f6b52; font-size: 14px; font-weight: 600; }
+@media (max-width: 640px) { .reset header { height: 64px; padding: 0 16px; } .reset header a:first-child span { display: none; } .reset header img { width: 59px; height: 32px; } .card { margin-top: 40px; padding: 28px 20px; } .card h1 { font-size: 28px; } }
