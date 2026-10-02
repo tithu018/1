@@ -87,21 +87,10 @@ function DesktopSignIn({ role, error }: Readonly<{ role: UserRole; error?: strin
           <span>{roleCopy[role].detail}</span>
         </div>
       </section>
-      <section className={`${styles.formArea} ${role === "store_manager" ? styles.storeFormArea : ""}`}>
+      <section className={styles.formArea}>
         <div className={styles.formStack}>
           <SignInForm role={role} error={error} />
           <p className={styles.language}>◎ English⌄</p>
-          {role === "store_manager" && (
-            <aside className={styles.demoOutlets}>
-              <strong>PROTOTYPE · DEMO OUTLETS</strong>
-              <div>
-                <button type="button">Fresh · OUT010</button>
-                <button type="button">Style · OUT017</button>
-                <button type="button">Tech · OUT022</button>
-              </div>
-              <span>In the live system the registered outlet decides the workspace.</span>
-            </aside>
-          )}
         </div>
       </section>
     </main>
