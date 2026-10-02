@@ -31,19 +31,16 @@
 
 .loaderSidebar {
   --sidebar-image: url("/Image/loader.png");
-  --sidebar-image-position: center calc(100% - 154px);
   --sidebar-image-size: 264px;
 }
 
 .storeSidebar {
   --sidebar-image: url("/Image/store-manager.png");
-  --sidebar-image-position: center calc(100% - 152px);
   --sidebar-image-size: 274px;
 }
 
 .dispatcherSidebar {
   --sidebar-image: url("/Image/dispatcher.png");
-  --sidebar-image-position: center calc(100% - 154px);
   --sidebar-image-size: 270px;
 }
 
@@ -51,7 +48,7 @@
   position: absolute;
   z-index: 0;
   inset: 0;
-  background: var(--sidebar-image) var(--sidebar-image-position) / var(--sidebar-image-size) auto no-repeat;
+  background: var(--sidebar-image) center calc(100% - 104px) / var(--sidebar-image-size) auto no-repeat;
   content: "";
   opacity: .5;
   pointer-events: none;
