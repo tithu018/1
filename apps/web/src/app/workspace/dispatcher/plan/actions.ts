@@ -13,7 +13,7 @@ export async function publishAssistedPlan(trips: { vehicleId: string; orderIds: 
     if (!trips.length || new Set(orderIds).size !== orderIds.length) throw new Error("Every published trip must contain unique orders.");
     const [vehicles, orders] = await Promise.all([
       tx.vehicle.findMany({ where: { id: { in: vehicleIds }, depotId: session.depotId } }),
-      tx.order.findMany({ where: { id: { in: orderIds }, outlet: { depotId: session.depotId }, status: { in: ["SUBMITTED", "CONFIRMED", "DEFERRED"] } }, include: { outlet: true } })
+      tx.order.findMany({ where: { id: { in: orderIds }, outlet: { depotId: session.depotId }, status: { in: ["SUBMITTED", "CONFIRMED", "DEFERRED", "ALLOCATED"] } }, include: { outlet: true } })
     ]);
     if (vehicles.length !== vehicleIds.length || orders.length !== orderIds.length) throw new Error("The plan contains a vehicle or order that is no longer available in this depot.");
     if (vehicles.some((vehicle) => vehicle.isInWorkshop)) throw new Error("A vehicle in the plan is currently in the workshop.");

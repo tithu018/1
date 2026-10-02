@@ -8,6 +8,7 @@ import { publishAssistedPlan } from "./actions";
 export function DispatcherPlan({ vehicles, orders }: Readonly<{ vehicles: AllocationVehicle[]; orders: AllocationOrder[] }>) {
   const [generated, setGenerated] = useState(false);
   const [published, setPublished] = useState(false);
+  const [publishedVersion, setPublishedVersion] = useState<number | null>(null);
   const [deferralReasonRecorded, setDeferralReasonRecorded] = useState(false);
   const [publishError, setPublishError] = useState<string | null>(null);
   const result = useMemo(() => suggestAllocation(vehicles, orders), [orders, vehicles]);
@@ -16,8 +17,9 @@ export function DispatcherPlan({ vehicles, orders }: Readonly<{ vehicles: Alloca
   async function publish() {
     setPublishError(null);
     try {
-      await publishAssistedPlan(result.trips.map((trip) => ({ vehicleId: trip.vehicleId, orderIds: trip.orders.map((order) => order.id), brand: trip.orders[0].brand.toUpperCase() as "FRESH" | "STYLE" | "TECH", district: trip.orders[0].district })));
+      const version = await publishAssistedPlan(result.trips.map((trip) => ({ vehicleId: trip.vehicleId, orderIds: trip.orders.map((order) => order.id), brand: trip.orders[0].brand.toUpperCase() as "FRESH" | "STYLE" | "TECH", district: trip.orders[0].district })));
       setPublished(true);
+      setPublishedVersion(version);
     } catch (error) { setPublishError(error instanceof Error ? error.message : "The plan could not be published."); }
   }
 

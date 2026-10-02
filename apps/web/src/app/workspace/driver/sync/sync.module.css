@@ -20,6 +20,15 @@
   font-weight: 800;
 }
 
+.sync header p,
+.note { margin: 4px 0 0; color: #68746d; font-size: 12px; }
+.sync button { margin-top: 12px; padding: 10px 13px; border: 0; border-radius: 6px; color: #fffdf9; background: #214e3b; font-weight: 700; cursor: pointer; }
+.sync button.secondary { color: #214e3b; background: #eef1eb; }
+.sync .offline, .sync .review { color: #7a5210; background: #f8ead0; }
+.sync .attention, .sync .conflict { color: #7a5210; background: #f8ead0; }
+.sync .conflict { color: #9e3b2a; background: #f6ddd6; }
+.demoAction { background: #66706a !important; }
+
 .sync aside,
 .sync section {
   margin-top: 16px;
