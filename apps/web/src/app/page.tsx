@@ -39,6 +39,30 @@ function Mark({ kind }: Readonly<{ kind: string }>) {
 export default function HomePage() {
   return (
     <main className={styles.page}>
+      <section className={styles.mobileDriverLanding} aria-label="Waypoint Driver">
+        <header>
+          <Link href="/" aria-label="Waypoint home">
+            <Image src="/Image/logo-green-hq.png" width={59} height={32} alt="Waypoint" priority />
+          </Link>
+          <Link href="/sign-in?role=driver">Sign in</Link>
+        </header>
+        <div className={styles.mobileDriverContent}>
+          <div className={styles.driverHeroArt}>
+            <Image src="/Image/driver.png" fill sizes="350px" alt="Waypoint driver reviewing a delivery stop" priority />
+          </div>
+          <p className={styles.eyebrow}>WAYPOINT DRIVER</p>
+          <h1>Your deliveries, stop by stop.</h1>
+          <p className={styles.driverLead}>Your assigned trip, a safe Drive Mode and delivery records that keep working without signal.</p>
+          <div className={styles.driverBenefits}>
+            <article><Mark kind="live" /><div><strong>Drive Mode</strong><p>Next stop, ETA and window — big and glanceable while you drive.</p></div></article>
+            <article><Mark kind="offline" /><div><strong>Works offline</strong><p>Deliveries are saved on your phone and sync when the signal returns.</p></div></article>
+            <article><Mark kind="check" /><div><strong>One tap at each stop</strong><p>Mark delivered; the store confirms what arrived.</p></div></article>
+          </div>
+          <Link className={styles.mobileDriverSignIn} href="/sign-in?role=driver">Sign in</Link>
+          <p className={styles.mobileAudience}>For Waypoint drivers. Store managers, dispatchers and loaders use the desktop web app.</p>
+          <small>© 2026 Waypoint</small>
+        </div>
+      </section>
       <section className={styles.hero}>
         <Image className={styles.heroImage} src="/Image/f1.png" fill priority sizes="100vw" alt="Delivery vehicles travelling between connected outlet locations" />
         <nav className={styles.nav} aria-label="Primary navigation">
