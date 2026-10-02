@@ -26,18 +26,40 @@
 .novaSidebar {
   width: 280px;
   padding: 24px 16px;
+  background: #214e3b;
 }
 
 .loaderSidebar {
-  background: #214e3b url("/Image/loader.png") center calc(100% - 154px) / 264px auto no-repeat;
+  --sidebar-image: url("/Image/loader.png");
+  --sidebar-image-position: center calc(100% - 154px);
+  --sidebar-image-size: 264px;
 }
 
 .storeSidebar {
-  background: #214e3b url("/Image/store-manager.png") center calc(100% - 152px) / 274px auto no-repeat;
+  --sidebar-image: url("/Image/store-manager.png");
+  --sidebar-image-position: center calc(100% - 152px);
+  --sidebar-image-size: 274px;
 }
 
 .dispatcherSidebar {
-  background: #214e3b url("/Image/dispatcher.png") center calc(100% - 154px) / 270px auto no-repeat;
+  --sidebar-image: url("/Image/dispatcher.png");
+  --sidebar-image-position: center calc(100% - 154px);
+  --sidebar-image-size: 270px;
+}
+
+.novaSidebar::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: var(--sidebar-image) var(--sidebar-image-position) / var(--sidebar-image-size) auto no-repeat;
+  content: "";
+  opacity: .5;
+  pointer-events: none;
+}
+
+.novaSidebar > * {
+  position: relative;
+  z-index: 1;
 }
 
 .logo {
@@ -114,186 +136,9 @@
 }
 
 .navIcon {
-  position: relative;
   width: 20px;
   height: 20px;
   flex: 0 0 20px;
-}
-
-.clipboard {
-  border: 1.5px solid currentColor;
-  border-radius: 2px;
-}
-
-.clipboard::before {
-  position: absolute;
-  top: -3px;
-  left: 3px;
-  width: 5px;
-  height: 3px;
-  border: 1.5px solid currentColor;
-  border-bottom: 0;
-  border-radius: 2px 2px 0 0;
-  content: "";
-}
-
-.cube {
-  border: 1.5px solid currentColor;
-  transform: rotate(30deg) skew(-12deg);
-}
-
-.gridIcon {
-  display: grid;
-  grid-template-columns: repeat(2, 5px);
-  grid-template-rows: repeat(2, 5px);
-  gap: 3px;
-}
-
-.gridIcon::before,
-.gridIcon::after {
-  width: 5px;
-  height: 5px;
-  border: 1.5px solid currentColor;
-  border-radius: 2px;
-  content: "";
-}
-
-.gridIcon::after {
-  box-shadow: -8px 8px 0 -1.5px #1f523f, -8px 8px 0 0 currentColor, 0 8px 0 -1.5px #1f523f, 0 8px 0 0 currentColor;
-}
-
-.truckIcon {
-  border: 1.5px solid currentColor;
-  border-radius: 2px;
-}
-
-.truckIcon::before,
-.truckIcon::after {
-  position: absolute;
-  bottom: -3px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: currentColor;
-  content: "";
-}
-
-.truckIcon::before {
-  left: 1px;
-}
-
-.truckIcon::after {
-  right: 1px;
-}
-
-.historyIcon {
-  border: 1.5px solid currentColor;
-  border-radius: 50%;
-}
-
-.historyIcon::before {
-  position: absolute;
-  top: 2px;
-  left: 5px;
-  width: 1.5px;
-  height: 5px;
-  background: currentColor;
-  content: "";
-}
-
-.historyIcon::after {
-  position: absolute;
-  top: 6px;
-  left: 5px;
-  width: 5px;
-  height: 1.5px;
-  background: currentColor;
-  content: "";
-}
-
-.bellIcon {
-  border: 1.5px solid currentColor;
-  border-top-color: transparent;
-  border-radius: 0 0 7px 7px;
-}
-
-.bellIcon::before {
-  position: absolute;
-  top: -4px;
-  left: 3px;
-  width: 5px;
-  height: 6px;
-  border: 1.5px solid currentColor;
-  border-bottom: 0;
-  border-radius: 7px 7px 0 0;
-  content: "";
-}
-
-.slidersIcon::before,
-.slidersIcon::after {
-  position: absolute;
-  left: 0;
-  width: 13px;
-  height: 1.5px;
-  background: currentColor;
-  content: "";
-}
-
-.slidersIcon::before {
-  top: 3px;
-  box-shadow: 0 7px 0 currentColor;
-}
-
-.slidersIcon::after {
-  top: 0;
-  left: 3px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  box-shadow: 5px 7px 0 currentColor;
-}
-
-.routeIcon::before,
-.routeIcon::after {
-  position: absolute;
-  border: 1.5px solid currentColor;
-  content: "";
-}
-
-.routeIcon::before {
-  top: 1px;
-  left: 1px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-}
-
-.routeIcon::after {
-  right: 1px;
-  bottom: 1px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  box-shadow: -4px -4px 0 -2px currentColor;
-}
-
-.chartIcon::before {
-  position: absolute;
-  bottom: 0;
-  left: 1px;
-  width: 2px;
-  height: 8px;
-  background: currentColor;
-  box-shadow: 5px -3px 0 currentColor, 10px -6px 0 currentColor;
-  content: "";
-}
-
-.alert::before {
-  position: absolute;
-  inset: 1px 0 0;
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  border: 1.5px solid currentColor;
-  content: "";
 }
 
 .sidebarFooter {
@@ -323,11 +168,10 @@
 }
 
 .signOut {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 11px;
-  padding: 0 0 0 23px;
+  padding: 0;
   border: 0;
   color: #fffdf8;
   background: transparent;
@@ -337,26 +181,10 @@
   cursor: pointer;
 }
 
-.signOut::before {
-  position: absolute;
-  left: 0;
-  width: 11px;
-  height: 11px;
-  border: 1.5px solid currentColor;
-  border-right: 0;
-  border-radius: 2px;
-  content: "";
-}
-
-.signOut::after {
-  position: absolute;
-  left: 7px;
-  width: 7px;
-  height: 7px;
-  border-top: 1.5px solid currentColor;
-  border-right: 1.5px solid currentColor;
-  content: "";
-  transform: rotate(45deg);
+.signOut svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
 }
 
 .content {
