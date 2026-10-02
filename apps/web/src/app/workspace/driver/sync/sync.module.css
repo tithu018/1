@@ -1,7 +1,7 @@
 .sync h1 {
-  margin: 10px 0 16px;
+  margin: 0;
   color: #215742;
-  font-size: 24px;
+  font-size: 28px;
 }
 
 .sync header {
@@ -22,7 +22,7 @@
 
 .sync header p,
 .note { margin: 4px 0 0; color: #68746d; font-size: 12px; }
-.sync button { margin-top: 12px; padding: 10px 13px; border: 0; border-radius: 6px; color: #fffdf9; background: #214e3b; font-weight: 700; cursor: pointer; }
+.sync button { min-height: 44px; margin-top: 12px; padding: 10px 13px; border: 0; border-radius: 8px; color: #fffdf9; background: #214e3b; font-weight: 700; cursor: pointer; }
 .sync button.secondary { color: #214e3b; background: #eef1eb; }
 .sync .offline, .sync .review { color: #7a5210; background: #f8ead0; }
 .sync .attention, .sync .conflict { color: #7a5210; background: #f8ead0; }
@@ -31,10 +31,10 @@
 
 .sync aside,
 .sync section {
-  margin-top: 16px;
-  padding: 16px;
+  margin-top: 18px;
+  padding: 18px;
   border: 1px solid #e6dac6;
-  border-radius: 11px;
+  border-radius: 14px;
   background: #fffdf9;
 }
 
@@ -53,7 +53,7 @@
 .sync article {
   display: grid;
   gap: 5px;
-  padding: 13px 0;
+  padding: 15px 0;
   border-bottom: 1px solid #e6dac6;
   font-size: 12px;
 }
