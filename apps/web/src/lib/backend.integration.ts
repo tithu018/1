@@ -80,6 +80,12 @@ afterAll(async () => {
 });
 
 describe("authentication and one dispatcher permission level", () => {
+  it("stores optional map locations and rejects incomplete or out-of-range coordinates", async () => {
+    expect(await db.outlet.findUnique({ where: { id: "FRESH" } })).toMatchObject({ latitude: null, longitude: null });
+    await expect(db.outlet.update({ where: { id: "FRESH" }, data: { latitude: 6.9344 } })).rejects.toThrow();
+    await expect(db.outlet.update({ where: { id: "FRESH" }, data: { latitude: 91, longitude: 79.8428 } })).rejects.toThrow();
+    expect(await db.outlet.update({ where: { id: "FRESH" }, data: { address: "Demo stop", latitude: 6.9344, longitude: 79.8428 } })).toMatchObject({ latitude: 6.9344, longitude: 79.8428 });
+  });
   it("checks credentials, role and authoritative account scope", async () => {
     expect(await authenticate("DISPATCHER@example.test", "FixturePassword123!", "dispatcher")).toMatchObject({ accountId: "dispatcher" });
     expect(await authenticate("dispatcher@example.test", "wrong", "dispatcher")).toBeNull();

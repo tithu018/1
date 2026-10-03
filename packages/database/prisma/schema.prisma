@@ -99,6 +99,9 @@ model Outlet {
   mallWindow            String?
   windowOpenTime        String
   windowCloseTime       String
+  address               String?
+  latitude              Float?
+  longitude             Float?
   depot                 Depot    @relation(fields: [depotId], references: [id])
   accounts              Account[]
   orders                Order[]

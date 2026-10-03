@@ -12,6 +12,7 @@
     "db:generate": "pnpm --filter @waypoint/database generate",
     "db:migrate": "pnpm --filter @waypoint/database migrate",
     "db:seed": "pnpm --filter @waypoint/database seed",
+    "db:seed:driver": "pnpm --filter @waypoint/database seed:driver",
     "db:bootstrap": "pnpm --filter @waypoint/database bootstrap"
   }
 }
