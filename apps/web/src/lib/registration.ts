@@ -4,10 +4,19 @@ export type RegistrationInput = {
   dockType: string; parkingConstraint: string; windowOpenTime: string; windowCloseTime: string; mallWindow: string | null;
 };
 
+export function parseAccount(form: FormData) {
+  const displayName = String(form.get("displayName") ?? "").trim();
+  const email = String(form.get("email") ?? "").trim().toLowerCase();
+  const password = String(form.get("password") ?? "");
+  if (!displayName || displayName.length > 100) throw new Error("Enter a name of up to 100 characters.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) throw new Error("Enter a valid email address.");
+  if (password.length < 12 || new TextEncoder().encode(password).length > 72) throw new Error("Use a password of at least 12 characters and at most 72 bytes.");
+  return { displayName, email, password };
+}
+
 export function parseRegistration(form: FormData): RegistrationInput {
   const value = (key: string) => String(form.get(key) ?? "").trim();
-  const displayName = value("displayName"), email = value("email").toLowerCase();
-  const password = String(form.get("password") ?? "");
+  const { displayName, email, password } = parseAccount(form);
   const outletId = value("outletId").toUpperCase(), brand = value("brand");
   const district = value("district"), dockType = value("dockType"), parkingConstraint = value("parkingConstraint");
   const windowOpenTime = value("windowOpenTime"), windowCloseTime = value("windowCloseTime");

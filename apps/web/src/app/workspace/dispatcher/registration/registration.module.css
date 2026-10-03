@@ -1,4 +1,8 @@
 .page { display: grid; gap: 24px; color: #202522; }
+.tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+.tabs button, .table button { border: 1px solid #e7dcc8; border-radius: 6px; padding: 10px 14px; background: #fffdf8; color: #214e3b; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: #214e3b; color: white; }
+.table button:disabled { opacity: .5; cursor: default; }
 .page h1 { font-size: 28px; margin: 0 0 8px; }
 .page p { color: #66706a; line-height: 1.6; }
 .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }

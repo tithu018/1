@@ -46,28 +46,25 @@ function RoleChooser() {
           <Image src="/Image/logo-green-hq.png" alt="" width={66} height={36} priority />
           <span>{APP_NAME}</span>
         </Link>
-        <Link href="/" className={styles.back}>← Back to home</Link>
+
       </header>
       <section className={styles.chooserIntro}>
         <p>SIGN IN</p>
-        <h1>How are you signing in today?</h1>
-        <span>Choose your role. Each role signs in to its own workspace.</span>
+        <h1>Choose your role</h1>
+
       </section>
       <div className={styles.grid}>
         {userRoles.map((item) => (
           <Link key={item} href={`/sign-in?role=${item}`} className={styles.role}>
             <span className={`${styles.roleIcon} ${styles[item]}`} aria-hidden="true" />
             <h2>{roleLabels[item]}</h2>
-            <p>{roleCopy[item].detail}</p>
-            <b>{roleCopy[item].device}</b>
+
+
             <i aria-hidden="true">→</i>
           </Link>
         ))}
       </div>
-      <aside className={styles.notice}>
-        <strong>Not sure which role to choose?</strong>
-        <span>Your role is assigned by your Waypoint administrator. If you pick the wrong one, you will see a message explaining your access.</span>
-      </aside>
+
     </main>
   );
 }
@@ -84,13 +81,13 @@ function DesktopSignIn({ role, error }: Readonly<{ role: UserRole; error?: strin
         <div className={styles.artContent}>
           <p>SIGNING IN AS</p>
           <h1>{roleLabels[role]}</h1>
-          <span>{roleCopy[role].detail}</span>
+
         </div>
       </section>
       <section className={styles.formArea}>
         <div className={styles.formStack}>
           <SignInForm role={role} error={error} />
-          <p className={styles.language}>◎ English⌄</p>
+
         </div>
       </section>
     </main>
@@ -119,27 +116,24 @@ function SignInForm({ role, error, compact }: Readonly<{ role: UserRole; error?:
       <p>to the {roleLabels[role]} workspace</p>
       {error && (
         <p className={styles.error}>
-          <strong>{error === "access" ? "Check the highlighted field" : "Could not reach Waypoint"}</strong>
-          <span>{error === "access" ? "Your password was kept. Add your email or staff ID to continue." : "Check your email or staff ID, password, and selected role."}</span>
+          <span>Check your email, password and selected role.</span>
         </p>
       )}
       <input type="hidden" name="role" value={role} />
-      <label htmlFor="identifier">Email or staff ID</label>
+      <label htmlFor="identifier">Email</label>
       <div className={styles.inputWrap}>
         <span className={styles.personIcon} aria-hidden="true" />
-        <input id="identifier" name="identifier" autoComplete="username" placeholder="Enter your email or staff ID" required />
+        <input id="identifier" type="email" name="identifier" autoComplete="username" placeholder="Enter your email" required />
       </div>
-      <small>ⓘ Use the email or staff ID from your administrator.</small>
+
       <label htmlFor="password">Password</label>
       <div className={styles.inputWrap}>
         <span className={styles.lockIcon} aria-hidden="true" />
         <input id="password" name="password" type="password" autoComplete="current-password" placeholder="Enter your password" required />
       </div>
-      <small>ⓘ Passwords are case-sensitive.</small>
+
       <div className={styles.options}>
-        <label>
-          <input type="checkbox" /> Label
-        </label>
+
         <Link href="/sign-in/reset">Forgot password?</Link>
       </div>
       <button type="submit">Sign in</button>

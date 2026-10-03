@@ -12,15 +12,11 @@ export default function ResetPasswordPage() {
         </Link>
         <Link href="/sign-in">← Back to sign in</Link>
       </header>
-      <form className={styles.card}>
-        <h1>Reset your password</h1>
-        <p>Enter your email or staff ID. If it matches an account, reset instructions go to the contact your administrator registered.</p>
-        <label htmlFor="reset-id">Email or staff ID</label>
-        <input id="reset-id" placeholder="Value" />
-        <small>ⓘ Helper</small>
-        <button type="button">Send reset instructions</button>
+      <section className={styles.card}>
+        <h1>Password reset</h1>
+        <p>Contact your dispatcher office to reset your password.</p>
         <Link href="/sign-in">← Back to sign in</Link>
-      </form>
+      </section>
     </main>
   );
 }

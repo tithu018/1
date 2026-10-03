@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:backend": "vitest run --config vitest.backend.config.ts"
   },
   "dependencies": {
     "@waypoint/allocation": "workspace:*",

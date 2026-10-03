@@ -6,6 +6,7 @@ import { requireRole } from "@/lib/auth";
 import { displayDate, displayTime, label } from "@/lib/format";
 import styles from "./section.module.css";
 import { DataTable } from "@/components/data-table";
+import { DriverAssignment } from "../plan/driver-assignment";
 
 function Table({ headers, rows }: { headers: string[]; rows: React.ReactNode[][] }) {
   return <div className={styles.tableWrap}><table><thead><tr>{headers.map((header) => <th key={header}>{header}</th>)}</tr></thead><tbody>{rows.map((row, index) => <tr key={index}>{row.map((cell, column) => <td key={column}>{cell}</td>)}</tr>)}</tbody></table>{!rows.length && <p className={styles.caption}>No records to display.</p>}</div>;
@@ -17,6 +18,7 @@ export default async function DispatcherSectionPage({ params }: { params: Promis
   if (!titles[section]) notFound();
   const session = await requireRole("dispatcher");
   if (!session.depotId) notFound();
+  const drivers = await prisma.account.findMany({ where: { depotId: session.depotId, role: "DRIVER", isActive: true }, select: { id: true, displayName: true } });
   const [vehicles, outlets, orders, issues, plan, events] = await Promise.all([
     prisma.vehicle.findMany({ where: { depotId: session.depotId }, orderBy: { id: "asc" } }),
     prisma.outlet.findMany({ where: { depotId: session.depotId }, orderBy: { id: "asc" } }),
@@ -37,8 +39,8 @@ export default async function DispatcherSectionPage({ params }: { params: Promis
     ];
   });
   return <WorkspaceShell role="dispatcher" active={titles[section]}><section className={styles.page}>
-    <header className={styles.heading}><div><h1>{titles[section]}</h1><p>{session.depotId} · {plan ? `${displayDate(plan.serviceDate)} · Plan v${plan.version}` : "No published plan"}</p></div><Link href="/workspace/dispatcher/registration">Register store manager</Link></header>
-    {section === "board" && <section className={styles.card}><h2>Published trips</h2><Table headers={["Trip", "Vehicle", "Brand", "District", "Stops", "Planned start", "Status"]} rows={plan?.trips.map((trip) => [trip.id, trip.vehicleId, label(trip.brand), trip.district, trip.allocations.length, trip.plannedStart ? displayTime(trip.plannedStart) : "Not set", label(trip.status)]) ?? []} /></section>}
+    <header className={styles.heading}><div><h1>{titles[section]}</h1><p>{session.depotId} · {plan ? `${displayDate(plan.serviceDate)} · Plan v${plan.version}` : "No published plan"}</p></div></header>
+    {section === "board" && <section className={styles.card}><h2>Trips</h2><Table headers={["Trip", "Vehicle", "Brand", "District", "Stops", "Departure", "Status", "Driver"]} rows={plan?.trips.map((trip) => [trip.id, trip.vehicleId, label(trip.brand), trip.district, trip.allocations.length, trip.plannedStart ? displayTime(trip.plannedStart) : "Not set", label(trip.status), ["ALLOCATED", "LOADED"].includes(trip.status) ? <DriverAssignment key={trip.id} tripId={trip.id} driverId={trip.driverId} drivers={drivers} /> : drivers.find((driver) => driver.id === trip.driverId)?.displayName ?? "—"]) ?? []} /></section>}
     {section === "attention" && <section className={styles.card}><h2>{issues.length} open issues</h2><Table headers={["Case", "Order", "Outlet", "Problem", "Status"]} rows={issues.map((issue) => [<Link key={issue.id} href={`/workspace/dispatcher/issues/${issue.id}`}>{issue.id}</Link>, issue.orderId, issue.order.outletId, issue.summary, label(issue.status)])} /></section>}
     {section === "deferrals" && <section className={styles.card}><h2>Recorded deferrals</h2><div className={styles.tableWrap}><DataTable exportName="deferrals" headers={["Order", "Outlet", "Brand", "Units", "Recorded", "Reason", "Requested date"]} rows={events.map((event) => [event.orderId, event.order.outletId, label(event.order.outlet.brand), String(event.order.units), displayDate(event.createdAt), event.reason ?? "Not recorded", displayDate(event.order.requestedDate)])} /></div></section>}
     {section === "capacity" && <><div className={styles.metrics}><article><small>QUEUED DEMAND</small><strong>{demand.toLocaleString()} kg</strong><span>{orders.length} orders</span></article><article><small>AVAILABLE WEIGHT CAPACITY</small><strong>{capacity.toLocaleString()} kg</strong><span>{vehicles.filter((vehicle) => !vehicle.isInWorkshop).length} vehicles</span></article><article><small>WEIGHT PRESSURE</small><strong>{capacity ? `${Math.round(demand / capacity * 100)}%` : "No capacity"}</strong><span>Queued demand against current fleet</span></article></div><p className={styles.caption}>This is a current queue estimate. Temperature, volume, access and route constraints are checked in the planner.</p></>}

@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+export { Prisma, PrismaClient } from "@prisma/client";
+export type { Account } from "@prisma/client";
 
 const databaseUrl = process.env.DATABASE_URL?.replace("@localhost:5432", "@127.0.0.1:5433");
 

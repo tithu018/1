@@ -145,15 +145,16 @@ export async function WorkspaceShell({
             {usesNovaSidebar ? (
             <>
               <div className={styles.headerSite}>
-                <span className={styles.siteIcon} aria-hidden="true" />
                 <strong>{site}</strong>
                 <span>{context}</span>
               </div>
               <div className={styles.headerRight}>
-                <span className={`${styles.status} ${isStore ? styles.warningStatus : isDispatcher ? styles.neutralStatus : styles.onlineStatus}`}>
-                  {isStore ? "Order cutoff 16:00" : roleLabels[role]}
-                </span>
-                <span className={styles.bell} aria-label="Notifications" role="img" />
+                {!isDispatcher && <>
+                  <span className={`${styles.status} ${isStore ? styles.warningStatus : styles.onlineStatus}`}>
+                    {isStore ? "Order cutoff 16:00" : roleLabels[role]}
+                  </span>
+                  <span className={styles.bell} aria-label="Notifications" role="img" />
+                </>}
                 <span className={styles.avatar}>{isStore ? "SM" : isDispatcher ? "DS" : "LD"}</span>
                 <span className={styles.identity}>
                   <strong>{session.displayName}</strong>

@@ -98,6 +98,7 @@ export function suggestAllocation(vehicles: readonly AllocationVehicle[], orders
         const candidateOrders = existing ? [...existing.orders, order] : [order];
         return { vehicle, existing, evaluation: evaluateTrip(vehicle, candidateOrders) };
       })
+      .filter((candidate) => candidate.existing || trips.filter((trip) => trip.vehicleId === candidate.vehicle.id).length < 2)
       .filter((candidate) => candidate.evaluation.valid)
       .sort((a, b) => (a.existing ? 0 : 1) - (b.existing ? 0 : 1));
 
