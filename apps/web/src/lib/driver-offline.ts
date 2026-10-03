@@ -7,4 +7,5 @@ export function readPending(accountId: string): PendingDelivery[] {
 }
 export function writePending(accountId: string, records: PendingDelivery[]) {
   localStorage.setItem(`waypoint-driver-pending-${accountId}`, JSON.stringify(records));
+  if (typeof window !== "undefined") window.dispatchEvent(new Event("waypoint-pending-changed"));
 }

@@ -15,6 +15,7 @@ import { publishAssistedPlan, assignTripDriver } from "@/app/workspace/dispatche
 import { confirmTripLoaded } from "@/app/workspace/loader/load/actions";
 import { recordReceipt } from "@/app/workspace/store_manager/receive/actions";
 import { startDriverTrip, recordDriverOutcome, resolveDriverSyncConflict, createLoaderIssue, transitionIssue, acknowledgeNotification } from "./workflow-actions";
+import { updateDriverProfile, changeDriverPassword } from "@/app/workspace/driver/profile/actions";
 
 // Only the framework boundary is mocked. Actions, JWTs, bcrypt and PostgreSQL are real.
 const runtime = vi.hoisted(() => ({ db: null as unknown as PrismaClient, cookies: new Map<string, string>() }));
@@ -80,6 +81,25 @@ afterAll(async () => {
 });
 
 describe("authentication and one dispatcher permission level", () => {
+  it("allows a driver to update only their own profile", async () => {
+    await login("driver");
+    expect((await updateDriverProfile({}, form({ displayName: "Updated Driver", accountId: "spare" }))).success).toBeTruthy();
+    expect((await db.account.findUniqueOrThrow({ where: { id: "driver" } })).displayName).toBe("Updated Driver");
+    expect((await db.account.findUniqueOrThrow({ where: { id: "spare" } })).displayName).toBe("spare");
+    expect((await updateDriverProfile({}, form({ displayName: " " }))).error).toBeTruthy();
+    await login("store"); await expect(updateDriverProfile({}, form({ displayName: "Wrong role" }))).rejects.toThrow("REDIRECT");
+  });
+  it("checks the current password and revokes other sessions on a driver password change", async () => {
+    await login("driver"); const oldToken = runtime.cookies.get("waypoint_session")!;
+    const input = { currentPassword: "FixturePassword123!", password: "UpdatedPassword123!", confirmation: "UpdatedPassword123!" };
+    expect((await changeDriverPassword({}, form({ ...input, confirmation: "DifferentPassword!" }))).error).toContain("match");
+    expect((await changeDriverPassword({}, form({ ...input, currentPassword: "WrongPassword" }))).error).toContain("incorrect");
+    expect((await changeDriverPassword({}, form(input))).success).toBeTruthy();
+    expect(await getSession()).toMatchObject({ accountId: "driver", sessionVersion: 1 });
+    runtime.cookies.set("waypoint_session", oldToken); expect(await getSession()).toBeNull();
+    expect(await authenticate("driver@example.test", "UpdatedPassword123!", "driver")).not.toBeNull();
+    expect(await authenticate("driver@example.test", "FixturePassword123!", "driver")).toBeNull();
+  });
   it("stores optional map locations and rejects incomplete or out-of-range coordinates", async () => {
     expect(await db.outlet.findUnique({ where: { id: "FRESH" } })).toMatchObject({ latitude: null, longitude: null });
     await expect(db.outlet.update({ where: { id: "FRESH" }, data: { latitude: 6.9344 } })).rejects.toThrow();

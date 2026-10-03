@@ -462,6 +462,27 @@
   font-weight: 700;
 }
 
+/* Driver workspace only. Other role layouts retain their existing styles. */
+.driverShell { width: min(100%, 1040px); min-height: 100svh; padding-bottom: calc(94px + env(safe-area-inset-bottom)); background: #f4f7f1; box-shadow: 0 0 60px #214e3b0b; }
+.driverHeader { min-height: 80px; color: #20372f; background: #f4f7f1; border-bottom: 1px solid #e3e9e1; padding-top: env(safe-area-inset-top); }
+.driverTopBar { height: 80px; padding: 0 24px; gap: 16px; }
+.driverBrand { display: flex; align-items: center; gap: 11px; }
+.driverBrand > img { width: 52px; height: 32px; object-fit: contain; flex-shrink: 0; }
+.driverBrand > div { display: grid; gap: 4px; }
+.driverBrand strong { font-size: 17px; letter-spacing: -.5px; }
+.driverBrand small { color: #758378; font-size: 10px; }
+.driverTools { display: flex; align-items: center; gap: 14px; }
+.driverConnection { display: flex; align-items: center; gap: 5px; min-height: 44px; color: #638168; font-size: 11px; }
+.driverConnection svg { width: 15px; height: 15px; }
+.driverAvatar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 2px solid white; background: #dfeccf; color: #214e3b; font-size: 13px; font-weight: 750; }
+.driverShell .main { padding: 26px 24px; }
+.driverShell .bottomNav { z-index: 30; width: min(100%, 1040px); left: 50%; right: auto; transform: translateX(-50%); height: calc(76px + env(safe-area-inset-bottom)); padding: 9px 12px calc(9px + env(safe-area-inset-bottom)); box-sizing: border-box; border-top: 1px solid #e0e7dd; background: #ffffffed; backdrop-filter: blur(15px); }
+.driverShell .bottomNav a { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; width: 24%; min-height: 50px; border-radius: 14px; color: #839083; font-size: 10px; font-weight: 650; }
+.driverShell .bottomNav svg { width: 21px; height: 21px; }
+.driverShell .bottomNav .active { color: #214e3b; background: #edf4e6; }
+.driverShell a:focus-visible { outline: 3px solid #9bc471; outline-offset: 3px; }
+@media (max-width: 380px) { .driverTopBar { padding: 0 16px; } .driverShell .main { padding: 23px 16px; } .driverTools { gap: 9px; } }
+
 @media (max-width: 850px) {
   .shell,
   .novaShell {

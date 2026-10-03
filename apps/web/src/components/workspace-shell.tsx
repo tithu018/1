@@ -1,7 +1,11 @@
+import { DriverHeader } from "@/app/workspace/driver/driver-chrome";
 import Image from "next/image";
 import Link from "next/link";
 import {
   Bell,
+  CloudUpload,
+  MapPinned,
+  UserRound,
   ChartNoAxesColumnIncreasing,
   ClipboardList,
   Clock3,
@@ -25,7 +29,7 @@ const navigation: Record<UserRole, readonly string[]> = {
   store_manager: ["Dashboard", "Place order", "Order status", "Receive", "History & issues", "Notifications", "Settings"],
   dispatcher: ["Plan", "Registration", "Live Board", "Needs Attention", "Deferral Log", "Capacity Forecast", "Reference Data"],
   loader: ["Trip queue", "Active load", "Loading issues"],
-  driver: ["Today", "Active trip", "Sync"]
+  driver: ["Today", "Active trip", "Sync", "Profile"]
 };
 
 function hrefFor(role: UserRole, item: string) {
@@ -46,6 +50,7 @@ function hrefFor(role: UserRole, item: string) {
   if (role === "loader" && item === "Active load") return "/workspace/loader/load";
   if (role === "loader" && item === "Loading issues") return "/workspace/loader/issues";
   if (role === "driver" && item === "Active trip") return "/workspace/driver/trip";
+  if (role === "driver" && item === "Profile") return "/workspace/driver/profile";
   if (role === "driver" && item === "Sync") return "/workspace/driver/sync";
   return `/workspace/${role}`;
 }
@@ -53,6 +58,10 @@ function hrefFor(role: UserRole, item: string) {
 function NavIcon({ item }: Readonly<{ item: string }>) {
   const iconByItem: Record<string, LucideIcon> = {
     Dashboard: LayoutDashboard,
+    Today: LayoutDashboard,
+    "Active trip": MapPinned,
+    Sync: CloudUpload,
+    Profile: UserRound,
     "Place order": ClipboardList,
     "Order status": Truck,
     Receive: Package,
@@ -128,18 +137,7 @@ export async function WorkspaceShell({
       )}
       <div className={styles.content}>
         {isDriver ? (
-          <header className={styles.driverHeader}>
-            <div className={styles.driverTopBar}>
-              <div>
-                <strong>{session.displayName}</strong>
-                <span>{context}</span>
-              </div>
-              <div className={styles.headerRight}>
-                <Link className={styles.status} href="/workspace/driver/sync">Sync records</Link>
-                <Link className={styles.driverSettings} href="/workspace/driver/settings" aria-label="Driver settings"><span aria-hidden="true" /></Link>
-              </div>
-            </div>
-          </header>
+          <DriverHeader name={session.displayName} depot={depot?.name ?? "No depot assigned"} accountId={session.accountId} />
         ) : (
           <header className={`${styles.header} ${usesNovaSidebar ? styles.novaHeader : ""}`}>
             {usesNovaSidebar ? (
@@ -170,8 +168,8 @@ export async function WorkspaceShell({
       {isDriver && (
         <nav className={styles.bottomNav} aria-label="Driver navigation">
           {navigation.driver.map((item) => (
-            <Link className={item === active ? styles.active : ""} href={hrefFor("driver", item)} key={item}>
-              {item}
+            <Link className={item === active ? styles.active : ""} href={hrefFor("driver", item)} key={item} aria-current={item === active ? "page" : undefined}>
+              <NavIcon item={item} />{item}
             </Link>
           ))}
         </nav>
