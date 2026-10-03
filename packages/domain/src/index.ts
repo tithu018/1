@@ -57,48 +57,6 @@ export interface DeliveryOrder {
   expectedShortfall?: string;
 }
 
-export const demoOutlet: OutletContext = {
-  id: "OUT010",
-  brand: "fresh",
-  district: "Colombo",
-  depot: "peliyagoda",
-  deliveryWindow: "05:00–07:30"
-};
-
-export const demoOrders: DeliveryOrder[] = [
-  {
-    id: "ORD0096797",
-    outletId: "OUT010",
-    kind: "Dry",
-    units: 45,
-    weightKg: 359,
-    volumeM3: 1.878,
-    status: "submitted",
-    deliveryWindow: "05:00–07:30"
-  },
-  {
-    id: "ORD0096654",
-    outletId: "OUT010",
-    kind: "Chilled",
-    units: 40,
-    weightKg: 293.5,
-    volumeM3: 1.683,
-    status: "deferred",
-    deliveryWindow: "05:00–07:30"
-  },
-  {
-    id: "ORD0096653",
-    outletId: "OUT010",
-    kind: "Dry",
-    units: 44,
-    weightKg: 330.8,
-    volumeM3: 1.621,
-    status: "delivered",
-    deliveryWindow: "05:00–07:30",
-    expectedShortfall: "2 units flagged short before departure"
-  }
-];
-
 export interface CatalogProduct {
   code: string;
   name: string;

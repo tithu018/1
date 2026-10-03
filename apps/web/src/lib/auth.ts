@@ -7,14 +7,14 @@ import type { UserRole } from "@waypoint/domain";
 
 const cookieName = "waypoint_session";
 const roleMap = { STORE_MANAGER: "store_manager", DISPATCHER: "dispatcher", LOADER: "loader", DRIVER: "driver" } as const;
-export type Session = { accountId: string; role: UserRole; displayName: string; outletId?: string; depotId?: string };
+export type Session = { accountId: string; role: UserRole; displayName: string; outletId?: string; depotId?: string; sessionVersion?: number };
 
 function secret() { const value = process.env.SESSION_SECRET; if (!value) throw new Error("SESSION_SECRET is required to sign in."); return new TextEncoder().encode(value); }
 
 export async function authenticate(identifier: string, password: string, requestedRole: UserRole): Promise<Session | null> {
   const account = await prisma.account.findUnique({ where: { email: identifier.trim().toLowerCase() } });
-  if (!account || roleMap[account.role] !== requestedRole || !(await compare(password, account.passwordHash))) return null;
-  return { accountId: account.id, role: roleMap[account.role], displayName: account.displayName, outletId: account.outletId ?? undefined, depotId: account.depotId ?? undefined };
+  if (!account || !account.isActive || roleMap[account.role] !== requestedRole || !(await compare(password, account.passwordHash))) return null;
+  return { accountId: account.id, role: roleMap[account.role], displayName: account.displayName, outletId: account.outletId ?? undefined, depotId: account.depotId ?? undefined, sessionVersion: account.sessionVersion };
 }
 
 export async function createSession(session: Session) {
@@ -32,7 +32,9 @@ export async function getSession(): Promise<Session | null> {
   try {
     const { payload } = await jwtVerify(token, secret());
     if (typeof payload.accountId !== "string" || typeof payload.role !== "string" || typeof payload.displayName !== "string" || !["store_manager", "dispatcher", "loader", "driver"].includes(payload.role)) return null;
-    return { accountId: payload.accountId, role: payload.role as UserRole, displayName: payload.displayName, outletId: typeof payload.outletId === "string" ? payload.outletId : undefined, depotId: typeof payload.depotId === "string" ? payload.depotId : undefined };
+    const account = await prisma.account.findUnique({ where: { id: payload.accountId } });
+    if (!account || !account.isActive || roleMap[account.role] !== payload.role || (payload.sessionVersion ?? 0) !== account.sessionVersion) return null;
+    return { accountId: account.id, role: roleMap[account.role], displayName: account.displayName, outletId: account.outletId ?? undefined, depotId: account.depotId ?? undefined, sessionVersion: account.sessionVersion };
   } catch { return null; }
 }
 

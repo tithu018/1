@@ -8,7 +8,8 @@
   "scripts": {
     "generate": "prisma generate",
     "migrate": "prisma migrate dev",
-    "seed": "prisma db seed"
+    "seed": "prisma db seed",
+    "bootstrap": "node prisma/bootstrap.mjs"
   },
   "dependencies": {
     "@prisma/client": "6.19.0",

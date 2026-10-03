@@ -15,3 +15,5 @@ dist
 *.png
 !apps/web/public/**/*.png
 *.docx
+.tmp
+**/*.tsbuildinfo

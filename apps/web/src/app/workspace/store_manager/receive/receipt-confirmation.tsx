@@ -1,42 +1,30 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useState } from "react";
+import { displayDate, displayTime } from "@/lib/format";
 import styles from "./receipt-confirmation.module.css";
 import { recordReceipt } from "./actions";
 
-const items = [
-  { code: "FR-D01", name: "Basmati rice", expected: 2 },
-  { code: "FR-D02", name: "Red lentils (dhal)", expected: 2 },
-  { code: "FR-D04", name: "Wheat flour", expected: 9 },
-  { code: "FR-D07", name: "Instant noodles", expected: 10 },
-  { code: "FR-D08", name: "Cream crackers", expected: 10 },
-  { code: "FR-D11", name: "Bottled water", expected: 1 },
-  { code: "FR-D13", name: "Toilet tissue", expected: 2 }
-];
-
-export function ReceiptConfirmation({ orderId, expectedUnits }: Readonly<{ orderId: string | null; expectedUnits: number }>) {
+type Item = { code: string; name: string; expected: number };
+export function ReceiptConfirmation({ orderId, expectedUnits, items, brand, loaderNotes }: { orderId: string | null; expectedUnits: number; items: Item[]; brand: string; loaderNotes: string[] }) {
   const [arrivalConfirmed, setArrivalConfirmed] = useState(false);
   const [received, setReceived] = useState<Record<string, number>>(() => Object.fromEntries(items.map((item) => [item.code, item.expected])));
-  const [outcome, setOutcome] = useState<"full" | "short" | "reservation">("short");
-  const [recorded, setRecorded] = useState(false);
+  const [outcome, setOutcome] = useState<"full" | "short" | "reservation">("full");
+  const [note, setNote] = useState("");
+  const [recorded, setRecorded] = useState<{ issueId: string | null; at: string } | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const totalExpected = items.reduce((total, item) => total + item.expected, 0);
-  const totalReceived = useMemo(() => Object.values(received).reduce((total, value) => total + value, 0), [received]);
-  const hasShortfall = totalReceived < totalExpected || outcome !== "full";
-
+  const totalReceived = Object.values(received).reduce((sum, value) => sum + value, 0);
   async function submitReceipt() {
-    if (!orderId) { setError("There is no delivered order awaiting receipt confirmation."); return; }
-    setSaving(true);
-    setError(null);
-    try { await recordReceipt(orderId, totalReceived, expectedUnits || totalExpected, outcome, "Store receipt confirmed from the product count."); setRecorded(true); }
+    if (!orderId) return;
+    setSaving(true); setError(null);
+    try { const result = await recordReceipt(orderId, totalReceived, expectedUnits, totalReceived < expectedUnits && outcome === "full" ? "short" : outcome, note); setRecorded({ ...result, at: new Date().toISOString() }); }
     catch (cause) { setError(cause instanceof Error ? cause.message : "Receipt could not be recorded."); }
     finally { setSaving(false); }
   }
-
-  if (recorded) return <section className={styles.success}><span>✓</span><h1>Receipt recorded</h1><p>The Dispatcher can now see your confirmation and the reported shortfall.</p><dl><div><dt>Order</dt><dd>ORD0096653</dd></div><div><dt>Recorded</dt><dd>Tue 24 Mar 2026 · 15:45</dd></div><div><dt>Received</dt><dd>{totalReceived} of {totalExpected} units</dd></div><div><dt>Issue opened</dt><dd>{hasShortfall ? "ISS-0417" : "None"}</dd></div><div><dt>Issue status</dt><dd>{hasShortfall ? "Reported" : "—"}</dd></div></dl><button onClick={() => setRecorded(false)}>Back to receipt</button></section>;
-
-  if (!arrivalConfirmed) return <section className={styles.arrival}><header><h1>Did the delivery arrive?</h1><p>Step 1 of 2 · ORD0096653 · Dry (ambient)</p></header><section><h2>Delivery</h2><dl><div><dt>Delivered by</dt><dd>VEH022 · marked delivered at 04:44</dd></div><div><dt>Expected</dt><dd>{totalExpected} units · {items.length} products</dd></div><div><dt>Loader note</dt><dd>Cream crackers (FR-D08): 2 cartons short</dd></div></dl></section><aside>Confirm arrival first. Next you’ll check each product and report anything missing or damaged.</aside><button onClick={() => setArrivalConfirmed(true)}>Confirm arrival</button><button className={styles.secondary}>It hasn’t arrived</button></section>;
-
-  return <section><header className={styles.heading}><div><h1>Confirm receipt</h1><p>Step 2 of 2 · {orderId ?? "No order selected"} · Delivered order</p></div><aside><strong>Expected</strong><span>{totalExpected} units · {items.length} products</span><strong>Received</strong><span>{totalReceived} units</span></aside></header><section className={styles.shortfall}><strong>Expected shortfall</strong><p>Review each product count before sending the receipt to the Dispatcher.</p></section><section className={styles.choices}><h2>What did you receive?</h2><label className={outcome === "full" ? styles.selected : ""}><input type="radio" checked={outcome === "full"} onChange={() => setOutcome("full")} /> <span><strong>Received in full</strong><small>Every product arrived in the expected quantity.</small></span></label><label className={outcome === "short" ? styles.selected : ""}><input type="radio" checked={outcome === "short"} onChange={() => setOutcome("short")} /> <span><strong>Received short or damaged</strong><small>An issue will be opened from this receipt.</small></span></label><label className={outcome === "reservation" ? styles.selected : ""}><input type="radio" checked={outcome === "reservation"} onChange={() => setOutcome("reservation")} /> <span><strong>Accept with reservation</strong><small>Record a concern while accepting the delivery.</small></span></label></section><section className={styles.table}><h2>Check each product</h2>{items.map((item) => <article key={item.code}><div><strong>{item.name} · {item.code}</strong><span>Expected {item.expected}</span></div><label>Received <input type="number" min="0" max={item.expected} value={received[item.code]} onChange={(event) => setReceived((current) => ({ ...current, [item.code]: Math.max(0, Math.min(item.expected, Number(event.target.value) || 0)) }))} /></label><b className={received[item.code] < item.expected ? styles.isShort : ""}>{received[item.code] < item.expected ? `Short ${item.expected - received[item.code]}` : "OK"}</b></article>)}</section><section className={styles.evidence}><h2>Note and photo</h2><textarea defaultValue="Receipt confirmed from the product count." /><p>Evidence is retained with the receipt audit event.</p></section>{error && <p role="alert">{error}</p>}<button className={styles.primary} disabled={saving} onClick={submitReceipt}>{saving ? "Saving..." : "Confirm receipt"}</button></section>;
+  if (!orderId) return <section className={styles.arrival}><h1>No delivery awaiting receipt</h1><p>Your delivered orders will appear here.</p><Link href="/workspace/store_manager/status">View order status</Link></section>;
+  if (recorded) return <section className={styles.success}><h1>Receipt recorded</h1><p>The dispatcher can see your confirmation.</p><dl><div><dt>Order</dt><dd>{orderId}</dd></div><div><dt>Recorded</dt><dd>{displayDate(recorded.at)} · {displayTime(recorded.at)}</dd></div><div><dt>Received</dt><dd>{totalReceived} of {expectedUnits} units</dd></div><div><dt>Issue</dt><dd>{recorded.issueId ?? "None"}</dd></div></dl><Link href="/workspace/store_manager/history">View history &amp; issues</Link></section>;
+  if (!arrivalConfirmed) return <section className={styles.arrival}><header><h1>Did the delivery arrive?</h1><p>Step 1 of 2 · {orderId}</p></header><section><h2>Delivery</h2><p>{expectedUnits} units · {items.length} products</p>{loaderNotes.map((message, index) => <p key={index}>Loader note: {message}</p>)}</section><button onClick={() => setArrivalConfirmed(true)}>Confirm arrival</button><Link className={styles.secondary} href="/workspace/store_manager/status">It hasn’t arrived</Link></section>;
+  return <section><header className={styles.heading}><h1>Confirm receipt</h1><p>Step 2 of 2 · {orderId} · {totalReceived} of {expectedUnits} units</p></header><section className={styles.choices}><h2>What did you receive?</h2>{(["full", "short", ...(brand === "TECH" ? ["reservation"] : [])] as Array<typeof outcome>).map((choice) => <label key={choice}><input type="radio" checked={outcome === choice} onChange={() => setOutcome(choice)} />{choice === "full" ? "Received in full" : choice === "short" ? "Received short or damaged" : "Accept with reservation — inspection required"}</label>)}</section><section className={styles.table}><h2>Check each product</h2>{items.map((item) => <article key={item.code}><div><strong>{item.name}</strong><span>Expected {item.expected}</span></div><label>Received <input type="number" min="0" max={item.expected} step="1" value={received[item.code]} onChange={(event) => setReceived((current) => ({ ...current, [item.code]: Math.max(0, Math.min(item.expected, Math.floor(Number(event.target.value) || 0))) }))} /></label></article>)}</section><section className={styles.evidence}><h2>Receipt note</h2><textarea value={note} onChange={(event) => setNote(event.target.value)} /></section>{error && <p role="alert">{error}</p>}<button className={styles.primary} disabled={saving} onClick={submitReceipt}>{saving ? "Saving…" : "Confirm receipt"}</button></section>;
 }

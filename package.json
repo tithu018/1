@@ -8,8 +8,10 @@
     "build": "pnpm --filter @waypoint/web build",
     "lint": "pnpm --filter @waypoint/web lint",
     "test": "pnpm --filter @waypoint/web test",
+    "test:backend": "pnpm --filter @waypoint/web test:backend",
     "db:generate": "pnpm --filter @waypoint/database generate",
     "db:migrate": "pnpm --filter @waypoint/database migrate",
-    "db:seed": "pnpm --filter @waypoint/database seed"
+    "db:seed": "pnpm --filter @waypoint/database seed",
+    "db:bootstrap": "pnpm --filter @waypoint/database bootstrap"
   }
 }

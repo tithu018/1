@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import styles from "./settings.module.css";
 
-export function DriverSettings() {
+export function DriverSettings({ displayName, depot }: { displayName: string; depot: string }) {
   const [theme, setTheme] = useState<"day" | "night">("day");
   const [voice, setVoice] = useState(true);
   const [mobileData, setMobileData] = useState(true);
@@ -18,6 +18,6 @@ export function DriverSettings() {
 
     <section className={styles.card}><h2>Sync</h2><label><span><strong>Use mobile data</strong><small>Sync delivery outcomes when Wi-Fi is unavailable.</small></span><input checked={mobileData} onChange={(event) => setMobileData(event.target.checked)} type="checkbox" /></label><div className={styles.statusRow}><span><strong>Offline storage</strong><small>Trip data is available on this device.</small></span><b>Ready</b></div></section>
 
-    <section className={styles.card}><h2>Account</h2><dl><div><dt>Driver</dt><dd>Nimal Perera</dd></div><div><dt>Vehicle</dt><dd>VEH012</dd></div><div><dt>Language</dt><dd>English</dd></div><div><dt>App version</dt><dd>1.0.0</dd></div></dl></section>
+    <section className={styles.card}><h2>Account</h2><dl><div><dt>Driver</dt><dd>{displayName}</dd></div><div><dt>Depot</dt><dd>{depot}</dd></div><div><dt>Language</dt><dd>English</dd></div></dl></section>
   </section>;
 }
