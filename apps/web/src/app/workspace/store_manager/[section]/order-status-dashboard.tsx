@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { CalendarDays, Check, ChevronDown, ChevronRight, Circle, Clock3, Package, Search, Truck, X } from "lucide-react";
+import { CalendarDays, Check, ChevronDown, ChevronRight, Circle, Package, Search, Truck, X } from "lucide-react";
 import styles from "./section.module.css";
 
 type OrderLine = { id: string; description: string; productCode: string; quantity: number };
@@ -147,7 +147,7 @@ export function OrderStatusDashboard({ orders }: { orders: StatusOrder[] }) {
 
           <footer className={styles.statusPager}>
             <span>Showing {filtered.length ? `1-${filtered.length}` : "0"} of {orders.length} orders</span>
-            <div><button type="button" aria-label="Previous page" disabled>‹</button><button className={styles.currentPage} type="button">1</button></div>
+            <div><button type="button" aria-label="Previous page" disabled>{"<"}</button><button className={styles.currentPage} type="button">1</button></div>
           </footer>
         </section>
 
