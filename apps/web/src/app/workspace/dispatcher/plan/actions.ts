@@ -49,7 +49,10 @@ export async function publishAssistedPlan(trips: PlannedTrip[], deferred: Deferr
       if (!deferralReasons.includes(order.reason)) throw new Error("Choose a deferral reason for every deferred order.");
       if (parseServiceDate(order.nextDate) <= serviceDate) throw new Error("Deferred orders need a later service date.");
     }
-    if (latest?.status === "PUBLISHED") await tx.plan.update({ where: { id: latest.id }, data: { status: "SUPERSEDED" } });
+    if (latest?.status === "PUBLISHED") {
+      await tx.loadSession.updateMany({ where: { trip: { planId: latest.id }, status: "CONFIRMED" }, data: { status: "REVERIFY_REQUIRED" } });
+      await tx.plan.update({ where: { id: latest.id }, data: { status: "SUPERSEDED" } });
+    }
     const plan = await tx.plan.create({ data: { depotId: session.depotId!, serviceDate, version: (latest?.version ?? 0) + 1, status: "PUBLISHED", publishedAt: new Date() } });
     for (const [index, trip] of trips.entries()) {
       const created = await tx.trip.create({ data: { planId: plan.id, vehicleId: trip.vehicleId, driverId: trip.driverId, tripNumber: index + 1, brand: trip.brand, district: trip.district, status: "ALLOCATED" } });

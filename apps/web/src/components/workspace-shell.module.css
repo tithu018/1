@@ -516,6 +516,7 @@
 .driverShell .bottomNav svg { width: 21px; height: 21px; }
 .driverShell .bottomNav .active { color: #214e3b; background: #edf4e6; }
 .driverShell a:focus-visible { outline: 3px solid #9bc471; outline-offset: 3px; }
+.loaderMobileNav { display: none; }
 @media (max-width: 380px) { .driverTopBar { padding: 0 16px; } .driverShell .main { padding: 23px 16px; } .driverTools { gap: 9px; } }
 
 @media (max-width: 850px) {
@@ -540,4 +541,18 @@
   .novaShell .main {
     padding: 24px 20px;
   }
+
+  .loaderShell .content { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+  .loaderShell .novaHeader { min-height: 64px; padding: 8px 16px; }
+  .loaderShell .headerSite span,
+  .loaderShell .status,
+  .loaderShell .bell,
+  .loaderShell .identity small { display: none; }
+  .loaderShell .headerSite strong { max-width: 145px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .loaderShell .headerRight { gap: 9px; }
+  .loaderShell .identity strong { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .loaderMobileNav { position: fixed; z-index: 50; right: 0; bottom: 0; left: 0; display:flex; height:calc(68px + env(safe-area-inset-bottom)); align-items:flex-start; justify-content:space-around; padding:8px 8px env(safe-area-inset-bottom); border-top:1px solid #e0d6c5; background:#fffdf8ed; backdrop-filter:blur(14px); }
+  .loaderMobileNav a { display:flex; min-width:88px; min-height:52px; flex-direction:column; align-items:center; justify-content:center; gap:4px; border-radius:12px; color:#68746d; font-size:11px; font-weight:700; }
+  .loaderMobileNav svg { width:20px; height:20px; }
+  .loaderMobileNav .active { color:#214e3b; background:#dce8de; }
 }
