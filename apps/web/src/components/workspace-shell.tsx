@@ -3,8 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   Bell,
+  ChevronDown,
   CloudUpload,
   MapPinned,
+  MapPin,
   UserRound,
   ChartNoAxesColumnIncreasing,
   ClipboardList,
@@ -82,6 +84,49 @@ function NavIcon({ item }: Readonly<{ item: string }>) {
   return <Icon aria-hidden="true" className={styles.navIcon} strokeWidth={2} />;
 }
 
+function StoreManagerHeader({
+  context,
+  displayName,
+  site
+}: Readonly<{ context: string; displayName: string; site: string }>) {
+  return (
+    <header className={`${styles.header} ${styles.novaHeader} ${styles.storeHeader}`}>
+      <section className={styles.storeHeaderSite} aria-label="Current outlet">
+        <MapPin aria-hidden="true" />
+        <div>
+          <strong>{site}</strong>
+          <span>{context}</span>
+        </div>
+        <ChevronDown aria-hidden="true" />
+      </section>
+
+      <div className={styles.storeHeaderRight}>
+        <span className={styles.storeCutoffBadge}>
+          <Clock3 aria-hidden="true" />
+          <span>
+            <small>Order cutoff</small>
+            <strong>16:00</strong>
+          </span>
+        </span>
+
+        <Link className={styles.storeBell} href="/workspace/store_manager/notifications" aria-label="Notifications">
+          <Bell aria-hidden="true" />
+          <span aria-hidden="true" />
+        </Link>
+
+        <section className={styles.storeProfile} aria-label="Store Manager profile">
+          <span className={styles.storeAvatar}>SM</span>
+          <span className={styles.storeIdentity}>
+            <strong>{displayName}</strong>
+            <small>{displayDate()}</small>
+          </span>
+          <ChevronDown aria-hidden="true" />
+        </section>
+      </div>
+    </header>
+  );
+}
+
 export async function WorkspaceShell({
   role,
   active,
@@ -146,6 +191,8 @@ export async function WorkspaceShell({
       <div className={styles.content}>
         {isDriver ? (
           <DriverHeader name={session.displayName} depot={depot?.name ?? "No depot assigned"} accountId={session.accountId} />
+        ) : isStore ? (
+          <StoreManagerHeader context={context} displayName={session.displayName} site={site} />
         ) : (
           <header className={`${styles.header} ${usesNovaSidebar ? styles.novaHeader : ""}`}>
             {usesNovaSidebar ? (
