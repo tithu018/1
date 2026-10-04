@@ -8,6 +8,7 @@ import styles from "./section.module.css";
 import { StorePreferences } from "./preferences";
 import { NotificationsList } from "./notifications-list";
 import { HistoryIssuesDashboard } from "./history-issues-dashboard";
+import { OrderStatusDashboard } from "./order-status-dashboard";
 
 function shortOrderReference(orderId: string) {
   const raw = orderId.replace(/^ORD-/i, "").replace(/[^a-z0-9]/gi, "");
@@ -36,13 +37,12 @@ export default async function StoreSectionPage({ params }: { params: Promise<{ s
   const session = await requireRole("store_manager");
   const [account, orders, issues, notifications] = await Promise.all([
     prisma.account.findUnique({ where: { id: session.accountId }, include: { outlet: { include: { depot: true } } } }),
-    session.outletId ? prisma.order.findMany({ where: { outletId: session.outletId }, orderBy: { createdAt: "desc" } }) : [],
+    session.outletId ? prisma.order.findMany({ where: { outletId: session.outletId }, include: { lines: true, statusEvents: { orderBy: { createdAt: "asc" } } }, orderBy: { createdAt: "desc" } }) : [],
     session.outletId ? prisma.issueCase.findMany({ where: { order: { outletId: session.outletId } }, include: { order: true }, orderBy: { updatedAt: "desc" } }) : [],
     prisma.notification.findMany({ where: { recipientId: session.accountId }, orderBy: { createdAt: "desc" }, take: 30 })
   ]);
 
   const outlet = account?.outlet;
-  const rows = section === "status" ? orders.filter((order) => order.status !== "CANCELLED") : orders;
   const orderEntityIds = notifications.filter((item) => item.entityType === "Order" && item.entityId).map((item) => item.entityId!);
   const issueEntityIds = notifications.filter((item) => item.entityType === "IssueCase" && item.entityId).map((item) => item.entityId!);
   const [notificationOrders, notificationIssues] = section === "notifications" && session.outletId ? await Promise.all([
@@ -74,8 +74,8 @@ export default async function StoreSectionPage({ params }: { params: Promise<{ s
 
   return (
     <WorkspaceShell role="store_manager" active={titles[section]}>
-      <section className={`${styles.page} ${section === "notifications" ? styles.notificationPageShell : ""} ${section === "history" ? styles.historyPageShell : ""}`}>
-        {section !== "notifications" && section !== "history" && (
+      <section className={`${styles.page} ${section === "status" ? styles.statusPageShell : ""} ${section === "notifications" ? styles.notificationPageShell : ""} ${section === "history" ? styles.historyPageShell : ""}`}>
+        {section !== "notifications" && section !== "history" && section !== "status" && (
           <header className={styles.heading}>
             <h1>{titles[section]}</h1>
             <p>{outlet ? `${outlet.id} · ${label(outlet.brand)}` : "No outlet assigned"}</p>
@@ -113,32 +113,23 @@ export default async function StoreSectionPage({ params }: { params: Promise<{ s
         )}
 
         {section === "status" && (
-          <>
-            <section className={styles.card}>
-              <h2>Active orders</h2>
-              <div className={styles.tableWrap}>
-                <table>
-                  <thead>
-                    <tr><th>Order</th><th>Delivery date</th><th>Type</th><th>Units</th><th>Status</th><th /></tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((order) => (
-                      <tr key={order.id}>
-                        <td>{order.id}</td>
-                        <td>{displayDate(order.requestedDate)} · {order.deliveryWindowOpen}-{order.deliveryWindowClose}</td>
-                        <td>{order.temperatureRequired === "REEFER" ? "Chilled" : "Ambient"}</td>
-                        <td>{order.units}</td>
-                        <td><span className={styles.badge}>{label(order.status)}</span></td>
-                        <td><Link href={`/workspace/store_manager/orders/${order.id}`}>View / manage</Link></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {!rows.length && <p>No orders yet. <Link href="/workspace/store_manager/orders">Place an order</Link></p>}
-              <p className={styles.caption}>Submitted to Confirmed to Allocated to Loaded to Out for delivery to Delivered. Deferred orders retain a recorded reason.</p>
-            </section>
-          </>
+          <OrderStatusDashboard orders={orders.map((order) => ({
+            id: order.id,
+            orderRef: shortOrderReference(order.id),
+            deliveryRef: shortOrderReference(order.id).replace("ORD", "DEL"),
+            outletId: order.outletId,
+            outletLabel: outlet ? `${outlet.id} · ${label(outlet.brand)}` : order.outletId,
+            requestedDate: order.requestedDate.toISOString(),
+            requestedDateLabel: displayDate(order.requestedDate),
+            deliveryWindow: `${order.deliveryWindowOpen}-${order.deliveryWindowClose}`,
+            type: order.temperatureRequired === "REEFER" ? "Chilled" : "Ambient",
+            units: order.units,
+            status: order.status,
+            statusLabel: label(order.status),
+            createdAt: order.createdAt.toISOString(),
+            statusEvents: order.statusEvents.map((event) => ({ status: event.status, reason: event.reason, createdAt: event.createdAt.toISOString() })),
+            lines: order.lines.map((line) => ({ id: line.id, description: line.description, productCode: line.productCode, quantity: line.quantity }))
+          }))} />
         )}
 
         {section === "notifications" && <NotificationsList notifications={notificationRows} />}
