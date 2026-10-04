@@ -147,7 +147,7 @@ export async function WorkspaceShell({
     <div className={`${isDriver ? styles.driverShell : styles.shell} ${usesNovaSidebar ? styles.novaShell : ""} ${isDispatcher ? styles.dispatcherShell : ""} ${isLoader ? styles.loaderShell : ""}`}>
       {!isDriver && (
         <aside className={`${styles.sidebar} ${usesNovaSidebar ? styles.novaSidebar : ""} ${isLoader ? styles.loaderSidebar : ""} ${isStore ? styles.storeSidebar : ""} ${isDispatcher ? styles.dispatcherSidebar : ""}`}>
-          <div className={styles.logo}>
+          <div className={styles.logo} aria-label={`${APP_NAME} workspace`}>
             {usesNovaSidebar ? (
               <>
                 <Image src="/Image/logo-white-hq.png" alt="" width={66} height={36} priority />

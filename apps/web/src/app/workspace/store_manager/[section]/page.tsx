@@ -74,7 +74,7 @@ export default async function StoreSectionPage({ params }: { params: Promise<{ s
 
   return (
     <WorkspaceShell role="store_manager" active={titles[section]}>
-      <section className={`${styles.page} ${section === "status" ? styles.statusPageShell : ""} ${section === "notifications" ? styles.notificationPageShell : ""} ${section === "history" ? styles.historyPageShell : ""}`}>
+      <section className={`${styles.page} ${section === "status" ? styles.statusPageShell : ""} ${section === "notifications" ? styles.notificationPageShell : ""} ${section === "history" ? styles.historyPageShell : ""} ${section === "settings" ? styles.settingsPageShell : ""}`}>
         {section !== "notifications" && section !== "history" && section !== "status" && (
           <header className={styles.heading}>
             <h1>{titles[section]}</h1>
@@ -134,29 +134,41 @@ export default async function StoreSectionPage({ params }: { params: Promise<{ s
 
         {section === "notifications" && <NotificationsList notifications={notificationRows} />}
 
-        {section === "settings" && <StorePreferences accountId={session.accountId} locale={account?.locale ?? "en"} />}
         {section === "settings" && (
-          <>
+          <div className={styles.settingsGrid}>
+            <StorePreferences accountId={session.accountId} locale={account?.locale ?? "en"} />
             <section className={styles.card}>
-              <h2>Outlet details</h2>
+              <div className={styles.cardTitle}>
+                <div>
+                  <h2>Outlet details</h2>
+                </div>
+              </div>
               <dl className={styles.definitionList}>
                 {outlet && Object.entries({
                   Outlet: outlet.id,
                   Brand: label(outlet.brand),
                   Depot: outlet.depot.name,
                   District: outlet.district,
-                  "Delivery window": `${outlet.windowOpenTime}-${outlet.windowCloseTime}`,
-                  Dock: label(outlet.dockType),
-                  Access: label(outlet.parkingConstraint)
+                  "Delivery window": `${outlet.windowOpenTime}-${outlet.windowCloseTime}`
                 }).map(([term, value]) => <div key={term}><dt>{term}</dt><dd>{value}</dd></div>)}
               </dl>
             </section>
             <section className={styles.card}>
-              <h2>Account</h2>
-              <p>{account?.displayName} · {account?.email} · {account?.locale}</p>
-              <Link href="/sign-in/reset">Change password</Link>
+              <div className={styles.cardTitle}>
+                <div>
+                  <h2>Account</h2>
+                </div>
+                <Link className={styles.secondaryButton} href="/sign-in/reset">Change password</Link>
+              </div>
+              <div className={styles.accountRow}>
+                <span className={styles.avatar}>SM</span>
+                <div>
+                  <strong>{account?.displayName ?? session.displayName}</strong>
+                  <p>{account?.email ?? "Email unavailable"}</p>
+                </div>
+              </div>
             </section>
-          </>
+          </div>
         )}
       </section>
     </WorkspaceShell>

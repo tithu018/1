@@ -1,4 +1,5 @@
 .page { width: min(100%, 1080px); }
+.settingsPageShell { width: min(100%, 1160px); }
 .notificationPageShell { width: min(100%, 1380px); }
 .historyPageShell { width: min(100%, 1380px); }
 .heading { margin-bottom: 24px; }
@@ -6,8 +7,9 @@
 .heading p { margin: 8px 0 0; color: #68746d; font-size: 15px; }
 .card { margin-bottom: 24px; padding: 24px; border: 1px solid #e6dac6; border-radius: 16px; background: #fffdf9; box-shadow: 0 12px 28px #2920100c; }
 .card h2 { margin: 0 0 14px; color: #202522; font-size: 22px; }
-.cardTitle { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.cardTitle { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 .cardTitle h2 { margin: 0; }
+.cardTitle p { margin: 5px 0 0; color: #68746d; font-size: 14px; line-height: 1.45; }
 .tableWrap { overflow-x: auto; border: 1px solid #ddceb7; border-radius: 12px; }
 .tableWrap table { width: 100%; border-collapse: collapse; color: #202522; font-size: 14px; }
 .tableWrap th { height: 39px; padding: 0 14px; background: #f1eadc; color: #68746d; font-size: 12px; font-weight: 700; text-align: left; white-space: nowrap; }
@@ -29,20 +31,32 @@
 .notificationList p { margin: 5px 0; color: #68746d; font-size: 14px; }
 .notificationList small { color: #8b948e; font-size: 12px; }
 .notificationList i { width: 9px; height: 9px; border-radius: 50%; background: #9d3e2e; }
-.settingsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.settingsGrid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; align-items: start; }
+.settingsGrid .card { height: 100%; margin-bottom: 0; }
 .definitionList { margin: 0; }
 .definitionList div { display: flex; min-height: 48px; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #e6dac6; font-size: 14px; }
 .definitionList dt { color: #68746d; }
 .definitionList dd { margin: 0; font-weight: 800; text-align: right; }
+.preferenceForm { display: grid; gap: 0; }
 .toggleRow { display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid #e6dac6; }
 .toggleRow span { display: grid; gap: 4px; }
 .toggleRow small { color: #68746d; font-size: 12px; }
 .toggleRow input { width: 42px; height: 22px; accent-color: #215742; }
+.selectRow { display: flex; min-height: 72px; align-items: center; justify-content: space-between; gap: 18px; border-top: 1px solid #e6dac6; color: #202522; }
+.selectRow span { display: grid; gap: 4px; font-weight: 800; }
+.selectRow small { color: #68746d; font-size: 12px; font-weight: 500; }
+.selectRow select { min-width: 150px; min-height: 40px; padding: 0 12px; border: 1px solid #ddceb7; border-radius: 8px; color: #202522; background: #fffdf9; font: inherit; }
+.preferenceForm button, .secondaryButton { display: inline-flex; width: fit-content; min-height: 42px; align-items: center; justify-content: center; margin-top: 16px; padding: 0 16px; border: 1px solid #215742; border-radius: 8px; color: #fffdf9; background: #215742; font: inherit; font-weight: 800; cursor: pointer; }
+.preferenceForm p[role="status"] { margin: 12px 0 0; color: #215742; font-size: 14px; font-weight: 800; }
 .accountRow { display: flex; align-items: center; gap: 14px; }
 .avatar { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 50%; color: #215742; background: #dce8de; font-size: 13px; font-weight: 800; }
 .accountRow div { flex: 1; }
+.accountRow strong { color: #202522; font-size: 16px; }
 .accountRow p { margin: 4px 0 0; color: #68746d; font-size: 13px; }
 .accountRow button { height: 40px; padding: 0 15px; border: 1px solid #ddceb7; border-radius: 8px; color: #215742; background: #fffdf9; font-weight: 800; }
+.accountDefinitionList { margin-top: 16px; }
+.cardTitle .secondaryButton { flex: 0 0 auto; margin-top: 0; }
+.secondaryButton { color: #215742; background: #fffdf9; text-decoration: none; }
 .notificationsPage { width: 100%; }
 .notificationHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
 .notificationHeading h1 { margin: 0; color: #215742; font-size: 34px; line-height: 1.12; letter-spacing: -.035em; }
@@ -231,4 +245,4 @@
 @media (max-width: 980px) { .statusFilters { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 1180px) { .historySummaryGrid { grid-template-columns: repeat(2,minmax(0,1fr)); } .historyFilters { grid-template-columns: 1fr 1fr; } .historyTableWrap { overflow: hidden; } .orderHistoryHeader, .issueHistoryHeader { display: none; } .orderHistoryRow, .issueHistoryRow { min-width: 0; grid-template-columns: 34px minmax(0,1fr) auto; align-items: start; gap: 8px 12px; padding: 14px; } .orderHistoryRow > div, .issueHistoryRow > div { grid-column: 2; } .orderHistoryRow time, .issueHistoryRow time, .orderHistoryRow > span:not(.historyTruckIcon):not(.historyBadge), .issueHistoryRow > span:not(.historyTruckIcon):not(.historyBadge), .issueHistoryRow p, .historyAction { grid-column: 2; } .historyBadge { grid-column: 2; } .historyChevron { grid-column: 3; grid-row: 1 / span 5; } }
 @media (max-width: 900px) { .notificationRow { grid-template-columns: 50px minmax(0,1fr) 24px; gap: 12px; } .notificationReadDot { position: absolute; left: 68px; } .notificationCopy { grid-column: 2; } .notificationRow time { grid-column: 2; } .notificationRow > svg { grid-column: 3; grid-row: 1 / span 2; } }
-@media (max-width: 640px) { .heading h1 { font-size: 30px; } .card { padding: 16px; border-radius: 12px; } .cardTitle, .accountRow { align-items: flex-start; flex-direction: column; } .notificationHeading h1, .historyHeading h1, .statusHeading h1 { font-size: 30px; } .notificationFilters { gap: 10px; } .notificationFilters button { min-width: 0; flex: 1 1 132px; } .notificationRow { min-height: 86px; padding: 14px; } .notificationCopy strong, .notificationCopy span { white-space: normal; } .notificationRow time { font-size: 13px; } .historySummaryGrid, .historyFilters, .statusSummaryGrid, .statusFilters { grid-template-columns: 1fr; } .historyCard { padding: 16px; } .historyCardHeader { align-items: flex-start; flex-direction: column; } .issueFilters { width: 100%; } .issueFilters select { flex: 1 1 100%; } .statusSummaryGrid article { min-height: 84px; } .statusTableHeader { display: none; } .statusTableRow { min-width: 0; grid-template-columns: 34px minmax(0,1fr) auto; gap: 10px; padding: 14px; } .statusTableRow time, .statusTableRow > span, .statusAction { grid-column: 2; } .statusChevron { grid-column: 3; grid-row: 1 / span 4; } .orderStatusBadge { grid-column: 2; } .statusPager { align-items: flex-start; flex-direction: column; } .detailHero { grid-template-columns: 42px minmax(0,1fr); } .detailHero .orderStatusBadge { grid-column: 2; } }
+@media (max-width: 640px) { .heading h1 { font-size: 30px; } .card { padding: 16px; border-radius: 12px; } .cardTitle, .accountRow, .selectRow { align-items: flex-start; flex-direction: column; } .selectRow select { width: 100%; } .notificationHeading h1, .historyHeading h1, .statusHeading h1 { font-size: 30px; } .notificationFilters { gap: 10px; } .notificationFilters button { min-width: 0; flex: 1 1 132px; } .notificationRow { min-height: 86px; padding: 14px; } .notificationCopy strong, .notificationCopy span { white-space: normal; } .notificationRow time { font-size: 13px; } .historySummaryGrid, .historyFilters, .statusSummaryGrid, .statusFilters { grid-template-columns: 1fr; } .historyCard { padding: 16px; } .historyCardHeader { align-items: flex-start; flex-direction: column; } .issueFilters { width: 100%; } .issueFilters select { flex: 1 1 100%; } .statusSummaryGrid article { min-height: 84px; } .statusTableHeader { display: none; } .statusTableRow { min-width: 0; grid-template-columns: 34px minmax(0,1fr) auto; gap: 10px; padding: 14px; } .statusTableRow time, .statusTableRow > span, .statusAction { grid-column: 2; } .statusChevron { grid-column: 3; grid-row: 1 / span 4; } .orderStatusBadge { grid-column: 2; } .statusPager { align-items: flex-start; flex-direction: column; } .detailHero { grid-template-columns: 42px minmax(0,1fr); } .detailHero .orderStatusBadge { grid-column: 2; } }
