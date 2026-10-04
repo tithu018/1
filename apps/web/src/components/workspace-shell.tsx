@@ -200,12 +200,6 @@ export async function WorkspaceShell({
                 <span>{context}</span>
               </div>
               <div className={styles.headerRight}>
-                {!isDispatcher && <>
-                  <span className={`${styles.status} ${isStore ? styles.warningStatus : styles.onlineStatus}`}>
-                    {isStore ? "Order cutoff 16:00" : roleLabels[role]}
-                  </span>
-                  <span className={styles.bell} aria-label="Notifications" role="img" />
-                </>}
                 <span className={styles.avatar}>{isStore ? "SM" : isDispatcher ? "DS" : "LD"}</span>
                 <span className={styles.identity}>
                   <strong>{session.displayName}</strong>
