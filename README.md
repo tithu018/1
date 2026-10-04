@@ -1,101 +1,102 @@
+<p align="center">
+  <img src="apps/web/public/Image/logo-green-hq.png" alt="Waypoint" width="110" />
+</p>
+
 # Waypoint
 
-Waypoint is a role-based delivery operations platform for coordinating orders from outlet submission through planning, loading, delivery, receipt confirmation, and issue resolution.
+Waypoint is a responsive, role-based delivery operations platform for the Tech-Triathlon 2026 Hackathon. It connects Store Managers, Dispatchers, Loaders, and Drivers through one auditable workflow: order submission, constraint-aware planning, loading, delivery, receipt confirmation, and issue resolution.
 
-The project provides purpose-built workspaces for Store Managers, Dispatchers, Loaders, and Drivers. The interface is based on the Waypoint Figma prototype and supports a complete, auditable delivery workflow backed by PostgreSQL.
+## Contents
 
-## Highlights
+- [Product overview](#product-overview)
+- [Technology stack](#technology-stack)
+- [Architecture](#architecture)
+- [Quick start with Docker](#quick-start-with-docker)
+- [Demo accounts](#demo-accounts)
+- [Judge walkthrough](#judge-walkthrough)
+- [Configuration](#configuration)
+- [Development and validation](#development-and-validation)
+- [Design departures and scope notes](#design-departures-and-scope-notes)
+- [Production deployment](#production-deployment)
 
-- Four protected role-based workspaces with dedicated desktop and mobile interfaces.
-- End-to-end order, planning, loading, delivery, receipt, and issue workflows.
-- Assisted vehicle allocation with capacity, temperature, access, depot, brand, and district constraints.
-- Versioned delivery plans and downstream re-verification when a plan changes.
-- Delivery and loading exception reporting with a shared issue lifecycle.
-- Driver offline, conflict-review, and synchronization states.
-- Server-confirmed actions, notifications, status history, and audit records.
-- Responsive Figma-aligned interface with high-resolution PNG artwork.
-- Docker Compose deployment with automated migrations and health checks; demo seeding is an explicit opt-in command.
+## Product overview
 
-## User roles
+Waypoint provides four purpose-built workspaces:
 
-| Role | Main responsibilities | Key screens |
-| --- | --- | --- |
-| Store Manager | Place and manage outlet orders, monitor status, confirm receipts, and review issues | Dashboard, Place Order, Order Status, Receive, History & Issues, Notifications, Settings |
-| Dispatcher | Review the order queue, generate plans, inspect hard-rule results, publish plans, and resolve exceptions | Plan, Live Board, Needs Attention, Deferral Log, Capacity Forecast, Reference Data |
-| Loader | Review assigned trips, load in the required sequence, report dock problems, and respond to plan changes | Trip Queue, Active Load, Loading Issues, Re-verification |
-| Driver | Follow the assigned trip, enter safe-stop mode, record delivery outcomes, work offline, and synchronize records | Today, Active Trip, Navigation, Stop, Sync, Settings |
+| Role | Core responsibilities |
+| --- | --- |
+| Store Manager | Submit outlet orders, monitor status, confirm receipts, review issues, and receive notifications |
+| Dispatcher | Generate feasible plans, assign drivers, record deferrals, publish plan versions, monitor execution, and resolve exceptions |
+| Loader | Review the trip queue, verify loading order and reefer readiness, record actual quantities, report loading issues, and confirm hand-off |
+| Driver | Review an assigned trip, start and complete stops, record delivery outcomes, and reconcile offline records |
 
-## Operational workflow
+Key capabilities include:
 
-1. The Store Manager submits an order for an outlet and delivery window.
-2. The Dispatcher reviews confirmed orders and generates an assisted plan.
-3. Waypoint checks vehicle capacity, temperature, access, depot, brand, and district rules.
-4. The Dispatcher records deferral reasons where necessary and publishes a versioned plan.
-5. The Loader verifies each assigned stop and confirms the vehicle handoff.
-6. The Driver completes the trip, records delivery outcomes, and synchronizes offline records when connectivity returns.
-7. The Store Manager confirms the received quantities and reports any shortfall.
-8. The Dispatcher reviews the combined Loader, Driver, and Store evidence and moves the issue through its lifecycle.
+- Constraint-aware assisted allocation across weight, volume, temperature, vehicle access, depot, brand, district, workshop state, and trip-count rules.
+- Versioned delivery plans with downstream re-verification when a published plan changes.
+- Server-confirmed order, loading, delivery, receipt, issue, notification, and audit records.
+- Driver offline-operation and conflict-review states.
+- Responsive desktop and phone experiences, with phone-focused Loader and Driver workflows.
+- Idempotent demonstration data that supports a repeatable four-role walkthrough.
 
-Order status follows this progression:
-
-```text
-Submitted → Confirmed → Allocated → Loaded → Out for delivery → Delivered
-```
-
-Issue cases follow this progression:
+The main order lifecycle is:
 
 ```text
-Reported → Acknowledged → Under review → Resolved ↔ Reopened
+Submitted -> Confirmed -> Allocated -> Loaded -> Out for delivery -> Delivered
 ```
 
-## Architecture
+Issue cases use:
 
 ```text
-Browser
-   │
-   ▼
-Next.js application container
-   ├── React frontend and responsive role workspaces
-   ├── Server Components and Server Actions
-   ├── JWT session authentication and role authorization
-   ├── Allocation and workflow domain logic
-   └── Prisma data access
-           │
-           ▼
-PostgreSQL container
+Reported -> Acknowledged -> Under review -> Resolved <-> Reopened
 ```
-
-The frontend and application backend run together in the `app` container. PostgreSQL runs in a separate `postgres` container. Docker Compose manages both services as one stack.
 
 ## Technology stack
 
-| Area | Technology |
+| Layer | Technology |
 | --- | --- |
-| Web application | Next.js 16, React 19, TypeScript |
-| Styling | CSS Modules and responsive CSS |
+| Frontend | Next.js 16, React 19, TypeScript, CSS Modules, Lucide icons |
+| Application backend | Next.js Server Components, Server Actions, and Route Handlers on Node.js 22 |
+| Data access | Prisma ORM 6 |
 | Database | PostgreSQL 16 |
-| Data access | Prisma 6 |
-| Authentication | Signed JWT session cookie with JOSE, bcrypt password hashing |
-| Testing | Vitest |
-| Package management | pnpm workspaces |
-| Deployment | Docker and Docker Compose |
+| Authentication | Signed JWT session cookies with JOSE and bcrypt password hashing |
+| Testing | Vitest and ESLint |
+| Packaging | pnpm 10 workspaces |
+| Deployment | Docker, Docker Compose, health checks, and automated Prisma migrations |
+
+## Architecture
+
+The frontend and application backend run in one Next.js service. PostgreSQL runs as a separate service and is reachable only through the internal Docker network by default.
+
+<p align="center">
+  <img src="docs/assets/waypoint-system-architecture.png" alt="Waypoint system architecture showing responsive users, the Railway production environment, the Next.js frontend and server, Prisma data access, PostgreSQL, Docker-based local development, and quality tooling" width="100%" />
+</p>
+
+<p align="center"><em>Waypoint production, application, data, local-development, and quality architecture.</em></p>
+
+Submission documentation:
+
+- [System architecture](docs/Waypoint_System_Architecture.pdf)
+- [Data model](docs/Waypoint_Data_Model.pdf)
+- [AI tool disclosure](docs/Waypoint_AI_Tool_Disclosure.pdf)
 
 ## Quick start with Docker
 
 ### Prerequisites
 
-- Docker Desktop with Docker Compose
-- Ports `3001` and `5433` available by default
+- Docker Desktop, Docker Engine, or another Docker Compose-compatible runtime
+- Git
+- Ports `3001` and `5433` available, or alternative ports configured in `.env`
 
-### 1. Configure the environment
-
-Create `.env` from the example file:
+### 1. Clone and configure
 
 ```powershell
+git clone <repository-url>
+Set-Location <repository-folder>
 Copy-Item .env.example .env
 ```
 
-Set `SESSION_SECRET` to a long random value. A suitable value can be generated in PowerShell with:
+Generate a secure session secret in PowerShell:
 
 ```powershell
 $sessionBytes = New-Object byte[] 32
@@ -103,306 +104,173 @@ $sessionBytes = New-Object byte[] 32
 [Convert]::ToBase64String($sessionBytes)
 ```
 
-### 2. Build and start the complete stack
+Set the generated value as `SESSION_SECRET` in `.env`. For any non-local environment, also replace `POSTGRES_PASSWORD` with a strong unique password.
+
+### 2. Start the complete stack
 
 ```powershell
 docker compose up -d --build
 ```
 
-Docker performs the following automatically:
+This single command:
 
-1. Starts PostgreSQL and waits for it to become healthy.
+1. Starts PostgreSQL and waits for its health check.
 2. Applies all committed Prisma migrations.
-3. Seeds or refreshes the idempotent NOVA demonstration dataset.
+3. Seeds the idempotent demonstration dataset when `SEED_DEMO_DATA=true`.
 4. Starts the optimized Next.js production server.
-5. Checks application and database health.
+5. Enables application and database health checks.
 
-Compose enables `SEED_DEMO_DATA=true` by default so a new local stack immediately shows database-backed outlets, orders, trips, loading progress, issues and demo accounts. Set it to `false` in `.env` when you want migrations without demonstration records. The seed preserves an existing non-demo published plan instead of replacing operational work, and it can also be run explicitly with `pnpm db:seed`.
+### 3. Verify the deployment
 
-For a new empty database, set `DISPATCHER_EMAIL`, `DISPATCHER_PASSWORD` (at least 12 characters), and optionally `DISPATCHER_NAME` and `DISPATCHER_DEPOT` (`Peliyagoda` or `Kandy`) in `.env`, then run `pnpm db:bootstrap`. This creates the two operating depots and one dispatcher account without adding sample stores or orders. Existing accounts are never overwritten.
-
-## Dispatcher registration
-
-Only Dispatchers register users. Open **Registration** in the dispatcher sidebar and choose the **Depot** (Peliyagoda or Kandy); it defaults to the dispatcher's own depot. The selected depot applies to every tab:
-
-- **Store managers** — creates a password-hashed Store Manager account linked to one Fresh, Style or Tech outlet in the selected depot. The account's depot always matches its outlet. Existing unassigned outlets retain their saved master-data constraints.
-- **Staff** — creates Driver, Loader or Dispatcher accounts for the selected depot. A Peliyagoda dispatcher can therefore set up the Kandy hub's first dispatcher, loaders and drivers.
-- **Vehicles** — registers vehicles with capacity, temperature class and fuel profile at the selected depot.
-
-The account and vehicle lists show the selected depot, and Dispatchers can activate or deactivate accounts, reset passwords and change workshop status in either depot. Every registration and change records an audit event.
-
-New outlets require their ID, brand, district, dock and vehicle-access rules, and delivery window; address and coordinates are optional but give drivers the stop address and map. District suggestions list the selected depot's existing districts. Fresh windows must end by 08:00. Mall outlets require access or booking instructions; for mall-dock access these must start with the `HH:MM-HH:MM` access window, and the delivery window must fit inside it. Registered managers sign in using their email and supplied initial password. Their workspace reads their outlet's actual orders, receipts, issues and notifications, and shows empty states when no records exist.
-
-### 3. Open the application
-
-Visit [http://localhost:3001](http://localhost:3001) for Docker. Local `pnpm dev` continues to use [http://localhost:3000](http://localhost:3000).
-
-The Docker health endpoint is available at [http://localhost:3001/api/health](http://localhost:3001/api/health). A healthy response resembles:
-
-```json
-{
-  "service": "waypoint-web",
-  "status": "ok",
-  "database": "connected",
-  "time": "2026-10-02T09:00:09.261Z"
-}
+```powershell
+docker compose ps
+curl.exe -fsS http://localhost:3001/api/health
 ```
+
+Open [http://localhost:3001](http://localhost:3001). A healthy API response reports `status: "ok"` and `database: "connected"`.
 
 ## Demo accounts
 
+Choose the matching role on the sign-in screen before entering an account.
+
 | Role | Email | Password |
 | --- | --- | --- |
-| Store Manager | `store@waypoint.demo` | `Store123!` |
-| Style Store Manager | `style@waypoint.demo` | `Style123!` |
-| Tech Store Manager | `tech@waypoint.demo` | `Tech123!` |
+| Store Manager (Fresh) | `store@waypoint.demo` | `Store123!` |
 | Dispatcher | `dispatcher@waypoint.demo` | `Dispatch123!` |
 | Loader | `loader@waypoint.demo` | `Loader123!` |
 | Driver | `driver@waypoint.demo` | `Driver123!` |
 
-Select the matching role before signing in. These credentials are seeded for demonstration and local evaluation only.
+Additional brand-specific Store Manager accounts:
 
-## Docker operations
+| Brand | Email | Password |
+| --- | --- | --- |
+| Style | `style@waypoint.demo` | `Style123!` |
+| Tech | `tech@waypoint.demo` | `Tech123!` |
 
-Start or rebuild the entire stack:
+These credentials are for judging and local demonstration only. Do not use them in a production environment.
+
+## Judge walkthrough
+
+The seed creates a realistic Peliyagoda delivery day with allocated, loading, loaded, and deferred work. Complete the walkthrough in order; sign out before switching roles.
+
+1. **Confirm the planning decision as Dispatcher.** Sign in as `dispatcher@waypoint.demo`. Open **Plan** to review the service-day queue and the hard-rule checks used by assisted planning. Open **Live Board** to inspect the published plan and confirm that `VEH036` is loaded and assigned to the seeded Driver. Open **Deferral Log** to review the capacity-based deferral and its recorded reason.
+2. **Inspect and complete loading as Loader.** Sign in as `loader@waypoint.demo`. Open **Trip queue** and review the Fresh-priority and temperature indicators. Open the in-progress trip for `VEH012`, complete its remaining quantities, and confirm the load. Open **Loading issues** to inspect the documented shortfall on `VEH036`; the issue is shared with Dispatcher and Store views.
+3. **Complete the delivery as Driver.** Sign in as `driver@waypoint.demo` on a phone-sized viewport. From **Today**, open the assigned `VEH036` trip, review the stop and delivery window, start the trip, open the active stop, enter the receiver name, and confirm delivery. Visit **Sync** to verify that the delivery record is acknowledged or to review any queued/conflicting offline operation.
+4. **Confirm receipt as Store Manager.** Sign in as `store@waypoint.demo`. Review **Notifications** for the documented loading shortfall, then open **Receive**. Select the delivered order, compare expected and received quantities, add a note if needed, and confirm the receipt. The result is persisted with the Store Manager identity and timestamp.
+5. **Close the operational loop as Dispatcher.** Sign back in as the Dispatcher. Open **Live Board** to see the store-verification state. Open **Needs Attention**, inspect the combined Loader, Driver, and Store evidence, and progress the issue through its lifecycle.
+6. **Review degradation behavior.** On a phone-sized Driver view, use the browser network controls to go offline before recording an outcome. Restore connectivity and open **Sync** to review the pending operation and conflict handling. Loader loading issues and plan-change re-verification provide additional failure-path demonstrations.
+
+## Configuration
+
+The root `.env.example` documents every variable needed by Docker Compose.
+
+| Variable | Purpose | Local default |
+| --- | --- | --- |
+| `POSTGRES_USER` | PostgreSQL user | `waypoint` |
+| `POSTGRES_PASSWORD` | PostgreSQL password | `waypoint` |
+| `POSTGRES_DB` | PostgreSQL database | `waypoint` |
+| `POSTGRES_PORT` | Host port for PostgreSQL | `5433` |
+| `APP_PORT` | Host port for the web application | `3001` |
+| `DATABASE_URL` | Host-side Prisma connection URL | PostgreSQL on `127.0.0.1:5433` |
+| `SESSION_SECRET` | Secret used to sign eight-hour sessions | Replace before use |
+| `SEED_DEMO_DATA` | Run the idempotent judge/demo seed during startup | `true` |
+
+Inside Docker, Compose supplies an internal `DATABASE_URL` that connects the application to `postgres:5432`. Never commit `.env` or production credentials.
+
+Useful Docker commands:
 
 ```powershell
-docker compose up -d --build
-```
-
-Start without rebuilding existing images:
-
-```powershell
-docker compose up -d
-```
-
-Check service health:
-
-```powershell
-docker compose ps
-```
-
-Follow application logs:
-
-```powershell
+# Follow application logs
 docker compose logs -f app
-```
 
-Follow database logs:
-
-```powershell
-docker compose logs -f postgres
-```
-
-Restart only the application:
-
-```powershell
+# Restart only the application
 docker compose restart app
-```
 
-Stop the complete stack while retaining database data:
-
-```powershell
+# Stop services while retaining database data
 docker compose down
 ```
 
-Delete the containers and persisted database volume:
+`docker compose down -v` also deletes the PostgreSQL volume and all local application data. Use it only when an intentional clean reset is required.
 
-```powershell
-docker compose down -v
-```
+## Development and validation
 
-> `docker compose down -v` permanently removes the local Waypoint database. Use it only when a clean reset is intended.
-
-## Environment variables
-
-| Variable | Purpose | Development default |
-| --- | --- | --- |
-| `POSTGRES_USER` | PostgreSQL user created by the database container | `waypoint` |
-| `POSTGRES_PASSWORD` | PostgreSQL password | `waypoint` |
-| `POSTGRES_DB` | PostgreSQL database name | `waypoint` |
-| `DATABASE_URL` | Prisma connection URL used by host-side development | `postgresql://waypoint:waypoint@127.0.0.1:5433/waypoint?schema=public` |
-| `SESSION_SECRET` | Secret used to sign eight-hour authentication sessions | No secure default; replace the example value |
-
-Inside Docker, Compose supplies an internal `DATABASE_URL` that addresses the database service as `postgres:5432`. The host-side URL continues to use `127.0.0.1:5433`.
-
-Never commit `.env` or production credentials. The file is excluded from Git and the Docker build context.
-
-## Local development
-
-Use this workflow when running Next.js directly on the host while keeping PostgreSQL in Docker.
-
-### Prerequisites
-
-- Node.js 22 or a compatible supported Node.js release
-- pnpm 10.11.0
-- Docker Desktop
-
-### Setup
+For host-side development with PostgreSQL in Docker:
 
 ```powershell
 docker compose up -d postgres
 pnpm install
 pnpm db:generate
-pnpm db:migrate -- --name init
+pnpm --filter @waypoint/database exec prisma migrate deploy
 pnpm db:seed
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Stop the development server with `Ctrl+C`, then stop PostgreSQL with:
+The development server is available at [http://localhost:3000](http://localhost:3000).
 
-```powershell
-docker compose down
-```
-
-Do not run the Docker `app` service and `pnpm dev` simultaneously because both use port `3000`.
-
-## Available commands
-
-| Command | Description |
-| --- | --- |
-| `pnpm dev` | Start the Next.js development server |
-| `pnpm build` | Create an optimized production build |
-| `pnpm lint` | Run ESLint across the web application |
-| `pnpm test` | Run the Vitest test suite |
-| `pnpm db:generate` | Generate the Prisma Client |
-| `pnpm db:migrate -- --name <name>` | Create and apply a development migration |
-| `pnpm db:seed` | Seed or refresh the idempotent demo data |
-| `docker compose up -d --build` | Build and start the complete production-style stack |
-| `docker compose down` | Stop the stack without deleting database data |
-
-## Validation
-
-Before committing application changes, run:
+Run the quality gates before submission:
 
 ```powershell
 pnpm lint
 pnpm test
 pnpm build
+docker compose build app
 ```
 
-For deployment changes, also run:
-
-With a running app and an existing dispatcher, `pnpm --filter @waypoint/web exec node registration-smoke.mjs` verifies registration and sign-in for all three brands, manager workspace empty states, duplicate rejection and role access. It removes only the temporary accounts and outlets created by that test. Set `WAYPOINT_TEST_URL` to test another local port.
+The optional registration smoke test requires a running application and dispatcher account:
 
 ```powershell
-docker compose build app
-docker compose up -d
-docker compose ps
-curl.exe -fsS http://127.0.0.1:3000/api/health
+pnpm --filter @waypoint/web exec node registration-smoke.mjs
 ```
 
-Both `app` and `postgres` should report `healthy`.
-
-## Repository structure
+### Monorepo structure
 
 ```text
 .
-├── apps/
-│   └── web/                 Next.js application, routes, components, and public assets
-├── packages/
-│   ├── allocation/          Assisted planning and hard-rule evaluation
-│   ├── database/            Prisma schema, migrations, seed data, and database client
-│   └── domain/              Shared domain types, labels, catalog data, and role definitions
-├── Dockerfile               Production application image
-├── compose.yaml             Application and PostgreSQL services
-├── pnpm-workspace.yaml      Monorepo workspace definition
-└── package.json             Root commands and pinned pnpm version
+|-- apps/web/                 Next.js application and role workspaces
+|-- docs/                     Architecture, data model, and AI disclosure
+|-- packages/allocation/      Constraint evaluation and assisted planning
+|-- packages/database/        Prisma schema, migrations, seed, and client
+|-- packages/domain/          Shared domain types, labels, and catalog data
+|-- compose.yaml              Complete application and database stack
+|-- Dockerfile                Multi-stage production image
+|-- .env.example              Safe configuration template
+`-- package.json              Workspace commands
 ```
 
-## Core planning rules
+## Design departures and scope notes
 
-The allocation package rejects or defers assignments that violate a hard rule:
+The Hackathon build follows the Designathon's four-role workflow and visual language, with these documented implementation decisions:
 
-- A vehicle in the workshop cannot be assigned.
-- An order must remain within its depot.
-- Chilled orders require a reefer vehicle.
-- Van-only outlets require a van.
-- A trip may serve only one brand.
-- A trip may serve only one district.
-- Total trip weight cannot exceed vehicle capacity.
-- Total trip volume cannot exceed vehicle capacity.
-- The same order cannot appear twice in a plan or trip.
-- Whole orders are allocated; orders are not silently split.
+- The source design did not include phone layouts for every Store Manager and Loader screen. Responsive versions preserve the same content hierarchy and actions while reflowing dense desktop layouts for smaller screens.
+- Static prototype values were replaced with coherent database-backed records, timestamps, statuses, and calculated totals so cross-role state remains consistent.
+- The Loader experience uses an authenticated depot-scoped terminal account. Audit records identify that terminal account and session rather than claiming unsupported individual warehouse-worker identity.
+- Driver proof of delivery uses the permitted receiver-name evidence path. Photo and drawn-signature capture are not included in the current build.
+- Navigation maps are illustrative; the application does not claim live turn-by-turn routing or traffic integration.
+- Notifications are currently in-app. External SMS and push delivery are outside the submitted deployment.
+- The checked-in seed contains a focused, repeatable delivery day. Confidential source datasets are not published in this repository.
+- The current interface is English-first; Sinhala and Tamil localization are not included in this submission.
 
-The assisted planner proposes a plan, but the Dispatcher remains responsible for reviewing failures, recording deferral reasons, and publishing the final version.
-
-## Authentication and security
+## Security and data handling
 
 - Passwords are stored as bcrypt hashes.
-- Successful sign-in creates an `HttpOnly`, `SameSite=Lax` JWT cookie.
-- Sessions expire after eight hours.
-- Production cookies use the `Secure` flag.
-- Server-rendered workspaces enforce the required role before loading data.
-- Role selection and authenticated account role must match.
-- `SESSION_SECRET` is required and must be replaced outside local demonstration environments.
+- Authentication uses `HttpOnly`, `SameSite=Lax` JWT cookies; production cookies use the `Secure` flag.
+- Every protected workspace verifies the authenticated role on the server.
+- Store Manager access is outlet-scoped; operational staff access is depot- or assignment-scoped.
+- Workflow mutations create status history, notifications, and audit records where applicable.
+- PostgreSQL is bound to the local host by the supplied Compose configuration and is not exposed publicly.
 
-## Data and persistence
+## Production deployment
 
-PostgreSQL data is stored in the named Docker volume `waypoint-postgres`. Normal container restarts and `docker compose down` preserve that data.
+Before exposing the system publicly:
 
-The seed script uses stable demo identifiers and upserts for demonstration depots, outlets, vehicles, orders, accounts and order lines. Compose runs it when `SEED_DEMO_DATA=true`; local development can run it with `pnpm db:seed`. Operational screens render these database records without fabricated frontend fallback rows.
-
-## Troubleshooting
-
-### Port 3000 is already in use
-
-Check whether another development server or container is running:
-
-```powershell
-docker compose ps
-Get-NetTCPConnection -LocalPort 3000 -State Listen
-```
-
-Stop either the Docker stack with `docker compose down` or the host development server with `Ctrl+C`.
-
-### Prisma reports `EPERM` while renaming its Windows engine
-
-A running Node.js process is usually holding the Prisma DLL. Stop the development server, then run:
-
-```powershell
-pnpm db:generate
-```
-
-### The application container is unhealthy
-
-Inspect the startup sequence:
-
-```powershell
-docker compose logs --tail 200 app
-docker compose logs --tail 100 postgres
-```
-
-Confirm that migrations completed, the seed command finished, and Next.js reports `Ready`.
-
-### Reset the local database
-
-This removes all local Waypoint data and recreates the stack:
-
-```powershell
-docker compose down -v
-docker compose up -d --build
-```
-
-### Rebuild after changing dependencies
-
-```powershell
-docker compose build --no-cache app
-docker compose up -d
-```
-
-## Production considerations
-
-Before deploying beyond a local or competition environment:
-
-- Replace all demonstration credentials and use an external secrets manager.
-- Set a strong, unique `SESSION_SECRET`.
-- Do not expose PostgreSQL publicly unless required by the hosting platform.
-- Terminate TLS at a reverse proxy or managed ingress.
-- Add automated backups and retention policies for PostgreSQL.
-- Run migrations as a controlled deployment step when multiple application replicas are used.
-- Configure centralized logging, uptime monitoring, and error reporting.
-- Review authorization and workflow policies against the final operational requirements.
+1. Set a strong unique `POSTGRES_PASSWORD` and `SESSION_SECRET` through the hosting platform's secret manager.
+2. Set `SEED_DEMO_DATA=false` for a real operational environment. Keep it enabled only for the judging deployment that requires seeded accounts.
+3. Terminate TLS through a managed ingress, Caddy, or Nginx.
+4. Keep PostgreSQL private and configure automated backups and retention.
+5. Run migrations as a controlled release step if deploying multiple application replicas.
+6. Configure centralized logs, uptime monitoring, and error reporting.
+7. Keep the deployed URL available throughout the competition review period.
 
 ## License
 
-No license has been declared in this repository. Add an appropriate license before public distribution.
+No open-source license has been declared. All rights are reserved unless the repository owner adds a license.

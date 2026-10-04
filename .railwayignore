@@ -1,0 +1,7 @@
+/Source/
+/Planning/
+/Image/
+/.pnpm-store/
+node_modules/
+/.git/
+.env

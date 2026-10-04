@@ -18,25 +18,25 @@ const roleIcons: Record<UserRole, LucideIcon> = {
 const roleCopy: Record<UserRole, { detail: string; image: string; imageWidth: number; imageHeight: number }> = {
   store_manager: {
     detail: "Place and track outlet orders, see planned arrivals and confirm receipt.",
-    image: "/Image/store-manager.png",
+    image: "/Image/store-manager.webp",
     imageWidth: 994,
     imageHeight: 1086
   },
   dispatcher: {
     detail: "Build feasible delivery plans, explain deferrals and monitor live execution.",
-    image: "/Image/dispatcher.png",
+    image: "/Image/dispatcher.webp",
     imageWidth: 1086,
     imageHeight: 1448
   },
   loader: {
     detail: "Load trips against the published plan and flag shortfalls before departure.",
-    image: "/Image/loader.png",
+    image: "/Image/loader.webp",
     imageWidth: 941,
     imageHeight: 1672
   },
   driver: {
     detail: "Run your assigned route safely, capture proof of delivery and keep working offline.",
-    image: "/Image/driver.png",
+    image: "/Image/driver.webp",
     imageWidth: 1448,
     imageHeight: 1086
   }

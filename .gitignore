@@ -1,11 +1,30 @@
+# Dependencies and package-manager cache
 node_modules/
+.pnpm-store/
+
+# Framework and build output
 .next/
 dist/
 coverage/
+*.tsbuildinfo
+
+# Local configuration and secrets
 .env
-.env.local
+.env.*
+!.env.example
+
+# Runtime files
 *.log
 data/
 .tmp/
-*.tsbuildinfo
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local AI-agent instructions
+apps/web/AGENTS.md
+apps/web/CLAUDE.md
 
