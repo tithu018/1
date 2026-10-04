@@ -30,17 +30,17 @@
 }
 
 .loaderSidebar {
-  --sidebar-image: url("/Image/loader.png");
+  --sidebar-image: url("/Image/loader.webp");
   --sidebar-image-size: 264px;
 }
 
 .storeSidebar {
-  --sidebar-image: url("/Image/store-manager.png");
+  --sidebar-image: url("/Image/store-manager.webp");
   --sidebar-image-size: 274px;
 }
 
 .dispatcherSidebar {
-  --sidebar-image: url("/Image/dispatcher.png");
+  --sidebar-image: url("/Image/dispatcher.webp");
   --sidebar-image-size: 270px;
 }
 
