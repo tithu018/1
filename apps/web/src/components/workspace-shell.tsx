@@ -164,9 +164,7 @@ export async function WorkspaceShell({
             {navigation[role].map((item) => (
               <Link className={item === active ? styles.active : ""} href={hrefFor(role, item)} key={item}>
                 {usesNovaSidebar && <NavIcon item={item} />}
-                {role === "dispatcher" && item === "Needs Attention"
-                  ? "Needs Attention · 3"
-                  : item}
+                {item}
               </Link>
             ))}
           </nav>

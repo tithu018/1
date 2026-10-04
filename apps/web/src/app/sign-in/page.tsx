@@ -1,5 +1,5 @@
 import { APP_NAME, roleLabels, type UserRole, userRoles } from "@waypoint/domain";
-import { ArrowLeft, ArrowRight, Grid2X2, Info, Package, Store, Truck, type LucideIcon } from "lucide-react";
+import { ArrowLeft, Grid2X2, Info, Package, Store, Truck, type LucideIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { signIn } from "./actions";
@@ -15,31 +15,27 @@ const roleIcons: Record<UserRole, LucideIcon> = {
   driver: Truck
 };
 
-const roleCopy: Record<UserRole, { detail: string; device: string; image: string; imageWidth: number; imageHeight: number }> = {
+const roleCopy: Record<UserRole, { detail: string; image: string; imageWidth: number; imageHeight: number }> = {
   store_manager: {
     detail: "Place and track outlet orders, see planned arrivals and confirm receipt.",
-    device: "Desktop · Phone",
     image: "/Image/store-manager.png",
     imageWidth: 994,
     imageHeight: 1086
   },
   dispatcher: {
     detail: "Build feasible delivery plans, explain deferrals and monitor live execution.",
-    device: "Desktop",
     image: "/Image/dispatcher.png",
     imageWidth: 1086,
     imageHeight: 1448
   },
   loader: {
     detail: "Load trips against the published plan and flag shortfalls before departure.",
-    device: "Tablet · Shared terminal",
     image: "/Image/loader.png",
     imageWidth: 941,
     imageHeight: 1672
   },
   driver: {
     detail: "Run your assigned route safely, capture proof of delivery and keep working offline.",
-    device: "Phone",
     image: "/Image/driver.png",
     imageWidth: 1448,
     imageHeight: 1086
@@ -78,8 +74,6 @@ function RoleChooser() {
               <span className={styles.roleIcon}><Icon aria-hidden="true" /></span>
               <h2>{roleLabels[item]}</h2>
               <p>{roleCopy[item].detail}</p>
-              <b>{roleCopy[item].device}</b>
-              <ArrowRight className={styles.roleArrow} aria-hidden="true" />
             </Link>
           );
         })}
