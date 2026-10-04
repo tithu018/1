@@ -1,5 +1,5 @@
 import { APP_NAME, roleLabels, type UserRole, userRoles } from "@waypoint/domain";
-import { ArrowLeft, Grid2X2, Info, Package, Store, Truck, type LucideIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, Grid2X2, Info, Package, Store, Truck, type LucideIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { signIn } from "./actions";
@@ -74,6 +74,7 @@ function RoleChooser() {
               <span className={styles.roleIcon}><Icon aria-hidden="true" /></span>
               <h2>{roleLabels[item]}</h2>
               <p>{roleCopy[item].detail}</p>
+              <ArrowRight className={styles.roleArrow} aria-hidden="true" />
             </Link>
           );
         })}

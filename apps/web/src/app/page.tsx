@@ -22,16 +22,15 @@ import styles from "./page.module.css";
 type RoleCard = {
   title: string;
   description: string;
-  device: string;
   role: string;
   icon: LucideIcon;
 };
 
 const roles: RoleCard[] = [
-  { title: "Store Manager", description: "Place and track outlet orders, see planned arrivals and confirm receipt.", device: "Desktop · Phone", role: "store_manager", icon: Store },
-  { title: "Dispatcher", description: "Build feasible delivery plans, explain deferrals and monitor live execution.", device: "Desktop", role: "dispatcher", icon: Grid2X2 },
-  { title: "Loader", description: "Load trips against the published plan and flag shortfalls before departure.", device: "Tablet · Shared terminal", role: "loader", icon: Package },
-  { title: "Driver", description: "Run your assigned route safely, capture proof of delivery and keep working offline.", device: "Phone", role: "driver", icon: Truck }
+  { title: "Store Manager", description: "Place and track outlet orders, see planned arrivals and confirm receipt.", role: "store_manager", icon: Store },
+  { title: "Dispatcher", description: "Build feasible delivery plans, explain deferrals and monitor live execution.", role: "dispatcher", icon: Grid2X2 },
+  { title: "Loader", description: "Load trips against the published plan and flag shortfalls before departure.", role: "loader", icon: Package },
+  { title: "Driver", description: "Run your assigned route safely, capture proof of delivery and keep working offline.", role: "driver", icon: Truck }
 ];
 
 const platformFeatures = [
@@ -113,12 +112,12 @@ export default function HomePage() {
         <h2>Four roles. One shared system.</h2>
         <p className={styles.sectionLead}>Each role signs in to its own workspace, with the same status vocabulary, data and audit trail.</p>
         <div className={styles.roleGrid}>
-          {roles.map(({ title, description, device, role, icon: Icon }) => (
+          {roles.map(({ title, description, role, icon: Icon }) => (
             <Link href={`/sign-in?role=${role}`} key={title} className={styles.roleCard}>
               <span className={styles.circleIcon}><Icon aria-hidden="true" /></span>
               <h3>{title}</h3>
               <p>{description}</p>
-              <div><b>{device}</b><ArrowRight aria-hidden="true" /></div>
+              <div><ArrowRight aria-hidden="true" /></div>
             </Link>
           ))}
         </div>

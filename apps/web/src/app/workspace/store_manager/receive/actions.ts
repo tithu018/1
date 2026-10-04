@@ -29,6 +29,7 @@ export async function recordReceipt(orderId: string, receivedUnits: number, expe
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Order", entityId: orderId, action: "receipt_recorded", payload: { receivedUnits, expectedUnits, outcome, issueId: issue?.id ?? null, note: note.trim() || null } } });
     return { issueId: issue?.id ?? null };
   }, { isolationLevel: "Serializable" });
+  revalidatePath("/workspace", "layout");
   revalidatePath("/workspace/store_manager");
   revalidatePath("/workspace/store_manager/receive");
   revalidatePath("/workspace/store_manager/history");

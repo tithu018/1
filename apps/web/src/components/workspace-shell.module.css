@@ -476,71 +476,6 @@
   font-size: 12px;
 }
 
-.status {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  color: #1f5b42;
-  background: #dce8de;
-  font-size: 10px;
-  font-weight: 800;
-}
-
-.status::before {
-  display: inline-grid;
-  width: 10px;
-  height: 10px;
-  place-items: center;
-  border: 1.5px solid currentColor;
-  border-radius: 50%;
-  font-size: 8px;
-  line-height: 1;
-  content: "";
-}
-
-.onlineStatus::before {
-  border-radius: 50%;
-  content: "";
-}
-
-.warningStatus {
-  color: #7a5210;
-  background: #f8ead0;
-}
-
-.warningStatus::before {
-  border-radius: 2px;
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-}
-
-.neutralStatus {
-  color: #6a5636;
-  background: #eee7d7;
-}
-
-.bell {
-  position: relative;
-  width: 14px;
-  height: 14px;
-  border: 2px solid #202522;
-  border-top-color: transparent;
-  border-radius: 0 0 8px 8px;
-}
-
-.bell::before {
-  position: absolute;
-  top: -5px;
-  left: 2px;
-  width: 6px;
-  height: 7px;
-  border: 2px solid #202522;
-  border-bottom: 0;
-  border-radius: 8px 8px 0 0;
-  content: "";
-}
-
 .avatar {
   display: grid;
   width: 36px;
@@ -684,6 +619,14 @@
 }
 
 /* Driver workspace only. Other role layouts retain their existing styles. */
+.dispatcherMobileNav { display: none; }
+.dispatcherShell .content { min-width: 0; }
+@media (max-width: 850px) {
+  .dispatcherMobileNav { display: flex; gap: 8px; overflow-x: auto; padding: 12px 20px; border-bottom: 1px solid #e6dac6; background: #fffdf9; }
+  .dispatcherMobileNav a, .dispatcherMobileNav button { display: flex; align-items: center; gap: 7px; flex-shrink: 0; white-space: nowrap; padding: 10px 13px; border: 1px solid #e6dac6; border-radius: 9px; color: #215742; background: transparent; text-decoration: none; font-size: 12px; }
+  .dispatcherMobileNav a[aria-current="page"] { color: white; background: #215742; }
+  .dispatcherMobileNav svg { width: 16px; height: 16px; }
+}
 .driverShell { width: min(100%, 1040px); min-height: 100svh; padding-bottom: calc(94px + env(safe-area-inset-bottom)); background: #f4f7f1; box-shadow: 0 0 60px #214e3b0b; }
 .driverHeader { min-height: 80px; color: #20372f; background: #f4f7f1; border-bottom: 1px solid #e3e9e1; padding-top: env(safe-area-inset-top); }
 .driverTopBar { height: 80px; padding: 0 24px; gap: 16px; }

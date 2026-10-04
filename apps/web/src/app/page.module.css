@@ -50,8 +50,7 @@
 .roleCard:hover .circleIcon, .benefitGrid article:hover .circleIcon { transform: scale(1.04); }
 .roleCard h3, .benefitGrid h3 { margin: clamp(10px,1vw,18px) 0 0; color: #202522; font-size: clamp(15px,1.39vw,25px); line-height: 1.35; }
 .roleCard p, .benefitGrid p { margin: clamp(8px,.78vw,14px) 0 clamp(10px,.78vw,14px); color: #66706a; font-size: clamp(11px,1.06vw,19px); line-height: 1.45; }
-.roleCard > div { display: flex; width: 100%; align-items: center; justify-content: space-between; margin-top: auto; color: #2f6b52; }
-.roleCard b { font-size: clamp(10px,.89vw,16px); }
+.roleCard > div { display: flex; width: 100%; align-items: center; justify-content: flex-end; margin-top: auto; color: #2f6b52; }
 .roleCard > div svg { width: clamp(17px,1.33vw,24px); height: clamp(17px,1.33vw,24px); transition: transform 180ms ease; }
 .roleCard:hover > div svg { transform: translateX(3px); }
 .workflowSection, .whySection { background: #f7f3ea; }
