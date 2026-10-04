@@ -1,4 +1,5 @@
 .page { width: min(100%, 1080px); }
+.notificationPageShell { width: min(100%, 1380px); }
 .heading { margin-bottom: 24px; }
 .heading h1 { margin: 0; color: #215742; font-size: 34px; line-height: 1.12; letter-spacing: -.035em; }
 .heading p { margin: 8px 0 0; color: #68746d; font-size: 15px; }
@@ -41,5 +42,42 @@
 .accountRow div { flex: 1; }
 .accountRow p { margin: 4px 0 0; color: #68746d; font-size: 13px; }
 .accountRow button { height: 40px; padding: 0 15px; border: 1px solid #ddceb7; border-radius: 8px; color: #215742; background: #fffdf9; font-weight: 800; }
+.notificationsPage { width: 100%; }
+.notificationHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+.notificationHeading h1 { margin: 0; color: #215742; font-size: 34px; line-height: 1.12; letter-spacing: -.035em; }
+.notificationHeading p { margin: 8px 0 0; color: #68746d; font-size: 16px; line-height: 1.45; }
+.notificationFilters { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 24px; }
+.notificationFilters button { position: relative; display: inline-flex; min-width: 112px; min-height: 46px; align-items: center; justify-content: center; gap: 10px; padding: 9px 20px; border: 0; border-radius: 10px; color: #33465a; background: #fffdf9; box-shadow: 0 8px 18px #2a21120a; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+.notificationFilters button svg { width: 20px; height: 20px; }
+.notificationFilters .activeFilter { color: #fffdf8; background: #0b5b41; box-shadow: inset 0 -12px 22px #05392330, 0 12px 24px #0b5b4116; }
+.notificationFilters .activeFilter svg { color: #fffdf8; }
+.filterDot { position: absolute; top: 9px; right: 14px; width: 8px; height: 8px; border-radius: 50%; background: #f51920; }
+.notificationGroups { display: grid; gap: 28px; }
+.notificationGroup h2 { margin: 0 0 12px; color: #071a2e; font-size: 18px; line-height: 1.2; }
+.notificationRows { overflow: hidden; border: 1px solid #e6dac6; border-radius: 12px; background: #fffdf9; box-shadow: 0 12px 28px #2920100c; }
+.notificationRow { display: grid; min-height: 78px; grid-template-columns: 56px 12px minmax(0,1fr) max-content 24px; align-items: center; gap: 16px; padding: 12px 22px; color: inherit; border-top: 1px solid #e6dac6; transition: background-color .18s ease; }
+.notificationRow:first-child { border-top: 0; }
+.notificationRow:hover { background: #fbf7ee; }
+.unreadNotification { background: #fffdf9; }
+.notificationStatusIcon { display: grid; width: 50px; height: 50px; place-items: center; border-radius: 50%; }
+.notificationStatusIcon svg { width: 23px; height: 23px; }
+.notificationReadDot { width: 10px; height: 10px; border-radius: 50%; background: #149e61; }
+.notificationCopy { display: grid; min-width: 0; gap: 5px; }
+.notificationCopy strong { overflow: hidden; color: #071a2e; font-size: 17px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.notificationCopy span { overflow: hidden; color: #53657a; font-size: 15px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.notificationRow time { color: #53657a; font-size: 14px; white-space: nowrap; }
+.notificationRow > svg { width: 20px; height: 20px; color: #071a2e; }
+.notificationTypeorders .notificationStatusIcon { color: #0b7044; background: #dff3e7; }
+.notificationTypeorders .notificationReadDot { background: #0aa463; }
+.notificationTypedeliveries .notificationStatusIcon { color: #0f74dd; background: #e1efff; }
+.notificationTypedeliveries .notificationReadDot { background: #1687ed; }
+.notificationTypeissues .notificationStatusIcon { color: #d97706; background: #fde8bf; }
+.notificationTypeissues .notificationReadDot { background: #f69a08; }
+.notificationEmpty { display: grid; min-height: 360px; place-items: center; align-content: center; gap: 12px; padding: 42px 24px; border: 1px solid #e6dac6; border-radius: 16px; background: #fffdf9; box-shadow: 0 12px 28px #2920100c; color: #68746d; text-align: center; }
+.notificationEmpty svg { width: 48px; height: 48px; color: #215742; }
+.notificationEmpty h2 { margin: 0; color: #215742; font-size: 24px; }
+.notificationEmpty p { max-width: 420px; margin: 0; line-height: 1.5; }
+.notificationEmpty button { min-height: 42px; padding: 8px 18px; border: 1px solid #215742; border-radius: 9px; color: #215742; background: #fffdf9; font: inherit; font-weight: 800; cursor: pointer; }
 @media (max-width: 900px) { .settingsGrid { grid-template-columns: 1fr; gap: 0; } }
-@media (max-width: 640px) { .heading h1 { font-size: 30px; } .card { padding: 16px; border-radius: 12px; } .cardTitle, .accountRow { align-items: flex-start; flex-direction: column; } }
+@media (max-width: 900px) { .notificationRow { grid-template-columns: 50px minmax(0,1fr) 24px; gap: 12px; } .notificationReadDot { position: absolute; left: 68px; } .notificationCopy { grid-column: 2; } .notificationRow time { grid-column: 2; } .notificationRow > svg { grid-column: 3; grid-row: 1 / span 2; } }
+@media (max-width: 640px) { .heading h1 { font-size: 30px; } .card { padding: 16px; border-radius: 12px; } .cardTitle, .accountRow { align-items: flex-start; flex-direction: column; } .notificationHeading h1 { font-size: 30px; } .notificationFilters { gap: 10px; } .notificationFilters button { min-width: 0; flex: 1 1 132px; } .notificationRow { min-height: 86px; padding: 14px; } .notificationCopy strong, .notificationCopy span { white-space: normal; } .notificationRow time { font-size: 13px; } }
