@@ -1,117 +1,22 @@
-.issues {
-  width: min(100%, 1080px);
-}
-
-.heading h1 {
-  margin: 0;
-  color: #215742;
-  font-size: 34px;
-  line-height: 1.08;
-}
-
-.heading p {
-  margin: 8px 0 18px;
-  color: #68746d;
-  font-size: 15px;
-}
-
-.filters {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-}
-
-.filters button {
-  height: 36px;
-  padding: 0 20px;
-  border: 1px solid #ddceb7;
-  border-radius: 999px;
-  background: #fffdf9;
-  color: #202522;
-  font-size: 14px;
-}
-
-.filters .activeFilter {
-  border-color: #215742;
-  background: #215742;
-  color: #fffdf8;
-}
-
-.tableCard {
-  padding: 24px;
-  border: 1px solid #e6dac6;
-  border-radius: 14px;
-  background: #fffdf9;
-  box-shadow: 0 12px 24px #29201014;
-}
-
-.tableCard table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  overflow: hidden;
-  border: 1px solid #e4d8c5;
-  border-radius: 8px;
-  font-size: 13px;
-}
-
-.tableCard th {
-  height: 39px;
-  padding: 0 11px;
-  background: #f1eadc;
-  color: #68746d;
-  font-size: 11px;
-  font-weight: 800;
-  text-align: left;
-}
-
-.tableCard td {
-  height: 52px;
-  padding: 0 11px;
-  border-top: 1px solid #e6dac6;
-  color: #202522;
-  white-space: nowrap;
-}
-
-.tableCard td:first-child {
-  font-weight: 800;
-}
-
-.badge {
-  display: inline-flex;
-  min-height: 27px;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.reported {
-  color: #343832;
-  background: #eee7d7;
-}
-
-.resolved {
-  color: #226045;
-  background: #dce8de;
-}
-
-.tableCard p {
-  margin: 11px 0 0;
-  color: #68746d;
-  font-size: 12px;
-}
-
-@media (max-width: 900px) {
-  .tableCard {
-    overflow: auto;
-  }
-
-  .tableCard table {
-    min-width: 760px;
-  }
-}
+.issues { width:min(100%,1080px); }
+.heading h1 { margin:0; color:#215742; font-size:32px; line-height:1.1; }
+.heading p { margin:8px 0 18px; color:#68746d; font-size:14px; }
+.filters { display:flex; gap:8px; margin-bottom:18px; }
+.filters button { min-height:40px; padding:0 18px; border:1px solid #ddceb7; border-radius:999px; background:#fffdf9; color:#202522; font-size:13px; }
+.filters .activeFilter { border-color:#215742; background:#215742; color:#fffdf8; }
+.tableCard { padding:18px; border:1px solid #e6dac6; border-radius:14px; background:#fffdf9; box-shadow:0 12px 24px #29201014; }
+.headerRow,.issueRows article { display:grid; grid-template-columns:145px 80px 155px 1.1fr 1.4fr 120px; align-items:center; gap:10px; padding:0 11px; }
+.headerRow { min-height:38px; border:1px solid #e4d8c5; border-radius:9px 9px 0 0; color:#68746d; background:#f1eadc; font-size:11px; font-weight:800; }
+.issueRows { overflow:hidden; border:1px solid #e4d8c5; border-top:0; border-radius:0 0 9px 9px; }
+.issueRows article { min-height:58px; border-top:1px solid #e6dac6; font-size:12px; }
+.issueRows article:first-child { border-top:0; }
+.issueRows time { font-weight:700; }
+.issueRows p { margin:0; color:#68746d; }
+.issueRows a { color:#226045; font-weight:700; text-decoration:underline; }
+.badge { display:inline-flex; width:max-content; min-height:27px; align-items:center; gap:5px; padding:5px 10px; border-radius:999px; font-size:11px; font-style:normal; font-weight:800; white-space:nowrap; }
+.reported { color:#343832; background:#eee7d7; }
+.resolved { color:#226045; background:#dce8de; }
+.withdrawn { opacity:.7; }
+.tableCard > p,.tableCard footer { margin:12px 0 0; color:#68746d; font-size:11px; }
+@media (max-width:1000px) { .headerRow { display:none; } .issueRows { border-top:1px solid #e4d8c5; border-radius:9px; } .issueRows article { grid-template-columns:130px 1fr auto; padding:14px; } .issueRows strong,.issueRows span,.issueRows p { grid-column:2; } .issueRows em { grid-column:3; grid-row:1 / span 3; } }
+@media (max-width:560px) { .issueRows article { grid-template-columns:1fr auto; } .issueRows time,.issueRows b,.issueRows strong,.issueRows span,.issueRows p { grid-column:1; } .issueRows em { grid-column:2; grid-row:1 / span 5; } }

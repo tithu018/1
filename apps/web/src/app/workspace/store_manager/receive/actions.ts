@@ -1,8 +1,8 @@
 "use server";
 
 import { prisma } from "@waypoint/database";
-import { requireRole } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { requireRole } from "@/lib/auth";
 
 export async function recordReceipt(orderId: string, receivedUnits: number, expectedUnits: number, outcome: "full" | "short" | "reservation", note: string) {
   const session = await requireRole("store_manager");
@@ -30,5 +30,10 @@ export async function recordReceipt(orderId: string, receivedUnits: number, expe
     return { issueId: issue?.id ?? null };
   }, { isolationLevel: "Serializable" });
   revalidatePath("/workspace", "layout");
+  revalidatePath("/workspace/store_manager");
+  revalidatePath("/workspace/store_manager/receive");
+  revalidatePath("/workspace/store_manager/history");
+  revalidatePath("/workspace/store_manager/notifications");
+  revalidatePath(`/workspace/store_manager/orders/${orderId}`);
   return result;
 }

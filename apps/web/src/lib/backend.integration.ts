@@ -12,7 +12,7 @@ import { freshCatalog } from "@waypoint/domain";
 import { registerStoreManager, registerStaff, registerVehicle, setAccountActive, resetStaffPassword, setVehicleWorkshop } from "@/app/workspace/dispatcher/registration/actions";
 import { submitFreshOrder, submitRetailOrder, updateStoreOrder, cancelStoreOrder, acknowledgeDeferral } from "@/app/workspace/store_manager/orders/actions";
 import { publishAssistedPlan, assignTripDriver } from "@/app/workspace/dispatcher/plan/actions";
-import { confirmTripLoaded } from "@/app/workspace/loader/load/actions";
+import { confirmTripLoaded, reportLoaderIssue, setLoadLineState, startLoading, withdrawLoaderIssue } from "@/app/workspace/loader/load/actions";
 import { recordReceipt } from "@/app/workspace/store_manager/receive/actions";
 import { startDriverTrip, recordDriverOutcome, resolveDriverSyncConflict, createLoaderIssue, transitionIssue, acknowledgeNotification } from "./workflow-actions";
 import { updateDriverProfile, changeDriverPassword } from "@/app/workspace/driver/profile/actions";
@@ -41,7 +41,15 @@ async function order(id = "ORDER", outletId = "FRESH", overrides = {}) {
 }
 function trip(orderIds = ["ORDER"], overrides = {}) { return { vehicleId: "VAN", driverId: "driver", orderIds, brand: "FRESH" as const, district: "Colombo", ...overrides }; }
 async function publish(orderIds = ["ORDER"]) { await login("dispatcher"); await publishAssistedPlan([trip(orderIds)], [], { expectedVersion: null }); return db.trip.findFirstOrThrow(); }
-async function depart() { await order(); const assigned = await publish(); await login("loader"); await confirmTripLoaded(assigned.id, ["ORDER"]); await login("driver"); const versions = await startDriverTrip(assigned.id); return { assigned, version: versions[0].updatedAt }; }
+async function completeLoad(tripId: string) {
+  const assigned = await db.trip.findUniqueOrThrow({ where: { id: tripId }, include: { plan: true } });
+  await login("loader");
+  await startLoading({ tripId, planVersion: assigned.plan.version, loadingOrderConfirmed: true, reeferTemperatureC: 3.5, reeferConfirmed: true });
+  const lines = await db.loadLine.findMany({ where: { session: { tripId } } });
+  for (const line of lines) await setLoadLineState({ tripId, planVersion: assigned.plan.version, lineKey: line.lineKey, loaded: true });
+  return confirmTripLoaded(tripId, assigned.plan.version);
+}
+async function depart() { await order(); const assigned = await publish(); await completeLoad(assigned.id); await login("driver"); const versions = await startDriverTrip(assigned.id); return { assigned, version: versions[0].updatedAt }; }
 
 beforeAll(async () => {
   config({ path: resolve("../../.env"), quiet: true } as Parameters<typeof config>[0]);
@@ -174,6 +182,29 @@ describe("store orders", () => {
     const saved = await order(); await login("style"); await expect(cancelStoreOrder(saved.id)).rejects.toThrow(); await expect(updateStoreOrder(saved.id, [{ lineId: "unknown", quantity: 1 }])).rejects.toThrow();
     await expect(acknowledgeDeferral(saved.id)).rejects.toThrow();
   });
+  it("persists the Store Manager lifecycle with outlet scoped receipt, issues and notifications", async () => {
+    await login("store");
+    const [product] = freshCatalog;
+    const created = await submitFreshOrder([{ code: product.code, quantity: 5 }], "Back gate after 05:30");
+    const saved = await db.order.findFirstOrThrow({ where: { id: created.id, outletId: "FRESH" }, include: { lines: true, statusEvents: true } });
+    expect(saved).toMatchObject({ outletId: "FRESH", status: "SUBMITTED", units: 5 });
+    expect(saved.statusEvents.map((event) => event.status)).toContain("SUBMITTED");
+    await updateStoreOrder(saved.id, saved.lines.map((line) => ({ lineId: line.id, quantity: 4 })));
+    expect((await db.order.findUniqueOrThrow({ where: { id: saved.id } })).units).toBe(4);
+    await db.order.update({ where: { id: saved.id }, data: { status: "DELIVERED" } });
+    const receipt = await recordReceipt(saved.id, 3, 4, "short", "One unit missing");
+    expect(receipt.issueId).toBeTruthy();
+    expect(await db.receiptRecord.findUnique({ where: { orderId: saved.id } })).toMatchObject({ expectedUnits: 4, receivedUnits: 3, outcome: "short" });
+    expect(await db.issueCase.findFirst({ where: { orderId: saved.id, order: { outletId: "FRESH" } } })).toMatchObject({ status: "REPORTED" });
+    await login("style");
+    await expect(recordReceipt(saved.id, 4, 4, "full", "")).rejects.toThrow();
+    const notice = await db.notification.create({ data: { recipientId: "store", type: "ORDER", title: "Order update", body: saved.id, entityType: "Order", entityId: saved.id } });
+    await acknowledgeNotification(notice.id);
+    expect((await db.notification.findUniqueOrThrow({ where: { id: notice.id } })).readAt).toBeNull();
+    await login("store");
+    await acknowledgeNotification(notice.id);
+    expect((await db.notification.findUniqueOrThrow({ where: { id: notice.id } })).readAt).not.toBeNull();
+  });
 });
 describe("publication, loading and departure", () => {
   it("keeps old active trips visible and excludes them from a new planning queue", async () => {
@@ -211,7 +242,7 @@ describe("publication, loading and departure", () => {
     expect(await db.notification.count({ where: { recipientId: "driver", title: "Plan v2 published" } })).toBe(1);
     expect(await db.notification.count({ where: { recipientId: "spare", title: "Plan v2 published" } })).toBe(1);
     expect((await getDispatcherBoard("DEPOT", nextServiceDate())).some((item) => item.id === old.id)).toBe(false);
-    await login("loader"); await expect(confirmTripLoaded(old.id, ["ORDER"])).rejects.toThrow();
+    await login("loader"); await expect(confirmTripLoaded(old.id, 1)).rejects.toThrow();
   });
   it("publishes, loads, departs, delivers, confirms receipt and resolves an issue", async () => {
     const { assigned, version } = await depart();
@@ -247,15 +278,20 @@ describe("publication, loading and departure", () => {
     await login("store"); await acknowledgeDeferral("ORDER"); expect(await db.auditEvent.count({ where: { action: "deferral_acknowledged" } })).toBe(1);
   });
   it("invalidates loading after replan and rejects stale publication", async () => {
-    await order(); const old = await publish(); await login("loader"); await confirmTripLoaded(old.id, ["ORDER"]);
+    await order(); const old = await publish(); await completeLoad(old.id);
     await login("dispatcher"); await expect(publishAssistedPlan([trip()], [], { expectedVersion: null })).rejects.toThrow("Plan changed");
     expect(await publishAssistedPlan([trip()], [], { expectedVersion: 1 })).toBe(2);
-    await login("loader"); await expect(confirmTripLoaded(old.id, ["ORDER"])).rejects.toThrow("no longer");
+    expect((await db.loadSession.findUniqueOrThrow({ where: { tripId: old.id } })).status).toBe("REVERIFY_REQUIRED");
+    await login("loader"); await expect(confirmTripLoaded(old.id, 1)).rejects.toThrow("changed");
     const replacement = await db.trip.findFirstOrThrow({ where: { plan: { status: "PUBLISHED" } } }); await login("driver"); await expect(startDriverTrip(replacement.id)).rejects.toThrow("loaded");
   });
   it("rejects incomplete checklists and unassigned drivers, permits reassignment", async () => {
-    await order(); const assigned = await publish(); await login("loader"); await expect(confirmTripLoaded(assigned.id, ["ORDER", "ORDER"])).rejects.toThrow(); await expect(confirmTripLoaded(assigned.id, ["foreign"])).rejects.toThrow();
-    await confirmTripLoaded(assigned.id, ["ORDER"]); await confirmTripLoaded(assigned.id, ["ORDER"]); expect(await db.auditEvent.count({ where: { action: "load_confirmed" } })).toBe(1);
+    await order(); const assigned = await publish(); await login("loader"); await expect(confirmTripLoaded(assigned.id, 1)).rejects.toThrow("ready");
+    await startLoading({ tripId: assigned.id, planVersion: 1, loadingOrderConfirmed: true, reeferTemperatureC: 3.5, reeferConfirmed: true });
+    await expect(confirmTripLoaded(assigned.id, 1)).rejects.toThrow("checklist");
+    await expect(setLoadLineState({ tripId: assigned.id, planVersion: 1, lineKey: "foreign", loaded: true })).rejects.toThrow("not part");
+    const line = await db.loadLine.findFirstOrThrow({ where: { session: { tripId: assigned.id } } }); await setLoadLineState({ tripId: assigned.id, planVersion: 1, lineKey: line.lineKey, loaded: true });
+    await confirmTripLoaded(assigned.id, 1); await confirmTripLoaded(assigned.id, 1); expect(await db.auditEvent.count({ where: { action: "load_confirmed" } })).toBe(1);
     await login("spare"); await expect(startDriverTrip(assigned.id)).rejects.toThrow(); await login("dispatcher"); await assignTripDriver(assigned.id, "spare");
     expect((await setAccountActive({}, form({ accountId: "spare", isActive: "false" }))).error).toContain("Reassign");
     await login("driver"); await expect(startDriverTrip(assigned.id)).rejects.toThrow(); await login("spare"); await startDriverTrip(assigned.id); await startDriverTrip(assigned.id);
@@ -266,6 +302,25 @@ describe("publication, loading and departure", () => {
     const issue = await createLoaderIssue(assigned.id, "ORDER", "Shortfall", 2, "Missing cartons"); await transitionIssue(issue, "ACKNOWLEDGED", "Notified office"); await expect(transitionIssue(issue, "UNDER_REVIEW", "Review")).rejects.toThrow();
     await login("style"); await expect(transitionIssue(issue, "REOPENED", "Review")).rejects.toThrow("scope"); await login("store"); await expect(transitionIssue(issue, "UNDER_REVIEW", "Review")).rejects.toThrow();
     await login("dispatcher"); await transitionIssue(issue, "UNDER_REVIEW", "Investigating"); await expect(transitionIssue(issue, "REOPENED", "Review")).rejects.toThrow("Cannot move");
+  });
+  it("persists documented partial loads, evidence and cross-role notices", async () => {
+    await order(); const assigned = await publish(); await login("loader");
+    await startLoading({ tripId: assigned.id, planVersion: 1, loadingOrderConfirmed: true, reeferTemperatureC: 2.5, reeferConfirmed: true });
+    const line = await db.loadLine.findFirstOrThrow({ where: { session: { tripId: assigned.id } } });
+    const flag = await reportLoaderIssue({ tripId: assigned.id, planVersion: 1, lineKey: line.lineKey, type: "DAMAGED", quantity: 2, note: "Wet carton", photo: { name: "dock.jpg", mimeType: "image/jpeg", base64: Buffer.from("evidence").toString("base64") } });
+    expect(await db.loadIssue.findUniqueOrThrow({ where: { id: flag.id } })).toMatchObject({ type: "DAMAGED", quantity: 2, photoName: "dock.jpg" });
+    expect(await db.notification.count({ where: { title: "Damaged during loading", recipientId: { in: ["dispatcher", "store", "driver"] } } })).toBe(3);
+    expect(await confirmTripLoaded(assigned.id, 1)).toMatchObject({ plannedUnits: 10, loadedUnits: 8, flags: 1 });
+    await expect(withdrawLoaderIssue(flag.id)).rejects.toThrow("before");
+  });
+  it("withdraws a flag before hand-off and requires the line to be checked again", async () => {
+    await order(); const assigned = await publish(); await login("loader");
+    await startLoading({ tripId: assigned.id, planVersion: 1, loadingOrderConfirmed: true, reeferTemperatureC: 2.5, reeferConfirmed: true });
+    const line = await db.loadLine.findFirstOrThrow({ where: { session: { tripId: assigned.id } } });
+    const flag = await reportLoaderIssue({ tripId: assigned.id, planVersion: 1, lineKey: line.lineKey, type: "MISSING", quantity: 1 });
+    await withdrawLoaderIssue(flag.id); await expect(confirmTripLoaded(assigned.id, 1)).rejects.toThrow("checklist");
+    await setLoadLineState({ tripId: assigned.id, planVersion: 1, lineKey: line.lineKey, loaded: true }); await confirmTripLoaded(assigned.id, 1);
+    expect(await db.auditEvent.count({ where: { action: "withdrawn" } })).toBe(1);
   });
   it("publishes only one version during competing office updates", async () => {
     await order(); await login("dispatcher"); const results = await Promise.allSettled([publishAssistedPlan([trip()], [], { expectedVersion: null }), publishAssistedPlan([trip()], [], { expectedVersion: null })]);

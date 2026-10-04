@@ -14,7 +14,7 @@ type Issue = { id: string; status: string; summary: string; order: {
   deliveryOutcome: { outcome: string; receiverName: string | null; note: string | null } | null;
   receipt: { receivedUnits: number; expectedUnits: number; outcome: string; note: string | null; confirmedAt: string } | null;
 }; events: { from: string | null; to: string; note: string | null; createdAt: string; actor: { displayName: string } | null }[];
-loadIssue: { quantity: number | null; note: string | null } | null };
+loadIssue: { id: string; type: string; summary: string; photoName: string | null; quantity: number | null; note: string | null } | null };
 
 export function IssueDetail({ issue }: Readonly<{ issue: Issue }>) {
   const router = useRouter();
@@ -32,6 +32,8 @@ export function IssueDetail({ issue }: Readonly<{ issue: Issue }>) {
     <div className={styles.grid}><section className={styles.card}><h2><History size={20} />Case history</h2><ol>{issue.events.map((event, index) => <li key={`${event.createdAt}-${index}`}><b>{label(event.to)}</b>{event.note && <span>{event.note}</span>}<small>{displayDate(event.createdAt)} · {displayTime(event.createdAt)}{event.actor ? ` · ${event.actor.displayName}` : ""}</small></li>)}</ol></section>
       <section className={styles.card}><h2><ClipboardCheck size={20} />Delivery evidence</h2><dl>
         <div><dt>Loader report</dt><dd>{issue.loadIssue ? `${issue.loadIssue.quantity ?? "—"} units · ${issue.loadIssue.note ?? "No note"}` : "No loading report"}</dd></div>
+        <div><dt>Loader problem</dt><dd>{issue.loadIssue ? `${label(issue.loadIssue.type)} · ${issue.loadIssue.summary}` : "Not recorded"}</dd></div>
+        <div><dt>Loader evidence</dt><dd>{issue.loadIssue?.photoName ? <a href={`/api/load-issues/${issue.loadIssue.id}/photo`} rel="noreferrer" target="_blank">View {issue.loadIssue.photoName}</a> : "None"}</dd></div>
         <div><dt>Driver outcome</dt><dd>{issue.order.deliveryOutcome ? label(issue.order.deliveryOutcome.outcome) : "Not recorded"}</dd></div>
         <div><dt>Receiver</dt><dd>{issue.order.deliveryOutcome?.receiverName ?? "Not recorded"}</dd></div>
         <div><dt>Driver note</dt><dd>{issue.order.deliveryOutcome?.note || "No note"}</dd></div>

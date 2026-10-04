@@ -3,8 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   Bell,
+  ChevronDown,
   CloudUpload,
   MapPinned,
+  MapPin,
   UserRound,
   ChartNoAxesColumnIncreasing,
   ClipboardList,
@@ -13,7 +15,7 @@ import {
   LogOut,
   Package,
   Route,
-  SlidersHorizontal,
+  Settings,
   TriangleAlert,
   Truck,
   type LucideIcon
@@ -26,7 +28,7 @@ import { displayDate, label } from "@/lib/format";
 import styles from "./workspace-shell.module.css";
 
 const navigation: Record<UserRole, readonly string[]> = {
-  store_manager: ["Dashboard", "Place order", "Order status", "Receive", "History & issues", "Notifications", "Settings"],
+  store_manager: ["Dashboard", "Place order", "Order status", "Receive", "History & issues", "Notifications"],
   dispatcher: ["Plan", "Registration", "Live Board", "Needs Attention", "Deferral Log", "Capacity Forecast", "Reference Data"],
   loader: ["Trip queue", "Active load", "Loading issues"],
   driver: ["Today", "Active trip", "Sync", "Profile"]
@@ -67,7 +69,6 @@ function NavIcon({ item }: Readonly<{ item: string }>) {
     Receive: Package,
     "History & issues": Clock3,
     Notifications: Bell,
-    Settings: SlidersHorizontal,
     Plan: Route,
     "Live Board": Truck,
     "Needs Attention": TriangleAlert,
@@ -81,6 +82,49 @@ function NavIcon({ item }: Readonly<{ item: string }>) {
   const Icon = iconByItem[item] ?? LayoutDashboard;
 
   return <Icon aria-hidden="true" className={styles.navIcon} strokeWidth={2} />;
+}
+
+function StoreManagerHeader({
+  context,
+  displayName,
+  site
+}: Readonly<{ context: string; displayName: string; site: string }>) {
+  return (
+    <header className={`${styles.header} ${styles.novaHeader} ${styles.storeHeader}`}>
+      <section className={styles.storeHeaderSite} aria-label="Current outlet">
+        <MapPin aria-hidden="true" />
+        <div>
+          <strong>{site}</strong>
+          <span>{context}</span>
+        </div>
+        <ChevronDown aria-hidden="true" />
+      </section>
+
+      <div className={styles.storeHeaderRight}>
+        <span className={styles.storeCutoffBadge}>
+          <Clock3 aria-hidden="true" />
+          <span>
+            <small>Order cutoff</small>
+            <strong>16:00</strong>
+          </span>
+        </span>
+
+        <Link className={styles.storeBell} href="/workspace/store_manager/notifications" aria-label="Notifications">
+          <Bell aria-hidden="true" />
+          <span aria-hidden="true" />
+        </Link>
+
+        <section className={styles.storeProfile} aria-label="Store Manager profile">
+          <span className={styles.storeAvatar}>SM</span>
+          <span className={styles.storeIdentity}>
+            <strong>{displayName}</strong>
+            <small>{displayDate()}</small>
+          </span>
+          <ChevronDown aria-hidden="true" />
+        </section>
+      </div>
+    </header>
+  );
 }
 
 export async function WorkspaceShell({
@@ -100,7 +144,7 @@ export async function WorkspaceShell({
   const usesNovaSidebar = isLoader || isStore || isDispatcher;
 
   return (
-    <div className={`${isDriver ? styles.driverShell : styles.shell} ${usesNovaSidebar ? styles.novaShell : ""} ${isDispatcher ? styles.dispatcherShell : ""}`}>
+    <div className={`${isDriver ? styles.driverShell : styles.shell} ${usesNovaSidebar ? styles.novaShell : ""} ${isDispatcher ? styles.dispatcherShell : ""} ${isLoader ? styles.loaderShell : ""}`}>
       {!isDriver && (
         <aside className={`${styles.sidebar} ${usesNovaSidebar ? styles.novaSidebar : ""} ${isLoader ? styles.loaderSidebar : ""} ${isStore ? styles.storeSidebar : ""} ${isDispatcher ? styles.dispatcherSidebar : ""}`}>
           <Link href="/" className={styles.logo}>
@@ -125,7 +169,14 @@ export async function WorkspaceShell({
             ))}
           </nav>
           <div className={styles.sidebarFooter}>
-            <strong>{site}</strong>
+            <div className={styles.sidebarFooterTitle}>
+              <strong>{site}</strong>
+              {isStore && (
+                <Link className={styles.outletSettings} href="/workspace/store_manager/settings" aria-label="Store settings">
+                  <Settings aria-hidden="true" />
+                </Link>
+              )}
+            </div>
             <span>
               {context}
             </span>
@@ -138,6 +189,8 @@ export async function WorkspaceShell({
       <div className={styles.content}>
         {isDriver ? (
           <DriverHeader name={session.displayName} depot={depot?.name ?? "No depot assigned"} accountId={session.accountId} />
+        ) : isStore ? (
+          <StoreManagerHeader context={context} displayName={session.displayName} site={site} />
         ) : (
           <header className={`${styles.header} ${usesNovaSidebar ? styles.novaHeader : ""}`}>
             {usesNovaSidebar ? (
@@ -171,6 +224,15 @@ export async function WorkspaceShell({
           {navigation.driver.map((item) => (
             <Link className={item === active ? styles.active : ""} href={hrefFor("driver", item)} key={item} aria-current={item === active ? "page" : undefined}>
               <NavIcon item={item} />{item}
+            </Link>
+          ))}
+        </nav>
+      )}
+      {isLoader && (
+        <nav className={styles.loaderMobileNav} aria-label="Loader navigation">
+          {navigation.loader.map((item) => (
+            <Link className={item === active ? styles.active : ""} href={hrefFor("loader", item)} key={item} aria-current={item === active ? "page" : undefined}>
+              <NavIcon item={item} />{item === "Trip queue" ? "Queue" : item === "Active load" ? "Load" : "Issues"}
             </Link>
           ))}
         </nav>

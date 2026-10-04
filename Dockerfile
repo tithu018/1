@@ -37,4 +37,4 @@ COPY --from=builder /app ./
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "pnpm --filter @waypoint/database exec prisma migrate deploy && pnpm --filter @waypoint/web start"]
+CMD ["sh", "-c", "pnpm --filter @waypoint/database exec prisma migrate deploy && if [ \"$SEED_DEMO_DATA\" = \"true\" ]; then pnpm db:seed; fi && pnpm --filter @waypoint/web start"]
