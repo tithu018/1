@@ -73,7 +73,8 @@
 .wordmark { color: #214e3b; }
 .lightLogo { color: #fff; }
 .wordmark img, .lightLogo img { width: 66px; height: 36px; object-fit: contain; }
-.chooserTop .wordmark { gap: 0; padding-left: clamp(54px,5vw,90px); font-size: clamp(17px,1.56vw,28px); }
+.chooserTop .wordmark { gap: clamp(9px,.56vw,10px); padding-left: 0; font-size: clamp(17px,1.56vw,28px); }
+.chooserTop .wordmark img { width: clamp(50px,4.44vw,80px); height: auto; }
 .backHome { display: inline-flex; align-items: center; gap: clamp(5px,.44vw,8px); color: #2f6b52; font-size: clamp(12px,1vw,18px); font-weight: 650; transition: color 180ms ease,transform 180ms ease; }
 .backHome:hover { color: #214e3b; transform: translateX(-2px); }
 .backHome svg { width: clamp(14px,1.1vw,20px); height: clamp(14px,1.1vw,20px); }
@@ -82,7 +83,7 @@
 .chooserIntro h1 { margin: 0 0 clamp(6px,.67vw,12px); color: #214e3b; font-size: clamp(28px,2.22vw,40px); line-height: 1.2; letter-spacing: clamp(-1px,-.06vw,-.5px); }
 .chooserIntro span { color: #66706a; font-size: clamp(14px,1.28vw,23px); line-height: 1.5; }
 .grid { display: grid; width: min(calc(100% - 120px),1590px); grid-template-columns: repeat(4,minmax(0,1fr)); gap: clamp(18px,1.67vw,30px); margin: 0 auto; }
-.role { position: relative; display: flex; height: clamp(176px,16.33vw,294px); flex-direction: column; align-items: flex-start; padding: clamp(16px,1.72vw,31px); border: 1px solid #cfc2a8; border-radius: clamp(13px,1vw,18px); background: #fffdf8; box-shadow: 0 10px 28px rgba(59,50,34,.09); transition: border-color 180ms ease,transform 180ms ease,box-shadow 180ms ease; animation: chooserReveal .45s cubic-bezier(.22,.7,.28,1) both; }
+.role { position: relative; display: flex; min-height: clamp(176px,16.33vw,294px); flex-direction: column; align-items: flex-start; overflow: hidden; padding: clamp(16px,1.72vw,31px); border: 1px solid #cfc2a8; border-radius: clamp(13px,1vw,18px); background: #fffdf8; box-shadow: 0 10px 28px rgba(59,50,34,.09); transition: border-color 180ms ease,transform 180ms ease,box-shadow 180ms ease; animation: chooserReveal .45s cubic-bezier(.22,.7,.28,1) both; }
 .role:nth-child(2) { animation-delay: 55ms; }
 .role:nth-child(3) { animation-delay: 110ms; }
 .role:nth-child(4) { animation-delay: 165ms; }
