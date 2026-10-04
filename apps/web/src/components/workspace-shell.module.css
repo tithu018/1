@@ -619,6 +619,14 @@
 }
 
 /* Driver workspace only. Other role layouts retain their existing styles. */
+.dispatcherMobileNav { display: none; }
+.dispatcherShell .content { min-width: 0; }
+@media (max-width: 850px) {
+  .dispatcherMobileNav { display: flex; gap: 8px; overflow-x: auto; padding: 12px 20px; border-bottom: 1px solid #e6dac6; background: #fffdf9; }
+  .dispatcherMobileNav a, .dispatcherMobileNav button { display: flex; align-items: center; gap: 7px; flex-shrink: 0; white-space: nowrap; padding: 10px 13px; border: 1px solid #e6dac6; border-radius: 9px; color: #215742; background: transparent; text-decoration: none; font-size: 12px; }
+  .dispatcherMobileNav a[aria-current="page"] { color: white; background: #215742; }
+  .dispatcherMobileNav svg { width: 16px; height: 16px; }
+}
 .driverShell { width: min(100%, 1040px); min-height: 100svh; padding-bottom: calc(94px + env(safe-area-inset-bottom)); background: #f4f7f1; box-shadow: 0 0 60px #214e3b0b; }
 .driverHeader { min-height: 80px; color: #20372f; background: #f4f7f1; border-bottom: 1px solid #e3e9e1; padding-top: env(safe-area-inset-top); }
 .driverTopBar { height: 80px; padding: 0 24px; gap: 16px; }

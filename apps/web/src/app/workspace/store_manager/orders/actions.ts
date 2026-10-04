@@ -2,6 +2,7 @@
 
 import { prisma } from "@waypoint/database";
 import { freshCatalog } from "@waypoint/domain";
+import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
 import { serializable } from "@/lib/transactions";
 import { randomUUID } from "crypto";
@@ -24,6 +25,9 @@ export async function submitFreshOrder(lines: { code: string; quantity: number }
     await tx.auditEvent.create({ data: { id: `AUDIT-${randomUUID()}`, actorId: session.accountId, entityType: "Order", entityId: created.id, action: "submitted", payload: { note: note.trim() || null, units: totals.units } } });
     return created;
   });
+  revalidatePath("/workspace/store_manager");
+  revalidatePath("/workspace/store_manager/status");
+  revalidatePath("/workspace/store_manager/history");
   return { id: order.id, submittedAt: order.submittedAt!.toISOString(), requestedDate: order.requestedDate.toISOString() };
 }
 
@@ -39,13 +43,16 @@ export async function submitRetailOrder(input: { code: string; description: stri
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Order", entityId: created.id, action: "submitted", payload: { note: input.note.trim() || null, brand: outlet.brand } } });
     return created;
   });
+  revalidatePath("/workspace/store_manager");
+  revalidatePath("/workspace/store_manager/status");
+  revalidatePath("/workspace/store_manager/history");
   return { id: order.id, submittedAt: order.submittedAt!.toISOString(), requestedDate: order.requestedDate.toISOString() };
 }
 
 export async function updateStoreOrder(orderId: string, lines: { lineId: string; quantity: number }[]) {
   const session = await requireRole("store_manager");
   if (!session.outletId) throw new Error("The signed-in store account is not linked to an outlet.");
-  return serializable(async (tx) => {
+  const updatedId = await serializable(async (tx) => {
     const order = await tx.order.findFirst({ where: { id: orderId, outletId: session.outletId }, include: { lines: true } });
     if (!order) throw new Error("Order not found for this outlet.");
     if (!["SUBMITTED", "CONFIRMED", "DEFERRED"].includes(order.status)) throw new Error("This order can no longer be edited.");
@@ -62,6 +69,10 @@ export async function updateStoreOrder(orderId: string, lines: { lineId: string;
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Order", entityId: order.id, action: "updated", payload: { units, lineCount: updatedLines.length } } });
     return order.id;
   });
+  revalidatePath("/workspace/store_manager");
+  revalidatePath("/workspace/store_manager/status");
+  revalidatePath(`/workspace/store_manager/orders/${orderId}`);
+  return updatedId;
 }
 
 export async function cancelStoreOrder(orderId: string) {
@@ -74,6 +85,10 @@ export async function cancelStoreOrder(orderId: string) {
     await tx.orderStatusEvent.create({ data: { orderId: order.id, status: "CANCELLED", reason: "Cancelled by Store Manager" } });
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Order", entityId: order.id, action: "cancelled" } });
   });
+  revalidatePath("/workspace/store_manager");
+  revalidatePath("/workspace/store_manager/status");
+  revalidatePath("/workspace/store_manager/history");
+  revalidatePath(`/workspace/store_manager/orders/${orderId}`);
 }
 
 export async function acknowledgeDeferral(orderId: string) {
@@ -84,4 +99,6 @@ export async function acknowledgeDeferral(orderId: string) {
     if (!order) throw new Error("Deferred order not found for your outlet.");
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Order", entityId: orderId, action: "deferral_acknowledged" } });
   });
+  revalidatePath("/workspace/store_manager");
+  revalidatePath("/workspace/store_manager/status");
 }

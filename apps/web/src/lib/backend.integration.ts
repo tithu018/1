@@ -16,6 +16,7 @@ import { confirmTripLoaded, reportLoaderIssue, setLoadLineState, startLoading, w
 import { recordReceipt } from "@/app/workspace/store_manager/receive/actions";
 import { startDriverTrip, recordDriverOutcome, resolveDriverSyncConflict, createLoaderIssue, transitionIssue, acknowledgeNotification } from "./workflow-actions";
 import { updateDriverProfile, changeDriverPassword } from "@/app/workspace/driver/profile/actions";
+import { getDispatcherBoard, planningQueueWhere } from "./dispatcher-data";
 
 // Only the framework boundary is mocked. Actions, JWTs, bcrypt and PostgreSQL are real.
 const runtime = vi.hoisted(() => ({ db: null as unknown as PrismaClient, cookies: new Map<string, string>() }));
@@ -181,8 +182,68 @@ describe("store orders", () => {
     const saved = await order(); await login("style"); await expect(cancelStoreOrder(saved.id)).rejects.toThrow(); await expect(updateStoreOrder(saved.id, [{ lineId: "unknown", quantity: 1 }])).rejects.toThrow();
     await expect(acknowledgeDeferral(saved.id)).rejects.toThrow();
   });
+  it("persists the Store Manager lifecycle with outlet scoped receipt, issues and notifications", async () => {
+    await login("store");
+    const [product] = freshCatalog;
+    const created = await submitFreshOrder([{ code: product.code, quantity: 5 }], "Back gate after 05:30");
+    const saved = await db.order.findFirstOrThrow({ where: { id: created.id, outletId: "FRESH" }, include: { lines: true, statusEvents: true } });
+    expect(saved).toMatchObject({ outletId: "FRESH", status: "SUBMITTED", units: 5 });
+    expect(saved.statusEvents.map((event) => event.status)).toContain("SUBMITTED");
+    await updateStoreOrder(saved.id, saved.lines.map((line) => ({ lineId: line.id, quantity: 4 })));
+    expect((await db.order.findUniqueOrThrow({ where: { id: saved.id } })).units).toBe(4);
+    await db.order.update({ where: { id: saved.id }, data: { status: "DELIVERED" } });
+    const receipt = await recordReceipt(saved.id, 3, 4, "short", "One unit missing");
+    expect(receipt.issueId).toBeTruthy();
+    expect(await db.receiptRecord.findUnique({ where: { orderId: saved.id } })).toMatchObject({ expectedUnits: 4, receivedUnits: 3, outcome: "short" });
+    expect(await db.issueCase.findFirst({ where: { orderId: saved.id, order: { outletId: "FRESH" } } })).toMatchObject({ status: "REPORTED" });
+    await login("style");
+    await expect(recordReceipt(saved.id, 4, 4, "full", "")).rejects.toThrow();
+    const notice = await db.notification.create({ data: { recipientId: "store", type: "ORDER", title: "Order update", body: saved.id, entityType: "Order", entityId: saved.id } });
+    await acknowledgeNotification(notice.id);
+    expect((await db.notification.findUniqueOrThrow({ where: { id: notice.id } })).readAt).toBeNull();
+    await login("store");
+    await acknowledgeNotification(notice.id);
+    expect((await db.notification.findUniqueOrThrow({ where: { id: notice.id } })).readAt).not.toBeNull();
+  });
 });
 describe("publication, loading and departure", () => {
+  it("keeps old active trips visible and excludes them from a new planning queue", async () => {
+    await order(); const old = await publish();
+    const later = new Date("2026-10-04T00:00:00Z");
+    await order("SECOND", "FRESH", { requestedDate: later }); await login("dispatcher");
+    expect((await db.order.findMany({ where: planningQueueWhere("DEPOT", later) })).map((item) => item.id)).toEqual(["SECOND"]);
+    await publishAssistedPlan([trip(["SECOND"], { driverId: "spare" })], [], { serviceDate: "2026-10-04", expectedVersion: null });
+    const board = await getDispatcherBoard("DEPOT", later);
+    expect(board).toHaveLength(2); expect(board.some((item) => item.id === old.id)).toBe(true);
+    expect(await getDispatcherBoard("OTHER", later)).toHaveLength(0);
+    await expect(publishAssistedPlan([trip(["ORDER"])], [], { serviceDate: "2026-10-04", expectedVersion: 1 })).rejects.toThrow();
+  });
+  it("keeps completed trips pending store verification and exposes receipt evidence", async () => {
+    await depart(); await recordDriverOutcome({ operationId: "delivery", orderId: "ORDER", outcome: "DELIVERED", receiverName: "Receiver" });
+    const later = new Date("2026-10-04T00:00:00Z");
+    expect(await getDispatcherBoard("DEPOT", later)).toHaveLength(1);
+    await login("store"); await recordReceipt("ORDER", 10, 10, "full", "Received");
+    expect(await getDispatcherBoard("DEPOT", later)).toHaveLength(0);
+    const history = await getDispatcherBoard("DEPOT", nextServiceDate());
+    expect(history[0].allocations[0].order.receipt).toMatchObject({ outcome: "full", receivedUnits: 10 });
+    expect(history[0].allocations[0].order.deliveryOutcome?.receiverName).toBe("Receiver");
+  });
+  it("notifies both drivers on reassignment without duplicating unchanged assignments", async () => {
+    await order(); const assigned = await publish(); await login("dispatcher");
+    await assignTripDriver(assigned.id, "spare"); await assignTripDriver(assigned.id, "spare");
+    expect(await db.notification.count({ where: { recipientId: "driver", title: "Trip reassigned" } })).toBe(1);
+    expect(await db.notification.count({ where: { recipientId: "spare", title: "Trip assigned" } })).toBe(1);
+    expect(await db.auditEvent.count({ where: { action: "driver_assigned" } })).toBe(1);
+    await login("driver"); await expect(startDriverTrip(assigned.id)).rejects.toThrow();
+  });
+  it("notifies the displaced driver when replacing a published plan", async () => {
+    await order(); const old = await publish(); await login("dispatcher");
+    await publishAssistedPlan([trip(["ORDER"], { driverId: "spare" })], [], { expectedVersion: 1 });
+    expect(await db.notification.count({ where: { recipientId: "driver", title: "Plan v2 published" } })).toBe(1);
+    expect(await db.notification.count({ where: { recipientId: "spare", title: "Plan v2 published" } })).toBe(1);
+    expect((await getDispatcherBoard("DEPOT", nextServiceDate())).some((item) => item.id === old.id)).toBe(false);
+    await login("loader"); await expect(confirmTripLoaded(old.id, 1)).rejects.toThrow();
+  });
   it("publishes, loads, departs, delivers, confirms receipt and resolves an issue", async () => {
     const { assigned, version } = await depart();
     const input = { operationId: "delivery", orderId: "ORDER", outcome: "DELIVERED" as const, receiverName: "Receiver", clientUpdatedAt: version, photoKey: "test/photo" };

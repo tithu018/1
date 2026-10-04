@@ -17,7 +17,7 @@ export async function transitionIssue(issueId: string, nextStatus: "ACKNOWLEDGED
   const session = await getSession();
   if (!session || !["store_manager", "dispatcher", "loader"].includes(session.role)) throw new Error("You are not allowed to change issue status.");
   if (!note.trim()) throw new Error("A lifecycle transition needs a note.");
-  return serializable(async (tx) => {
+  const result = await serializable(async (tx) => {
     const issue = await tx.issueCase.findUnique({ where: { id: issueId }, include: { order: { include: { outlet: true } } } });
     if (!issue || (session.role === "store_manager" ? !session.outletId || issue.order.outletId !== session.outletId : !session.depotId || issue.order.outlet.depotId !== session.depotId)) throw new Error("Issue is outside your scope.");
     if (session.role === "store_manager" && nextStatus !== "REOPENED") throw new Error("Store managers can reopen resolved issues. Dispatchers manage resolutions.");
@@ -30,6 +30,8 @@ export async function transitionIssue(issueId: string, nextStatus: "ACKNOWLEDGED
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "IssueCase", entityId: issue.id, action: "status_changed", payload: { from: issue.status, to: nextStatus, note } } });
     return issue.id;
   });
+  revalidatePath("/workspace", "layout");
+  return result;
 }
 
 export async function acknowledgeNotification(notificationId: string) {
