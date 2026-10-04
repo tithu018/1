@@ -27,7 +27,7 @@
 .form input:not([type="checkbox"]) { width: 100%; height: 48px; padding: 0 14px 0 44px; border: 1px solid #8c8577; border-radius: 10px; color: #202522; background: #fffdf8; font-size: 16px; }
 .form input::placeholder { color: #66706a; opacity: 1; }
 .form small { display: block; margin-top: 6px; color: #66706a; font-size: 12px; line-height: 1.4; }
-.options { display: flex; min-height: 44px; align-items: center; justify-content: flex-end; margin: 20px 0; font-size: 14px; }
+.options { display: flex; min-height: 44px; align-items: center; justify-content: flex-start; margin: 20px 0; font-size: 14px; }
 .options a { color: #2f6b52; font-weight: 600; }
 .form button[type="submit"] { width: 100%; height: 48px; border: 0; border-radius: 10px; color: #fff; background: #214e3b; font-size: 16px; font-weight: 600; }
 .form hr { margin: 20px 0 12px; border: 0; border-top: 1px solid #e7dcc8; }

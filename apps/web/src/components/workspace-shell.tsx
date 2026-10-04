@@ -9,7 +9,7 @@ import {
   LogOut,
   Package,
   Route,
-  SlidersHorizontal,
+  Settings,
   TriangleAlert,
   Truck,
   type LucideIcon
@@ -20,7 +20,7 @@ import { requireRole } from "@/lib/auth";
 import styles from "./workspace-shell.module.css";
 
 const navigation: Record<UserRole, readonly string[]> = {
-  store_manager: ["Dashboard", "Place order", "Order status", "Receive", "History & issues", "Notifications", "Settings"],
+  store_manager: ["Dashboard", "Place order", "Order status", "Receive", "History & issues", "Notifications"],
   dispatcher: ["Plan", "Live Board", "Needs Attention", "Deferral Log", "Capacity Forecast", "Reference Data"],
   loader: ["Trip queue", "Active load", "Loading issues"],
   driver: ["Today", "Active trip", "Sync"]
@@ -55,7 +55,6 @@ function NavIcon({ item }: Readonly<{ item: string }>) {
     Receive: Package,
     "History & issues": Clock3,
     Notifications: Bell,
-    Settings: SlidersHorizontal,
     Plan: Route,
     "Live Board": Truck,
     "Needs Attention": TriangleAlert,
@@ -104,16 +103,21 @@ export async function WorkspaceShell({
             {navigation[role].map((item) => (
               <Link className={item === active ? styles.active : ""} href={hrefFor(role, item)} key={item}>
                 {usesNovaSidebar && <NavIcon item={item} />}
-                {role === "store_manager" && item === "Notifications"
-                  ? "Notifications · 4"
-                  : role === "dispatcher" && item === "Needs Attention"
+                {role === "dispatcher" && item === "Needs Attention"
                     ? "Needs Attention · 3"
                     : item}
               </Link>
             ))}
           </nav>
           <div className={styles.sidebarFooter}>
-            <strong>{isLoader || isDispatcher ? "Peliyagoda depot" : isStore ? "OUT010 - Fresh" : session.displayName}</strong>
+            <div className={styles.sidebarFooterTitle}>
+              <strong>{isLoader || isDispatcher ? "Peliyagoda depot" : isStore ? "OUT010 - Fresh" : session.displayName}</strong>
+              {isStore && (
+                <Link className={styles.outletSettings} href="/workspace/store_manager/settings" aria-label="Store settings">
+                  <Settings aria-hidden="true" />
+                </Link>
+              )}
+            </div>
             <span>
               {isStore
                 ? "Colombo - Peliyagoda depot"
