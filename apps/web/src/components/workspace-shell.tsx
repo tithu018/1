@@ -147,7 +147,7 @@ export async function WorkspaceShell({
     <div className={`${isDriver ? styles.driverShell : styles.shell} ${usesNovaSidebar ? styles.novaShell : ""} ${isLoader ? styles.loaderShell : ""}`}>
       {!isDriver && (
         <aside className={`${styles.sidebar} ${usesNovaSidebar ? styles.novaSidebar : ""} ${isLoader ? styles.loaderSidebar : ""} ${isStore ? styles.storeSidebar : ""} ${isDispatcher ? styles.dispatcherSidebar : ""}`}>
-          <Link href="/" className={styles.logo}>
+          <div className={styles.logo}>
             {usesNovaSidebar ? (
               <>
                 <Image src="/Image/logo-white-hq.png" alt="" width={66} height={36} priority />
@@ -159,7 +159,7 @@ export async function WorkspaceShell({
                 {APP_NAME}
               </>
             )}
-          </Link>
+          </div>
           <nav aria-label={`${roleLabels[role]} navigation`}>
             {navigation[role].map((item) => (
               <Link className={item === active ? styles.active : ""} href={hrefFor(role, item)} key={item}>
