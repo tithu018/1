@@ -1,4 +1,6 @@
 .page { width: min(100%, 1080px); }
+.notificationPageShell { width: min(100%, 1380px); }
+.historyPageShell { width: min(100%, 1380px); }
 .heading { margin-bottom: 24px; }
 .heading h1 { margin: 0; color: #215742; font-size: 34px; line-height: 1.12; letter-spacing: -.035em; }
 .heading p { margin: 8px 0 0; color: #68746d; font-size: 15px; }
@@ -41,5 +43,192 @@
 .accountRow div { flex: 1; }
 .accountRow p { margin: 4px 0 0; color: #68746d; font-size: 13px; }
 .accountRow button { height: 40px; padding: 0 15px; border: 1px solid #ddceb7; border-radius: 8px; color: #215742; background: #fffdf9; font-weight: 800; }
+.notificationsPage { width: 100%; }
+.notificationHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 26px; }
+.notificationHeading h1 { margin: 0; color: #215742; font-size: 34px; line-height: 1.12; letter-spacing: -.035em; }
+.notificationHeading p { margin: 8px 0 0; color: #68746d; font-size: 16px; line-height: 1.45; }
+.notificationFilters { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 24px; }
+.notificationFilters button { position: relative; display: inline-flex; min-width: 112px; min-height: 46px; align-items: center; justify-content: center; gap: 10px; padding: 9px 20px; border: 0; border-radius: 10px; color: #33465a; background: #fffdf9; box-shadow: 0 8px 18px #2a21120a; font: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+.notificationFilters button svg { width: 20px; height: 20px; }
+.notificationFilters .activeFilter { color: #fffdf8; background: #0b5b41; box-shadow: inset 0 -12px 22px #05392330, 0 12px 24px #0b5b4116; }
+.notificationFilters .activeFilter svg { color: #fffdf8; }
+.filterDot { position: absolute; top: 9px; right: 14px; width: 8px; height: 8px; border-radius: 50%; background: #f51920; }
+.notificationGroups { display: grid; gap: 28px; }
+.notificationGroup h2 { margin: 0 0 12px; color: #071a2e; font-size: 18px; line-height: 1.2; }
+.notificationRows { overflow: hidden; border: 1px solid #e6dac6; border-radius: 12px; background: #fffdf9; box-shadow: 0 12px 28px #2920100c; }
+.notificationRow { display: grid; min-height: 78px; grid-template-columns: 56px 12px minmax(0,1fr) max-content 24px; align-items: center; gap: 16px; padding: 12px 22px; color: inherit; border-top: 1px solid #e6dac6; transition: background-color .18s ease; }
+.notificationRow:first-child { border-top: 0; }
+.notificationRow:hover { background: #fbf7ee; }
+.unreadNotification { background: #fffdf9; }
+.notificationStatusIcon { display: grid; width: 50px; height: 50px; place-items: center; border-radius: 50%; }
+.notificationStatusIcon svg { width: 23px; height: 23px; }
+.notificationReadDot { width: 10px; height: 10px; border-radius: 50%; background: #149e61; }
+.notificationCopy { display: grid; min-width: 0; gap: 5px; }
+.notificationCopy strong { overflow: hidden; color: #071a2e; font-size: 17px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.notificationCopy span { overflow: hidden; color: #53657a; font-size: 15px; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+.notificationRow time { color: #53657a; font-size: 14px; white-space: nowrap; }
+.notificationRow > svg { width: 20px; height: 20px; color: #071a2e; }
+.notificationTypeorders .notificationStatusIcon { color: #0b7044; background: #dff3e7; }
+.notificationTypeorders .notificationReadDot { background: #0aa463; }
+.notificationTypedeliveries .notificationStatusIcon { color: #0f74dd; background: #e1efff; }
+.notificationTypedeliveries .notificationReadDot { background: #1687ed; }
+.notificationTypeissues .notificationStatusIcon { color: #d97706; background: #fde8bf; }
+.notificationTypeissues .notificationReadDot { background: #f69a08; }
+.notificationEmpty { display: grid; min-height: 360px; place-items: center; align-content: center; gap: 12px; padding: 42px 24px; border: 1px solid #e6dac6; border-radius: 16px; background: #fffdf9; box-shadow: 0 12px 28px #2920100c; color: #68746d; text-align: center; }
+.notificationEmpty svg { width: 48px; height: 48px; color: #215742; }
+.notificationEmpty h2 { margin: 0; color: #215742; font-size: 24px; }
+.notificationEmpty p { max-width: 420px; margin: 0; line-height: 1.5; }
+.notificationEmpty button { min-height: 42px; padding: 8px 18px; border: 1px solid #215742; border-radius: 9px; color: #215742; background: #fffdf9; font: inherit; font-weight: 800; cursor: pointer; }
+.historyPage { width: 100%; }
+.historyHeading { margin-bottom: 20px; }
+.historyHeading h1 { margin: 0; color: #215742; font-size: 34px; line-height: 1.12; letter-spacing: -.035em; }
+.historyHeading p { margin: 8px 0 0; color: #53657a; font-size: 16px; line-height: 1.45; }
+.historySummaryGrid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; margin-bottom: 18px; }
+.historySummaryGrid article { display: flex; min-width: 0; min-height: 100px; align-items: center; gap: 18px; padding: 18px 20px; border: 1px solid #e6dac6; border-radius: 12px; background: #fffdf9; box-shadow: 0 12px 28px #2920100c; }
+.historySummaryGrid article > span { display: grid; width: 58px; height: 58px; flex: 0 0 58px; place-items: center; border-radius: 50%; }
+.historySummaryGrid svg { width: 28px; height: 28px; }
+.historySummaryGrid div { display: grid; min-width: 0; gap: 2px; }
+.historySummaryGrid strong { color: #071a2e; font-size: 30px; line-height: 1; }
+.historySummaryGrid p { margin: 0; overflow: hidden; color: #0f2238; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.historySummaryGrid small { overflow: hidden; color: #53657a; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.summaryGreen { color: #0b7044; background: #dff3e7; }
+.summaryBlue { color: #0f74dd; background: #e1efff; }
+.summaryAmber { color: #d97706; background: #fde8bf; }
+.summaryRed { color: #d33442; background: #f9d7dd; }
+.historyCard { margin-bottom: 18px; padding: 20px; border: 1px solid #e6dac6; border-radius: 16px; background: #fffdf9; box-shadow: 0 12px 28px #2920100c; }
+.historyCardHeader { display: flex; min-width: 0; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
+.historyCardHeader h2 { margin: 0; color: #071a2e; font-size: 24px; line-height: 1.2; }
+.historyFilters { display: grid; grid-template-columns: minmax(260px,1fr) 160px 170px 170px; gap: 12px; margin-bottom: 14px; }
+.historySearch { display: flex; min-width: 0; min-height: 42px; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid #ddceb7; border-radius: 8px; color: #53657a; background: #fffdf9; }
+.historySearch svg { width: 19px; height: 19px; flex: 0 0 19px; color: #0e614e; }
+.historySearch input, .historyFilters select, .issueFilters select { min-width: 0; min-height: 42px; border: 1px solid #ddceb7; border-radius: 8px; color: #071a2e; background: #fffdf9; font: inherit; }
+.historySearch input { flex: 1; border: 0; outline: 0; }
+.historyFilters select, .issueFilters select { padding: 0 12px; }
+.issueFilters { display: flex; flex-wrap: wrap; gap: 12px; }
+.issueFilters select { min-width: 160px; }
+.historyTableWrap { overflow: hidden; border-radius: 8px; }
+.orderHistoryHeader, .orderHistoryRow, .issueHistoryHeader, .issueHistoryRow { display: grid; min-width: 0; align-items: center; gap: 14px; padding: 0 18px; }
+.orderHistoryHeader { grid-template-columns: minmax(150px,1.2fr) minmax(150px,1.1fr) minmax(90px,.7fr) 70px minmax(120px,.85fr) minmax(120px,.9fr) 22px; }
+.orderHistoryRow { grid-template-columns: 34px minmax(116px,1.2fr) minmax(150px,1.1fr) minmax(90px,.7fr) 70px minmax(120px,.85fr) minmax(120px,.9fr) 22px; }
+.issueHistoryHeader { grid-template-columns: minmax(150px,1fr) minmax(170px,1fr) minmax(220px,1.4fr) minmax(130px,.85fr) minmax(116px,.7fr) minmax(120px,.8fr) 22px; }
+.issueHistoryRow { grid-template-columns: 34px minmax(116px,1fr) minmax(170px,1fr) minmax(220px,1.4fr) minmax(130px,.85fr) minmax(116px,.7fr) minmax(120px,.8fr) 22px; }
+.orderHistoryHeader, .issueHistoryHeader { min-height: 42px; color: #68746d; background: #f1eadc; font-size: 13px; font-weight: 800; }
+.orderHistoryHeader span:first-child, .issueHistoryHeader span:first-child { grid-column: 1; }
+.orderHistoryRow, .issueHistoryRow { min-height: 64px; border-bottom: 1px solid #e6dac6; color: #071a2e; font-size: 14px; }
+.orderHistoryRow > div, .issueHistoryRow > div, .orderHistoryRow time, .issueHistoryRow time { display: grid; min-width: 0; gap: 3px; }
+.orderHistoryRow strong, .issueHistoryRow strong { overflow: hidden; color: #071a2e; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.orderHistoryRow small, .issueHistoryRow small { color: #53657a; font-size: 13px; }
+.historyTruckIcon { display: grid; width: 28px; height: 28px; place-items: center; color: #0b85a0; }
+.historyTruckIcon svg { width: 20px; height: 20px; }
+.historyBadge { display: inline-flex; width: fit-content; min-height: 30px; align-items: center; justify-content: center; gap: 7px; padding: 5px 11px; border-radius: 999px; font-size: 13px; font-weight: 800; white-space: nowrap; }
+.historyBadge svg { width: 15px; height: 15px; }
+.historyStatusSuccess { color: #075c37; background: #ccf5d9; }
+.historyStatusInfo { color: #075ac4; background: #d5eaff; }
+.historyStatusWarning { color: #8b500e; background: #f8dfab; }
+.historyStatusDanger { color: #a61b2b; background: #f9d7dd; }
+.historyStatusNeutral { color: #4b5968; background: #e4e8ed; }
+.historyAction { color: #07563d; font-weight: 850; white-space: nowrap; }
+.historyChevron { width: 20px; height: 20px; color: #071a2e; }
+.issueType { display: inline-flex; min-width: 0; align-items: center; gap: 8px; }
+.issueType i { display: grid; width: 30px; height: 30px; flex: 0 0 30px; place-items: center; border-radius: 50%; }
+.issueType svg { width: 17px; height: 17px; }
+.issueTypeWarning { color: #d97706; background: #fde8bf; }
+.issueTypeDanger { color: #d33442; background: #f9d7dd; }
+.issueTypeInfo { color: #0f74dd; background: #e1efff; }
+.issueHistoryRow p { min-width: 0; overflow: hidden; margin: 0; color: #26394a; text-overflow: ellipsis; white-space: nowrap; }
+.historyEmpty { margin: 0; padding: 28px; color: #53657a; text-align: center; }
+.statusPageShell { width: min(100%, 1480px); }
+.statusPage { width: 100%; }
+.statusHeading { margin-bottom: 20px; }
+.statusHeading h1 { margin: 0; color: #0c5a40; font-size: 38px; line-height: 1.05; letter-spacing: -.02em; }
+.statusHeading p { margin: 8px 0 0; color: #53657a; font-size: 16px; }
+.statusSummaryGrid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; margin-bottom: 20px; }
+.statusSummaryGrid article { display: flex; min-width: 0; min-height: 92px; align-items: center; gap: 18px; padding: 16px 18px; border: 1px solid #e8d7bb; border-radius: 10px; background: #fffdf9; box-shadow: 0 12px 28px #2920100a; }
+.statusSummaryGrid article > span { display: grid; width: 58px; height: 58px; flex: 0 0 58px; place-items: center; border-radius: 50%; }
+.statusSummaryGrid svg { width: 27px; height: 27px; }
+.statusSummaryGrid div { display: grid; min-width: 0; gap: 2px; }
+.statusSummaryGrid strong { color: #071a2e; font-size: 30px; line-height: 1; }
+.statusSummaryGrid p { overflow: hidden; margin: 0; color: #071a2e; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.statusSummaryGrid small { overflow: hidden; color: #53657a; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.statusLayout { display: grid; grid-template-columns: minmax(0,1fr) 310px; gap: 16px; align-items: start; }
+.statusBoard, .orderDetailsPanel { overflow: hidden; border: 1px solid #e6dac6; border-radius: 10px; background: #fffdf9; box-shadow: 0 12px 28px #2920100c; }
+.statusTabs { display: flex; overflow-x: auto; gap: 0; padding: 0; border-bottom: 1px solid #e6dac6; }
+.statusTabs button { min-height: 48px; flex: 0 0 auto; padding: 0 18px; border: 0; border-right: 1px solid #f0e6d6; color: #27384a; background: transparent; font: inherit; font-size: 14px; font-weight: 850; cursor: pointer; }
+.statusTabs .activeStatusTab { color: #fffdf9; background: #075c41; }
+.statusFilters { display: grid; grid-template-columns: minmax(220px,1fr) 132px 146px 150px; gap: 8px; padding: 12px; }
+.statusFilters label { position: relative; display: flex; min-width: 0; min-height: 40px; align-items: center; gap: 8px; padding: 0 10px; border: 1px solid #ddceb7; border-radius: 8px; color: #071a2e; background: #fffdf9; }
+.statusFilters svg { width: 18px; height: 18px; flex: 0 0 18px; color: #0c5a40; }
+.statusFilters label > svg:last-child { margin-left: auto; color: #071a2e; pointer-events: none; }
+.statusSearch input, .statusFilters select { min-width: 0; width: 100%; height: 40px; border: 0; outline: 0; color: #071a2e; background: transparent; font: inherit; }
+.statusFilters select { appearance: none; cursor: pointer; }
+.statusTableWrap { overflow: hidden; }
+.statusTableHeader, .statusTableRow { display: grid; min-width: 0; grid-template-columns: 28px minmax(96px,1.05fr) minmax(126px,1.15fr) minmax(62px,.58fr) 42px minmax(96px,.82fr) minmax(88px,.72fr) 22px; align-items: center; gap: 8px; padding: 0 10px; }
+.statusTableHeader { min-height: 40px; color: #68746d; background: #f1eadc; font-size: 12px; font-weight: 850; }
+.statusTableHeader span:first-child { grid-column: 2; }
+.statusTableRow { min-height: 58px; border-bottom: 1px solid #e6dac6; color: #071a2e; font-size: 13px; }
+.statusTableRow:hover, .selectedStatusRow { background: #fbf7ee; }
+.statusTableRow > div, .statusTableRow time { display: grid; min-width: 0; gap: 2px; }
+.statusTableRow button:not(.statusChevron), .statusTableRow small, .statusTableRow time, .statusTableRow > span:not(.orderStatusBadge) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.statusTableRow button:not(.statusChevron) { width: fit-content; max-width: 100%; padding: 0; border: 0; color: #071a2e; background: transparent; font: inherit; font-weight: 900; text-decoration: underline; cursor: pointer; }
+.statusTableRow small { color: #53657a; font-size: 12px; }
+.statusTableRow time small { display: block; }
+.statusRowIcon { display: grid; width: 28px; height: 28px; padding: 7px; border-radius: 50%; color: #0b85a0; background: #e5f4f7; }
+.orderStatusBadge { display: inline-flex; width: fit-content; max-width: 100%; min-height: 28px; align-items: center; justify-content: center; gap: 6px; overflow: hidden; padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
+.statusDelivered { color: #075c37; background: #ccf5d9; }
+.statusTransit { color: #075ac4; background: #d5eaff; }
+.statusConfirmed { color: #9a5505; background: #fde8bf; }
+.statusSubmittedPill { color: #7b35c8; background: #efe0ff; }
+.statusCancelled { color: #b30d1a; background: #ffe0e4; }
+.statusDeferred { color: #6b4a0b; background: #f5e2b4; }
+.statusNeutralPill { color: #4b5968; background: #e4e8ed; }
+.statusAction { overflow: hidden; color: #07563d; font-weight: 900; text-decoration: underline; text-overflow: ellipsis; white-space: nowrap; }
+.statusChevron { display: grid; width: 22px; height: 26px; place-items: center; border: 0; color: #071a2e; background: transparent; cursor: pointer; }
+.statusChevron svg { width: 18px; height: 18px; }
+.statusEmpty { margin: 0; padding: 28px; color: #53657a; text-align: center; }
+.statusPager { display: flex; min-height: 62px; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 18px; color: #071a2e; font-size: 14px; }
+.statusPager div { display: flex; gap: 8px; }
+.statusPager button { width: 40px; height: 40px; border: 1px solid #ddceb7; border-radius: 8px; color: #071a2e; background: #fffdf9; font: inherit; font-weight: 850; }
+.statusPager .currentPage { color: #fffdf9; background: #075c41; }
+.orderDetailsPanel { padding: 16px; }
+.orderDetailsPanel > header, .detailItems header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.orderDetailsPanel h2, .orderDetailsPanel h3 { margin: 0; color: #071a2e; }
+.orderDetailsPanel h2 { font-size: 21px; }
+.orderDetailsPanel h3 { font-size: 17px; }
+.orderDetailsPanel > header button { display: grid; width: 30px; height: 30px; place-items: center; border: 0; color: #071a2e; background: transparent; cursor: pointer; }
+.detailHero { display: grid; grid-template-columns: 42px minmax(0,1fr) auto; gap: 12px; align-items: center; margin: 12px 0 14px; padding-top: 14px; border-top: 1px solid #e6dac6; }
+.detailHero > svg { width: 42px; height: 42px; padding: 10px; border-radius: 50%; color: #075ac4; background: #d5eaff; }
+.detailHero div { display: grid; min-width: 0; gap: 3px; }
+.detailHero strong { color: #071a2e; font-size: 18px; }
+.detailHero span, .detailHero small { color: #53657a; }
+.detailDefinition { display: grid; gap: 8px; margin: 0 0 16px; padding: 14px; border-radius: 8px; background: #f8f1e6; }
+.detailDefinition div { display: flex; justify-content: space-between; gap: 18px; color: #071a2e; font-size: 14px; }
+.detailDefinition dt { color: #53657a; }
+.detailDefinition dd { margin: 0; font-weight: 700; text-align: right; }
+.currentStatus { margin-bottom: 18px; }
+.currentStatus ol { position: relative; display: grid; gap: 0; margin: 12px 0 0; padding: 0; list-style: none; }
+.currentStatus li { position: relative; display: grid; grid-template-columns: 28px 1fr; gap: 12px; min-height: 52px; color: #53657a; }
+.currentStatus li::before { content: ""; position: absolute; left: 13px; top: 24px; bottom: -2px; width: 3px; border-radius: 99px; background: #c8cdd0; }
+.currentStatus li:last-child::before { display: none; }
+.currentStatus li > span { z-index: 1; display: grid; width: 28px; height: 28px; place-items: center; border-radius: 50%; border: 3px solid #c8cdd0; background: #fffdf9; }
+.currentStatus svg { width: 16px; height: 16px; }
+.currentStatus div { display: grid; gap: 3px; padding-bottom: 12px; }
+.currentStatus strong { color: #071a2e; text-transform: capitalize; }
+.currentStatus small { color: #53657a; }
+.completeStep > span { color: #fff; border-color: #10a464 !important; background: #10a464 !important; }
+.completeStep::before { background: #10a464 !important; }
+.currentStep { margin: 0 -8px; padding: 8px; border-radius: 8px; background: #eaf4ff; }
+.currentStep > span { color: #fff; border-color: #1779e8 !important; background: #1779e8 !important; }
+.detailItems { margin-bottom: 18px; }
+.detailItems a { color: #075ac4; font-size: 13px; font-weight: 850; }
+.detailItems > div, .detailItems article { display: grid; grid-template-columns: minmax(0,1fr) 54px 74px; gap: 10px; align-items: center; min-height: 32px; padding: 0 10px; font-size: 13px; }
+.detailItems > div { margin-top: 10px; border-radius: 7px 7px 0 0; color: #53657a; background: #f1eadc; font-weight: 800; }
+.detailItems article { border-bottom: 1px solid #e6dac6; color: #071a2e; }
+.detailItems strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.detailItems em { width: fit-content; padding: 4px 9px; border-radius: 999px; color: #075c37; background: #ccf5d9; font-style: normal; font-weight: 850; }
+.fullDetailsButton { display: flex; min-height: 44px; align-items: center; justify-content: center; border: 1px solid #0c6a50; border-radius: 8px; color: #07563d; font-weight: 900; }
 @media (max-width: 900px) { .settingsGrid { grid-template-columns: 1fr; gap: 0; } }
-@media (max-width: 640px) { .heading h1 { font-size: 30px; } .card { padding: 16px; border-radius: 12px; } .cardTitle, .accountRow { align-items: flex-start; flex-direction: column; } }
+@media (max-width: 1240px) { .statusSummaryGrid { grid-template-columns: repeat(2,minmax(0,1fr)); } .statusLayout { grid-template-columns: 1fr; } .orderDetailsPanel { max-width: none; } }
+@media (max-width: 980px) { .statusFilters { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 1180px) { .historySummaryGrid { grid-template-columns: repeat(2,minmax(0,1fr)); } .historyFilters { grid-template-columns: 1fr 1fr; } .historyTableWrap { overflow-x: auto; } .orderHistoryHeader, .orderHistoryRow { min-width: 900px; } .issueHistoryHeader, .issueHistoryRow { min-width: 1040px; } }
+@media (max-width: 900px) { .notificationRow { grid-template-columns: 50px minmax(0,1fr) 24px; gap: 12px; } .notificationReadDot { position: absolute; left: 68px; } .notificationCopy { grid-column: 2; } .notificationRow time { grid-column: 2; } .notificationRow > svg { grid-column: 3; grid-row: 1 / span 2; } }
+@media (max-width: 640px) { .heading h1 { font-size: 30px; } .card { padding: 16px; border-radius: 12px; } .cardTitle, .accountRow { align-items: flex-start; flex-direction: column; } .notificationHeading h1, .historyHeading h1, .statusHeading h1 { font-size: 30px; } .notificationFilters { gap: 10px; } .notificationFilters button { min-width: 0; flex: 1 1 132px; } .notificationRow { min-height: 86px; padding: 14px; } .notificationCopy strong, .notificationCopy span { white-space: normal; } .notificationRow time { font-size: 13px; } .historySummaryGrid, .historyFilters, .statusSummaryGrid, .statusFilters { grid-template-columns: 1fr; } .historyCard { padding: 16px; } .historyCardHeader { align-items: flex-start; flex-direction: column; } .issueFilters { width: 100%; } .issueFilters select { flex: 1 1 100%; } .statusSummaryGrid article { min-height: 84px; } .statusTableHeader { display: none; } .statusTableRow { min-width: 0; grid-template-columns: 34px minmax(0,1fr) auto; gap: 10px; padding: 14px; } .statusTableRow time, .statusTableRow > span, .statusAction { grid-column: 2; } .statusChevron { grid-column: 3; grid-row: 1 / span 4; } .orderStatusBadge { grid-column: 2; } .statusPager { align-items: flex-start; flex-direction: column; } .detailHero { grid-template-columns: 42px minmax(0,1fr); } .detailHero .orderStatusBadge { grid-column: 2; } }
