@@ -1,16 +1,24 @@
+import { APP_NAME, roleLabels, type UserRole, userRoles } from "@waypoint/domain";
+import { ArrowLeft, ArrowRight, Grid2X2, Info, Package, Store, Truck, type LucideIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { APP_NAME, roleLabels, type UserRole, userRoles } from "@waypoint/domain";
 import { signIn } from "./actions";
 import { PasswordField } from "./password-field";
 import styles from "./sign-in.module.css";
 
 const validRoles = new Set<string>(userRoles);
 
+const roleIcons: Record<UserRole, LucideIcon> = {
+  store_manager: Store,
+  dispatcher: Grid2X2,
+  loader: Package,
+  driver: Truck
+};
+
 const roleCopy: Record<UserRole, { detail: string; device: string; image: string; imageWidth: number; imageHeight: number }> = {
   store_manager: {
     detail: "Place and track outlet orders, see planned arrivals and confirm receipt.",
-    device: "Desktop - Phone",
+    device: "Desktop · Phone",
     image: "/Image/store-manager.png",
     imageWidth: 994,
     imageHeight: 1086
@@ -24,7 +32,7 @@ const roleCopy: Record<UserRole, { detail: string; device: string; image: string
   },
   loader: {
     detail: "Load trips against the published plan and flag shortfalls before departure.",
-    device: "Tablet - Shared terminal",
+    device: "Tablet · Shared terminal",
     image: "/Image/loader.png",
     imageWidth: 941,
     imageHeight: 1672
@@ -55,25 +63,31 @@ function RoleChooser() {
           <Image src="/Image/logo-green-hq.png" alt="" width={66} height={36} priority />
           <span>{APP_NAME}</span>
         </Link>
-
+        <Link href="/" className={styles.backHome}><ArrowLeft aria-hidden="true" /> Back to home</Link>
       </header>
       <section className={styles.chooserIntro}>
         <p>SIGN IN</p>
-        <h1>Choose your role</h1>
-
+        <h1>How are you signing in today?</h1>
+        <span>Choose your role. Each role signs in to its own workspace.</span>
       </section>
       <div className={styles.grid}>
-        {userRoles.map((item) => (
-          <Link key={item} href={`/sign-in?role=${item}`} className={styles.role}>
-            <span className={`${styles.roleIcon} ${styles[item]}`} aria-hidden="true" />
-            <h2>{roleLabels[item]}</h2>
-
-
-            <i aria-hidden="true">→</i>
-          </Link>
-        ))}
+        {userRoles.map((item) => {
+          const Icon = roleIcons[item];
+          return (
+            <Link key={item} href={`/sign-in?role=${item}`} className={styles.role}>
+              <span className={styles.roleIcon}><Icon aria-hidden="true" /></span>
+              <h2>{roleLabels[item]}</h2>
+              <p>{roleCopy[item].detail}</p>
+              <b>{roleCopy[item].device}</b>
+              <ArrowRight className={styles.roleArrow} aria-hidden="true" />
+            </Link>
+          );
+        })}
       </div>
-
+      <aside className={styles.roleHelp}>
+        <Info aria-hidden="true" />
+        <p><strong>Not sure which role to choose?</strong><span>Your role is assigned by your Waypoint administrator. If you pick the wrong one, you’ll see a message explaining your access.</span></p>
+      </aside>
     </main>
   );
 }
@@ -104,7 +118,6 @@ function DesktopSignIn({ role, error }: Readonly<{ role: UserRole; error?: strin
       <section className={styles.formArea}>
         <div className={styles.formStack}>
           <SignInForm role={role} error={error} />
-
         </div>
       </section>
     </main>
@@ -119,7 +132,7 @@ function DriverSignIn({ error }: Readonly<{ error?: string }>) {
         <Link href="/sign-in">← Back</Link>
       </header>
       <section className={styles.driverForm}>
-        <span className={styles.driverPill}>▣ Signing in as Driver</span>
+        <span className={styles.driverPill}>Signing in as Driver</span>
         <SignInForm role="driver" error={error} compact />
       </section>
     </main>
@@ -131,11 +144,7 @@ function SignInForm({ role, error, compact }: Readonly<{ role: UserRole; error?:
     <form className={`${styles.form} ${compact ? styles.compactForm : ""}`} action={signIn}>
       <h2>Sign in</h2>
       <p>to the {roleLabels[role]} workspace</p>
-      {error && (
-        <p className={styles.error}>
-          <span>Check your email, password and selected role.</span>
-        </p>
-      )}
+      {error && <p className={styles.error}><span>Check your email, password and selected role.</span></p>}
       <input type="hidden" name="role" value={role} />
       <label htmlFor="identifier">Email</label>
       <div className={styles.inputWrap}>
@@ -146,10 +155,7 @@ function SignInForm({ role, error, compact }: Readonly<{ role: UserRole; error?:
       <label htmlFor="password">Password</label>
       <PasswordField />
 
-      <div className={styles.options}>
-
-        <Link href="/sign-in/reset">Forgot password?</Link>
-      </div>
+      <div className={styles.options}><Link href="/sign-in/reset">Forgot password?</Link></div>
       <button type="submit">Sign in</button>
       <hr />
       <Link href={compact ? "/" : "/sign-in"} className={styles.choose}>← {compact ? "Back to start" : "Choose a different role"}</Link>
