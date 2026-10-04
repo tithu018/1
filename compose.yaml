@@ -1,5 +1,8 @@
+name: nova_waypoint
+
 services:
   postgres:
+    container_name: Nova_Waypoint_Postgres
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
@@ -7,7 +10,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-waypoint}
       POSTGRES_DB: ${POSTGRES_DB:-waypoint}
     ports:
-      - "5433:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
     volumes:
       - waypoint-postgres:/var/lib/postgresql/data
     healthcheck:
@@ -17,6 +20,8 @@ services:
       retries: 10
 
   app:
+    container_name: Nova_Waypoint_App
+    image: nova_waypoint-app:local
     build:
       context: .
       dockerfile: Dockerfile
@@ -27,8 +32,9 @@ services:
       NODE_ENV: production
       HOSTNAME: 0.0.0.0
       PORT: 3000
+      SEED_DEMO_DATA: ${SEED_DEMO_DATA:-true}
     ports:
-      - "3000:3000"
+      - "127.0.0.1:${APP_PORT:-3001}:3000"
     depends_on:
       postgres:
         condition: service_healthy

@@ -144,7 +144,7 @@ export async function WorkspaceShell({
   const usesNovaSidebar = isLoader || isStore || isDispatcher;
 
   return (
-    <div className={`${isDriver ? styles.driverShell : styles.shell} ${usesNovaSidebar ? styles.novaShell : ""}`}>
+    <div className={`${isDriver ? styles.driverShell : styles.shell} ${usesNovaSidebar ? styles.novaShell : ""} ${isLoader ? styles.loaderShell : ""}`}>
       {!isDriver && (
         <aside className={`${styles.sidebar} ${usesNovaSidebar ? styles.novaSidebar : ""} ${isLoader ? styles.loaderSidebar : ""} ${isStore ? styles.storeSidebar : ""} ${isDispatcher ? styles.dispatcherSidebar : ""}`}>
           <Link href="/" className={styles.logo}>
@@ -225,6 +225,15 @@ export async function WorkspaceShell({
           {navigation.driver.map((item) => (
             <Link className={item === active ? styles.active : ""} href={hrefFor("driver", item)} key={item} aria-current={item === active ? "page" : undefined}>
               <NavIcon item={item} />{item}
+            </Link>
+          ))}
+        </nav>
+      )}
+      {isLoader && (
+        <nav className={styles.loaderMobileNav} aria-label="Loader navigation">
+          {navigation.loader.map((item) => (
+            <Link className={item === active ? styles.active : ""} href={hrefFor("loader", item)} key={item} aria-current={item === active ? "page" : undefined}>
+              <NavIcon item={item} />{item === "Trip queue" ? "Queue" : item === "Active load" ? "Load" : "Issues"}
             </Link>
           ))}
         </nav>

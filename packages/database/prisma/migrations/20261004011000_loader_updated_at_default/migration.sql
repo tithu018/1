@@ -1,0 +1,1 @@
+ALTER TABLE "LoadIssue" ALTER COLUMN "updatedAt" DROP DEFAULT;

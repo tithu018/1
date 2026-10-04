@@ -81,6 +81,17 @@ enum SyncOperationStatus {
   FAILED
 }
 
+enum LoadSessionStatus {
+  LOADING
+  CONFIRMED
+  REVERIFY_REQUIRED
+}
+
+enum LoadIssueType {
+  MISSING
+  DAMAGED
+}
+
 model Depot {
   id       String    @id
   name     String
@@ -90,80 +101,81 @@ model Depot {
 }
 
 model Outlet {
-  id                    String   @id
-  brand                 Brand
-  district              String
-  depotId               String
-  dockType              String
-  parkingConstraint     String
-  mallWindow            String?
-  windowOpenTime        String
-  windowCloseTime       String
-  address               String?
-  latitude              Float?
-  longitude             Float?
-  depot                 Depot    @relation(fields: [depotId], references: [id])
-  accounts              Account[]
-  orders                Order[]
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                String    @id
+  brand             Brand
+  district          String
+  depotId           String
+  dockType          String
+  parkingConstraint String
+  mallWindow        String?
+  windowOpenTime    String
+  windowCloseTime   String
+  address           String?
+  latitude          Float?
+  longitude         Float?
+  depot             Depot     @relation(fields: [depotId], references: [id])
+  accounts          Account[]
+  orders            Order[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 }
 
 model Vehicle {
-  id                  String             @id
-  depotId             String
-  type                VehicleType
-  temperature         VehicleTemperature
-  weightCapacityKg    Decimal            @db.Decimal(12, 2)
-  volumeCapacityM3    Decimal            @db.Decimal(12, 3)
-  kilometersPerLitre  Decimal            @db.Decimal(8, 3)
-  weeklyFuelQuotaL    Decimal            @db.Decimal(12, 2)
-  isInWorkshop        Boolean            @default(false)
-  depot               Depot              @relation(fields: [depotId], references: [id])
-  trips               Trip[]
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
+  id                 String             @id
+  depotId            String
+  type               VehicleType
+  temperature        VehicleTemperature
+  weightCapacityKg   Decimal            @db.Decimal(12, 2)
+  volumeCapacityM3   Decimal            @db.Decimal(12, 3)
+  kilometersPerLitre Decimal            @db.Decimal(8, 3)
+  weeklyFuelQuotaL   Decimal            @db.Decimal(12, 2)
+  isInWorkshop       Boolean            @default(false)
+  depot              Depot              @relation(fields: [depotId], references: [id])
+  trips              Trip[]
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
 }
 
 model Account {
-  id          String    @id @default(cuid())
-  email       String    @unique
-  displayName String
-  passwordHash String
-  role        Role
-  outletId    String?
-  depotId     String?
-  locale      String    @default("en")
-  isActive    Boolean   @default(true)
-  sessionVersion Int    @default(0)
-  assignedTrips Trip[] @relation("TripDriver")
-  outlet      Outlet?   @relation(fields: [outletId], references: [id])
-  events      AuditEvent[]
-  notifications Notification[]
-  issueEvents IssueEvent[]
-  proofAssets ProofAsset[]
-  syncOperations SyncOperation[]
-  openedIssues IssueCase[] @relation("IssueOpenedBy")
-  deliveryOutcomes DeliveryOutcomeRecord[]
-  createdLoadIssues LoadIssue[]
-  confirmedReceipts ReceiptRecord[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                    String                  @id @default(cuid())
+  email                 String                  @unique
+  displayName           String
+  passwordHash          String
+  role                  Role
+  outletId              String?
+  depotId               String?
+  locale                String                  @default("en")
+  isActive              Boolean                 @default(true)
+  sessionVersion        Int                     @default(0)
+  assignedTrips         Trip[]                  @relation("TripDriver")
+  outlet                Outlet?                 @relation(fields: [outletId], references: [id])
+  events                AuditEvent[]
+  notifications         Notification[]
+  issueEvents           IssueEvent[]
+  proofAssets           ProofAsset[]
+  syncOperations        SyncOperation[]
+  openedIssues          IssueCase[]             @relation("IssueOpenedBy")
+  deliveryOutcomes      DeliveryOutcomeRecord[]
+  createdLoadIssues     LoadIssue[]
+  confirmedReceipts     ReceiptRecord[]
+  confirmedLoadSessions LoadSession[]           @relation("LoadSessionConfirmedBy")
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
 }
 
 model Order {
-  id                  String       @id
+  id                  String                 @id
   outletId            String
   requestedDate       DateTime
-  status              OrderStatus  @default(SUBMITTED)
+  status              OrderStatus            @default(SUBMITTED)
   temperatureRequired VehicleTemperature
   units               Int
-  weightKg            Decimal      @db.Decimal(12, 2)
-  volumeM3            Decimal      @db.Decimal(12, 3)
+  weightKg            Decimal                @db.Decimal(12, 2)
+  volumeM3            Decimal                @db.Decimal(12, 3)
   submittedAt         DateTime?
   deliveryWindowOpen  String
   deliveryWindowClose String
-  outlet              Outlet       @relation(fields: [outletId], references: [id])
+  outlet              Outlet                 @relation(fields: [outletId], references: [id])
   lines               OrderLine[]
   allocations         Allocation[]
   statusEvents        OrderStatusEvent[]
@@ -172,68 +184,72 @@ model Order {
   receipt             ReceiptRecord?
   proofAssets         ProofAsset[]
   loadIssues          LoadIssue[]
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
+  loadLines           LoadLine[]
+  createdAt           DateTime               @default(now())
+  updatedAt           DateTime               @updatedAt
 }
 
 model OrderLine {
-  id          String  @id @default(cuid())
+  id          String      @id @default(cuid())
   orderId     String
   productCode String
   description String
   quantity    Int
-  weightKg    Decimal @db.Decimal(12, 2)
-  volumeM3    Decimal @db.Decimal(12, 3)
-  order       Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  weightKg    Decimal     @db.Decimal(12, 2)
+  volumeM3    Decimal     @db.Decimal(12, 3)
+  order       Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  loadLines   LoadLine[]
+  loadIssues  LoadIssue[]
 }
 
 model Plan {
-  id          String     @id @default(cuid())
+  id          String       @id @default(cuid())
   depotId     String
   serviceDate DateTime
   version     Int
-  status      PlanStatus @default(DRAFT)
+  status      PlanStatus   @default(DRAFT)
   publishedAt DateTime?
-  depot       Depot      @relation(fields: [depotId], references: [id])
+  depot       Depot        @relation(fields: [depotId], references: [id])
   trips       Trip[]
   allocations Allocation[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   @@unique([depotId, serviceDate, version])
 }
 
 model Trip {
-  id          String       @id @default(cuid())
-  planId      String
-  vehicleId   String
-  tripNumber  Int
-  brand       Brand
-  district    String
-  status      OrderStatus  @default(ALLOCATED)
+  id           String       @id @default(cuid())
+  planId       String
+  vehicleId    String
+  tripNumber   Int
+  brand        Brand
+  district     String
+  status       OrderStatus  @default(ALLOCATED)
   plannedStart DateTime?
-  driverId    String?
-  driver      Account? @relation("TripDriver", fields: [driverId], references: [id])
-  plan        Plan         @relation(fields: [planId], references: [id], onDelete: Cascade)
-  vehicle     Vehicle      @relation(fields: [vehicleId], references: [id])
-  allocations Allocation[]
-  loadIssues LoadIssue[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  driverId     String?
+  driver       Account?     @relation("TripDriver", fields: [driverId], references: [id])
+  plan         Plan         @relation(fields: [planId], references: [id], onDelete: Cascade)
+  vehicle      Vehicle      @relation(fields: [vehicleId], references: [id])
+  allocations  Allocation[]
+  loadIssues   LoadIssue[]
+  loadSession  LoadSession?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
   @@unique([planId, vehicleId, tripNumber])
   @@index([driverId, status])
 }
 
 model Allocation {
-  id         String @id @default(cuid())
-  orderId    String
-  planId     String
-  tripId     String
-  sequence   Int
-  order      Order  @relation(fields: [orderId], references: [id])
-  plan       Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
-  trip       Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  id       String @id @default(cuid())
+  orderId  String
+  planId   String
+  tripId   String
+  sequence Int
+  order    Order  @relation(fields: [orderId], references: [id])
+  plan     Plan   @relation(fields: [planId], references: [id], onDelete: Cascade)
+  trip     Trip   @relation(fields: [tripId], references: [id], onDelete: Cascade)
 
   @@unique([planId, orderId])
   @@unique([tripId, sequence])
@@ -249,58 +265,58 @@ model OrderStatusEvent {
 }
 
 model IssueCase {
-  id        String      @id @default(cuid())
-  orderId   String
-  status    IssueStatus @default(REPORTED)
-  summary   String
+  id         String       @id @default(cuid())
+  orderId    String
+  status     IssueStatus  @default(REPORTED)
+  summary    String
   openedById String?
-  order     Order       @relation(fields: [orderId], references: [id])
-  openedBy  Account?     @relation("IssueOpenedBy", fields: [openedById], references: [id])
-  events    IssueEvent[]
-  loadIssue LoadIssue?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  order      Order        @relation(fields: [orderId], references: [id])
+  openedBy   Account?     @relation("IssueOpenedBy", fields: [openedById], references: [id])
+  events     IssueEvent[]
+  loadIssue  LoadIssue?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 }
 
 model IssueEvent {
-  id        String      @id @default(cuid())
+  id        String       @id @default(cuid())
   issueId   String
   from      IssueStatus?
   to        IssueStatus
   note      String?
   actorId   String?
-  createdAt DateTime    @default(now())
-  issue     IssueCase   @relation(fields: [issueId], references: [id], onDelete: Cascade)
-  actor     Account?    @relation(fields: [actorId], references: [id])
+  createdAt DateTime     @default(now())
+  issue     IssueCase    @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  actor     Account?     @relation(fields: [actorId], references: [id])
 
   @@index([issueId, createdAt])
 }
 
 model Notification {
-  id         String           @id @default(cuid())
+  id          String           @id @default(cuid())
   recipientId String
-  type       NotificationType
-  title      String
-  body       String
-  entityType String?
-  entityId   String?
-  readAt     DateTime?
-  createdAt  DateTime         @default(now())
-  recipient  Account          @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  type        NotificationType
+  title       String
+  body        String
+  entityType  String?
+  entityId    String?
+  readAt      DateTime?
+  createdAt   DateTime         @default(now())
+  recipient   Account          @relation(fields: [recipientId], references: [id], onDelete: Cascade)
 
   @@index([recipientId, readAt, createdAt])
 }
 
 model ProofAsset {
-  id         String   @id @default(cuid())
-  orderId    String
+  id           String    @id @default(cuid())
+  orderId      String
   capturedById String?
-  type       ProofType
-  storageKey String
-  metadata   Json?
-  createdAt  DateTime @default(now())
-  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  capturedBy Account? @relation(fields: [capturedById], references: [id])
+  type         ProofType
+  storageKey   String
+  metadata     Json?
+  createdAt    DateTime  @default(now())
+  order        Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  capturedBy   Account?  @relation(fields: [capturedById], references: [id])
 
   @@index([orderId, createdAt])
 }
@@ -348,43 +364,91 @@ model SyncOperation {
 }
 
 model SyncConflict {
-  id             String        @id @default(cuid())
-  operationId    String        @unique
-  localPayload   Json
-  serverPayload  Json
-  resolution     String?
-  resolvedAt     DateTime?
-  operation      SyncOperation @relation(fields: [operationId], references: [operationId], onDelete: Cascade)
+  id            String        @id @default(cuid())
+  operationId   String        @unique
+  localPayload  Json
+  serverPayload Json
+  resolution    String?
+  resolvedAt    DateTime?
+  operation     SyncOperation @relation(fields: [operationId], references: [operationId], onDelete: Cascade)
 }
 
 model LoadIssue {
-  id         String    @id @default(cuid())
-  tripId     String
-  orderId    String
-  issueId    String?   @unique
-  summary    String
-  quantity   Int?
-  note       String?
-  createdById String
-  createdAt  DateTime  @default(now())
-  trip       Trip      @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  order      Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  issue      IssueCase? @relation(fields: [issueId], references: [id])
-  createdBy  Account   @relation(fields: [createdById], references: [id])
+  id            String        @id @default(cuid())
+  tripId        String
+  orderId       String
+  issueId       String?       @unique
+  orderLineId   String?
+  lineKey       String        @default("")
+  type          LoadIssueType @default(MISSING)
+  summary       String
+  quantity      Int?
+  note          String?
+  photoName     String?
+  photoMimeType String?
+  photoData     Bytes?
+  withdrawnAt   DateTime?
+  createdById   String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  trip          Trip          @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderLine     OrderLine?    @relation(fields: [orderLineId], references: [id], onDelete: SetNull)
+  issue         IssueCase?    @relation(fields: [issueId], references: [id])
+  createdBy     Account       @relation(fields: [createdById], references: [id])
 
   @@index([tripId, createdAt])
   @@index([orderId, createdAt])
+  @@index([tripId, lineKey, withdrawnAt])
+}
+
+model LoadSession {
+  id                         String            @id @default(cuid())
+  tripId                     String            @unique
+  planVersion                Int
+  vehicleIdSnapshot          String
+  status                     LoadSessionStatus @default(LOADING)
+  loadingOrderAcknowledgedAt DateTime
+  reeferTemperatureC         Decimal?          @db.Decimal(5, 2)
+  reeferConfirmedAt          DateTime?
+  confirmedAt                DateTime?
+  confirmedById              String?
+  trip                       Trip              @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  confirmedBy                Account?          @relation("LoadSessionConfirmedBy", fields: [confirmedById], references: [id])
+  lines                      LoadLine[]
+  createdAt                  DateTime          @default(now())
+  updatedAt                  DateTime          @updatedAt
+
+  @@index([status, updatedAt])
+}
+
+model LoadLine {
+  id              String      @id @default(cuid())
+  sessionId       String
+  lineKey         String
+  orderId         String
+  orderLineId     String?
+  plannedQuantity Int
+  loadedQuantity  Int         @default(0)
+  session         LoadSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  order           Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderLine       OrderLine?  @relation(fields: [orderLineId], references: [id], onDelete: SetNull)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@unique([sessionId, lineKey])
+  @@index([orderId])
 }
 
 model AuditEvent {
-  id          String   @id @default(cuid())
-  actorId     String?
-  entityType  String
-  entityId    String
-  action      String
-  payload     Json?
-  occurredAt  DateTime @default(now())
-  actor       Account? @relation(fields: [actorId], references: [id])
+  id         String   @id @default(cuid())
+  actorId    String?
+  entityType String
+  entityId   String
+  action     String
+  payload    Json?
+  occurredAt DateTime @default(now())
+  actor      Account? @relation(fields: [actorId], references: [id])
 
   @@index([entityType, entityId, occurredAt])
 }
