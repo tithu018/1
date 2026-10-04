@@ -5,13 +5,11 @@ import styles from "./issues.module.css";
 
 const filters = ["This shift", "Yesterday", "All"] as const;
 
-const issues = [
-  ["Wed 25 Mar - 03:47", "VEH012", "OUT010 - ORD0096797", "Instant noodles - FR-D07", "Damaged - 1", "Reported"],
-  ["Tue 24 Mar - 03:58", "VEH022", "OUT010 - ORD0096653", "Cream crackers - FR-D08", "Missing - 2", "Resolved - ISS-0417"]
-] as const;
-
-export function IssuesPanel() {
+export function IssuesPanel({ issues }: { issues: Array<{ row: string[]; day: string }> }) {
   const [activeFilter, setActiveFilter] = useState<(typeof filters)[number]>("This shift");
+  const [today] = useState(() => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Colombo" }));
+  const [yesterday] = useState(() => new Date(Date.now() - 86400000).toLocaleDateString("en-CA", { timeZone: "Asia/Colombo" }));
+  const visible = issues.filter((issue) => activeFilter === "All" || issue.day === (activeFilter === "Yesterday" ? yesterday : today));
 
   return (
     <section className={styles.issues}>
@@ -41,7 +39,7 @@ export function IssuesPanel() {
             </tr>
           </thead>
           <tbody>
-            {issues.map((issue) => (
+            {visible.map(({ row: issue }) => (
               <tr key={issue[2]}>
                 <td>{issue[0]}</td>
                 <td>{issue[1]}</td>
@@ -57,6 +55,7 @@ export function IssuesPanel() {
             ))}
           </tbody>
         </table>
+        {!visible.length && <p>No loading issues for this period.</p>}
         <p>Statuses follow the shared issue lifecycle: Reported → Acknowledged → Under review → Resolved.</p>
       </section>
     </section>

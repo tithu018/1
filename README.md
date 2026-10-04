@@ -14,7 +14,7 @@ The project provides purpose-built workspaces for Store Managers, Dispatchers, L
 - Driver offline, conflict-review, and synchronization states.
 - Server-confirmed actions, notifications, status history, and audit records.
 - Responsive Figma-aligned interface with high-resolution PNG artwork.
-- Docker Compose deployment with automated migrations, demo-data seeding, and health checks.
+- Docker Compose deployment with automated migrations and health checks; demo seeding is an explicit opt-in command.
 
 ## User roles
 
@@ -113,9 +113,18 @@ Docker performs the following automatically:
 
 1. Starts PostgreSQL and waits for it to become healthy.
 2. Applies all committed Prisma migrations.
-3. Seeds the repeatable demo dataset and accounts.
-4. Starts the optimized Next.js production server.
-5. Checks application and database health.
+3. Starts the optimized Next.js production server.
+4. Checks application and database health.
+
+Startup does not insert sample outlets, vehicles, orders, or accounts. Existing database records are retained. For an optional local demonstration dataset, run `pnpm db:seed` explicitly.
+
+For a new empty database, set `DISPATCHER_EMAIL`, `DISPATCHER_PASSWORD` (at least 12 characters), and optionally `DISPATCHER_NAME` and `DISPATCHER_DEPOT` (`Peliyagoda` or `Kandy`) in `.env`, then run `pnpm db:bootstrap`. This creates the two operating depots and one dispatcher account without adding sample stores or orders. Existing accounts are never overwritten.
+
+## Dispatcher registration
+
+Open **Registration** in the dispatcher sidebar to register a Store Manager for a Fresh, Style or Tech outlet. Registration creates a password-hashed account, links it to one outlet in the dispatcher's depot, and records an audit event. Existing unassigned outlets retain their saved master-data constraints.
+
+New outlets require their ID, brand, district, dock and vehicle-access rules, and delivery window. Fresh windows must end by 08:00; mall outlets require access or booking instructions. Registered managers sign in using their email and supplied initial password. Their workspace reads their outlet's actual orders, receipts, issues and notifications, and shows empty states when no records exist.
 
 ### 3. Open the application
 
@@ -264,6 +273,8 @@ pnpm build
 
 For deployment changes, also run:
 
+With a running app and an existing dispatcher, `pnpm --filter @waypoint/web exec node registration-smoke.mjs` verifies registration and sign-in for all three brands, manager workspace empty states, duplicate rejection and role access. It removes only the temporary accounts and outlets created by that test. Set `WAYPOINT_TEST_URL` to test another local port.
+
 ```powershell
 docker compose build app
 docker compose up -d
@@ -320,7 +331,7 @@ The assisted planner proposes a plan, but the Dispatcher remains responsible for
 
 PostgreSQL data is stored in the named Docker volume `waypoint-postgres`. Normal container restarts and `docker compose down` preserve that data.
 
-The seed script uses upserts for the demo depot, outlets, vehicles, orders, and accounts. It is safe for the application container to run it during startup without creating duplicate base records.
+The optional seed script uses upserts for demonstration depots, outlets, vehicles, orders, and accounts. It is never run automatically during application startup. Operational screens render database records without fabricated fallback rows.
 
 ## Troubleshooting
 

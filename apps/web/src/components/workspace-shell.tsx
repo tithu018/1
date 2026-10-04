@@ -1,7 +1,11 @@
+import { DriverHeader } from "@/app/workspace/driver/driver-chrome";
 import Image from "next/image";
 import Link from "next/link";
 import {
   Bell,
+  CloudUpload,
+  MapPinned,
+  UserRound,
   ChartNoAxesColumnIncreasing,
   ClipboardList,
   Clock3,
@@ -17,16 +21,19 @@ import {
 import { APP_NAME, roleLabels, type UserRole } from "@waypoint/domain";
 import { signOut } from "@/app/sign-in/actions";
 import { requireRole } from "@/lib/auth";
+import { prisma } from "@waypoint/database";
+import { displayDate, label } from "@/lib/format";
 import styles from "./workspace-shell.module.css";
 
 const navigation: Record<UserRole, readonly string[]> = {
   store_manager: ["Dashboard", "Place order", "Order status", "Receive", "History & issues", "Notifications"],
-  dispatcher: ["Plan", "Live Board", "Needs Attention", "Deferral Log", "Capacity Forecast", "Reference Data"],
+  dispatcher: ["Plan", "Registration", "Live Board", "Needs Attention", "Deferral Log", "Capacity Forecast", "Reference Data"],
   loader: ["Trip queue", "Active load", "Loading issues"],
-  driver: ["Today", "Active trip", "Sync"]
+  driver: ["Today", "Active trip", "Sync", "Profile"]
 };
 
 function hrefFor(role: UserRole, item: string) {
+  if (role === "dispatcher" && item === "Registration") return "/workspace/dispatcher/registration";
   if (role === "store_manager" && item === "Place order") return "/workspace/store_manager/orders";
   if (role === "store_manager" && item === "Receive") return "/workspace/store_manager/receive";
   if (role === "store_manager" && item === "Order status") return "/workspace/store_manager/status";
@@ -43,6 +50,7 @@ function hrefFor(role: UserRole, item: string) {
   if (role === "loader" && item === "Active load") return "/workspace/loader/load";
   if (role === "loader" && item === "Loading issues") return "/workspace/loader/issues";
   if (role === "driver" && item === "Active trip") return "/workspace/driver/trip";
+  if (role === "driver" && item === "Profile") return "/workspace/driver/profile";
   if (role === "driver" && item === "Sync") return "/workspace/driver/sync";
   return `/workspace/${role}`;
 }
@@ -50,6 +58,10 @@ function hrefFor(role: UserRole, item: string) {
 function NavIcon({ item }: Readonly<{ item: string }>) {
   const iconByItem: Record<string, LucideIcon> = {
     Dashboard: LayoutDashboard,
+    Today: LayoutDashboard,
+    "Active trip": MapPinned,
+    Sync: CloudUpload,
+    Profile: UserRound,
     "Place order": ClipboardList,
     "Order status": Truck,
     Receive: Package,
@@ -76,6 +88,10 @@ export async function WorkspaceShell({
   children
 }: Readonly<{ role: UserRole; active: string; children: React.ReactNode }>) {
   const session = await requireRole(role);
+  const outlet = session.outletId ? await prisma.outlet.findUnique({ where: { id: session.outletId }, include: { depot: true } }) : null;
+  const depot = session.depotId ? await prisma.depot.findUnique({ where: { id: session.depotId } }) : outlet?.depot;
+  const site = outlet ? `${outlet.id} · ${label(outlet.brand)}` : depot?.name ?? "No depot assigned";
+  const context = outlet ? `${outlet.district} · ${outlet.depot.name}` : displayDate();
   const isDriver = role === "driver";
   const isLoader = role === "loader";
   const isStore = role === "store_manager";
@@ -104,14 +120,14 @@ export async function WorkspaceShell({
               <Link className={item === active ? styles.active : ""} href={hrefFor(role, item)} key={item}>
                 {usesNovaSidebar && <NavIcon item={item} />}
                 {role === "dispatcher" && item === "Needs Attention"
-                    ? "Needs Attention · 3"
-                    : item}
+                  ? "Needs Attention · 3"
+                  : item}
               </Link>
             ))}
           </nav>
           <div className={styles.sidebarFooter}>
             <div className={styles.sidebarFooterTitle}>
-              <strong>{isLoader || isDispatcher ? "Peliyagoda depot" : isStore ? "OUT010 - Fresh" : session.displayName}</strong>
+              <strong>{site}</strong>
               {isStore && (
                 <Link className={styles.outletSettings} href="/workspace/store_manager/settings" aria-label="Store settings">
                   <Settings aria-hidden="true" />
@@ -119,13 +135,7 @@ export async function WorkspaceShell({
               )}
             </div>
             <span>
-              {isStore
-                ? "Colombo - Peliyagoda depot"
-                : isDispatcher
-                  ? "38 vehicles - 49 Fresh - 16 Style - 10 Tech outlets"
-                  : isLoader
-                    ? "Loading dock - shared terminal"
-                    : "VEH012"}
+              {context}
             </span>
           </div>
           <form action={signOut} className={styles.signOutForm}>
@@ -135,37 +145,26 @@ export async function WorkspaceShell({
       )}
       <div className={styles.content}>
         {isDriver ? (
-          <header className={styles.driverHeader}>
-            <div className={styles.driverStatusBar}><span>03:58</span><span>4G&nbsp; ▮ ▮ ▮</span></div>
-            <div className={styles.driverTopBar}>
-              <div>
-                <strong>VEH012 · Trip 1</strong>
-                <span>Wed 25 Mar · Peliyagoda</span>
-              </div>
-              <div className={styles.headerRight}>
-                <span className={styles.status}>Up to date</span>
-                <Link className={styles.driverSettings} href="/workspace/driver/settings" aria-label="Driver settings"><span aria-hidden="true" /></Link>
-              </div>
-            </div>
-          </header>
+          <DriverHeader name={session.displayName} depot={depot?.name ?? "No depot assigned"} accountId={session.accountId} />
         ) : (
           <header className={`${styles.header} ${usesNovaSidebar ? styles.novaHeader : ""}`}>
             {usesNovaSidebar ? (
             <>
               <div className={styles.headerSite}>
-                <span className={styles.siteIcon} aria-hidden="true" />
-                <strong>{isStore ? "OUT010 - Fresh outlet" : "Peliyagoda"}</strong>
-                <span>{isStore ? "Colombo - Peliyagoda depot" : isDispatcher ? "Tue 24 Mar 2026 - planning Wed 25 Mar" : "Loading for Wed 25 Mar 2026"}</span>
+                <strong>{site}</strong>
+                <span>{context}</span>
               </div>
               <div className={styles.headerRight}>
-                <span className={`${styles.status} ${isStore ? styles.warningStatus : isDispatcher ? styles.neutralStatus : styles.onlineStatus}`}>
-                  {isStore ? "Cutoff 16:00 - 20 min left" : isDispatcher ? "Queue closed" : "Online"}
-                </span>
-                <span className={styles.bell} aria-label="Notifications" role="img" />
+                {!isDispatcher && <>
+                  <span className={`${styles.status} ${isStore ? styles.warningStatus : styles.onlineStatus}`}>
+                    {isStore ? "Order cutoff 16:00" : roleLabels[role]}
+                  </span>
+                  <span className={styles.bell} aria-label="Notifications" role="img" />
+                </>}
                 <span className={styles.avatar}>{isStore ? "SM" : isDispatcher ? "DS" : "LD"}</span>
                 <span className={styles.identity}>
-                  <strong>{roleLabels[role]}</strong>
-                  <small>{isStore ? "Tue 24 Mar - 15:40" : isDispatcher ? "Tue 24 Mar - 16:05" : "Wed 25 Mar - 03:12"}</small>
+                  <strong>{session.displayName}</strong>
+                  <small>{displayDate()}</small>
                 </span>
               </div>
             </>
@@ -177,8 +176,8 @@ export async function WorkspaceShell({
       {isDriver && (
         <nav className={styles.bottomNav} aria-label="Driver navigation">
           {navigation.driver.map((item) => (
-            <Link className={item === active ? styles.active : ""} href={hrefFor("driver", item)} key={item}>
-              {item}
+            <Link className={item === active ? styles.active : ""} href={hrefFor("driver", item)} key={item} aria-current={item === active ? "page" : undefined}>
+              <NavIcon item={item} />{item}
             </Link>
           ))}
         </nav>

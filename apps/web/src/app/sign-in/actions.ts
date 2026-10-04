@@ -6,7 +6,7 @@ import { redirect } from "next/navigation";
 
 export async function signIn(formData: FormData) {
   const role = String(formData.get("role") ?? "");
-  if (!userRoles.includes(role as UserRole)) redirect("/#roles");
+  if (!userRoles.includes(role as UserRole)) redirect("/sign-in");
   const session = await authenticate(String(formData.get("identifier") ?? ""), String(formData.get("password") ?? ""), role as UserRole);
   if (!session) redirect(`/sign-in?role=${role}&error=credentials`);
   await createSession(session);
@@ -15,5 +15,5 @@ export async function signIn(formData: FormData) {
 
 export async function signOut() {
   await destroySession();
-  redirect("/#roles");
+  redirect("/sign-in");
 }

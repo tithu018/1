@@ -99,6 +99,9 @@ model Outlet {
   mallWindow            String?
   windowOpenTime        String
   windowCloseTime       String
+  address               String?
+  latitude              Float?
+  longitude             Float?
   depot                 Depot    @relation(fields: [depotId], references: [id])
   accounts              Account[]
   orders                Order[]
@@ -131,6 +134,9 @@ model Account {
   outletId    String?
   depotId     String?
   locale      String    @default("en")
+  isActive    Boolean   @default(true)
+  sessionVersion Int    @default(0)
+  assignedTrips Trip[] @relation("TripDriver")
   outlet      Outlet?   @relation(fields: [outletId], references: [id])
   events      AuditEvent[]
   notifications Notification[]
@@ -206,6 +212,8 @@ model Trip {
   district    String
   status      OrderStatus  @default(ALLOCATED)
   plannedStart DateTime?
+  driverId    String?
+  driver      Account? @relation("TripDriver", fields: [driverId], references: [id])
   plan        Plan         @relation(fields: [planId], references: [id], onDelete: Cascade)
   vehicle     Vehicle      @relation(fields: [vehicleId], references: [id])
   allocations Allocation[]
@@ -214,6 +222,7 @@ model Trip {
   updatedAt   DateTime     @updatedAt
 
   @@unique([planId, vehicleId, tripNumber])
+  @@index([driverId, status])
 }
 
 model Allocation {
