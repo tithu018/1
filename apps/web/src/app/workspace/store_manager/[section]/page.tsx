@@ -7,6 +7,7 @@ import { displayDate, label } from "@/lib/format";
 import styles from "./section.module.css";
 import { StorePreferences } from "./preferences";
 import { NotificationsList } from "./notifications-list";
+import { HistoryIssuesDashboard } from "./history-issues-dashboard";
 
 function shortOrderReference(orderId: string) {
   const raw = orderId.replace(/^ORD-/i, "").replace(/[^a-z0-9]/gi, "");
@@ -36,7 +37,7 @@ export default async function StoreSectionPage({ params }: { params: Promise<{ s
   const [account, orders, issues, notifications] = await Promise.all([
     prisma.account.findUnique({ where: { id: session.accountId }, include: { outlet: { include: { depot: true } } } }),
     session.outletId ? prisma.order.findMany({ where: { outletId: session.outletId }, orderBy: { createdAt: "desc" } }) : [],
-    session.outletId ? prisma.issueCase.findMany({ where: { order: { outletId: session.outletId } }, orderBy: { updatedAt: "desc" } }) : [],
+    session.outletId ? prisma.issueCase.findMany({ where: { order: { outletId: session.outletId } }, include: { order: true }, orderBy: { updatedAt: "desc" } }) : [],
     prisma.notification.findMany({ where: { recipientId: session.accountId }, orderBy: { createdAt: "desc" }, take: 30 })
   ]);
 
@@ -73,29 +74,48 @@ export default async function StoreSectionPage({ params }: { params: Promise<{ s
 
   return (
     <WorkspaceShell role="store_manager" active={titles[section]}>
-      <section className={`${styles.page} ${section === "notifications" ? styles.notificationPageShell : ""}`}>
-        {section !== "notifications" && (
+      <section className={`${styles.page} ${section === "notifications" ? styles.notificationPageShell : ""} ${section === "history" ? styles.historyPageShell : ""}`}>
+        {section !== "notifications" && section !== "history" && (
           <header className={styles.heading}>
             <h1>{titles[section]}</h1>
             <p>{outlet ? `${outlet.id} · ${label(outlet.brand)}` : "No outlet assigned"}</p>
           </header>
         )}
 
-        {(section === "status" || section === "history") && (
+        {section === "history" && (
+          <HistoryIssuesDashboard
+            issues={issues.map((issue) => ({
+              id: issue.id,
+              orderId: issue.orderId,
+              orderRef: shortOrderReference(issue.orderId),
+              deliveryRef: shortOrderReference(issue.orderId).replace("ORD", "DEL"),
+              type: issue.summary.startsWith("Receipt:") ? "Receipt issue" : issue.summary.startsWith("Loading:") ? "Loading issue" : issue.summary.startsWith("Delivery:") ? "Delivery issue" : "Reported issue",
+              description: issue.summary,
+              reportedAt: issue.createdAt.toISOString(),
+              reportedDate: displayDate(issue.createdAt),
+              reportedTime: issue.createdAt.toLocaleTimeString("en-GB", { timeZone: "Asia/Colombo", hour: "2-digit", minute: "2-digit" }),
+              status: issue.status,
+              statusLabel: label(issue.status)
+            }))}
+            orders={orders.map((order) => ({
+              id: order.id,
+              orderRef: shortOrderReference(order.id),
+              deliveryRef: shortOrderReference(order.id).replace("ORD", "DEL"),
+              requestedAt: order.requestedDate.toISOString(),
+              requestedDate: displayDate(order.requestedDate),
+              deliveryWindow: `${order.deliveryWindowOpen}-${order.deliveryWindowClose}`,
+              type: order.temperatureRequired === "REEFER" ? "Chilled" : "Ambient",
+              units: order.units,
+              status: order.status,
+              statusLabel: label(order.status)
+            }))}
+          />
+        )}
+
+        {section === "status" && (
           <>
-            {section === "history" && (
-              <section className={styles.card}>
-                <h2>Issue cases</h2>
-                {issues.map((issue) => (
-                  <p key={issue.id}>
-                    <Link href={`/workspace/store_manager/orders/${issue.orderId}`}>{issue.id}</Link> · {issue.summary} · {label(issue.status)}
-                  </p>
-                ))}
-                {!issues.length && <p>No issue cases.</p>}
-              </section>
-            )}
             <section className={styles.card}>
-              <h2>{section === "history" ? "Order history" : "Active orders"}</h2>
+              <h2>Active orders</h2>
               <div className={styles.tableWrap}>
                 <table>
                   <thead>

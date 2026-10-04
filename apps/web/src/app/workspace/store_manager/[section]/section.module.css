@@ -1,5 +1,6 @@
 .page { width: min(100%, 1080px); }
 .notificationPageShell { width: min(100%, 1380px); }
+.historyPageShell { width: min(100%, 1380px); }
 .heading { margin-bottom: 24px; }
 .heading h1 { margin: 0; color: #215742; font-size: 34px; line-height: 1.12; letter-spacing: -.035em; }
 .heading p { margin: 8px 0 0; color: #68746d; font-size: 15px; }
@@ -78,6 +79,65 @@
 .notificationEmpty h2 { margin: 0; color: #215742; font-size: 24px; }
 .notificationEmpty p { max-width: 420px; margin: 0; line-height: 1.5; }
 .notificationEmpty button { min-height: 42px; padding: 8px 18px; border: 1px solid #215742; border-radius: 9px; color: #215742; background: #fffdf9; font: inherit; font-weight: 800; cursor: pointer; }
+.historyPage { width: 100%; }
+.historyHeading { margin-bottom: 20px; }
+.historyHeading h1 { margin: 0; color: #215742; font-size: 34px; line-height: 1.12; letter-spacing: -.035em; }
+.historyHeading p { margin: 8px 0 0; color: #53657a; font-size: 16px; line-height: 1.45; }
+.historySummaryGrid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 16px; margin-bottom: 18px; }
+.historySummaryGrid article { display: flex; min-width: 0; min-height: 100px; align-items: center; gap: 18px; padding: 18px 20px; border: 1px solid #e6dac6; border-radius: 12px; background: #fffdf9; box-shadow: 0 12px 28px #2920100c; }
+.historySummaryGrid article > span { display: grid; width: 58px; height: 58px; flex: 0 0 58px; place-items: center; border-radius: 50%; }
+.historySummaryGrid svg { width: 28px; height: 28px; }
+.historySummaryGrid div { display: grid; min-width: 0; gap: 2px; }
+.historySummaryGrid strong { color: #071a2e; font-size: 30px; line-height: 1; }
+.historySummaryGrid p { margin: 0; overflow: hidden; color: #0f2238; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.historySummaryGrid small { overflow: hidden; color: #53657a; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.summaryGreen { color: #0b7044; background: #dff3e7; }
+.summaryBlue { color: #0f74dd; background: #e1efff; }
+.summaryAmber { color: #d97706; background: #fde8bf; }
+.summaryRed { color: #d33442; background: #f9d7dd; }
+.historyCard { margin-bottom: 18px; padding: 20px; border: 1px solid #e6dac6; border-radius: 16px; background: #fffdf9; box-shadow: 0 12px 28px #2920100c; }
+.historyCardHeader { display: flex; min-width: 0; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
+.historyCardHeader h2 { margin: 0; color: #071a2e; font-size: 24px; line-height: 1.2; }
+.historyFilters { display: grid; grid-template-columns: minmax(260px,1fr) 160px 170px 170px; gap: 12px; margin-bottom: 14px; }
+.historySearch { display: flex; min-width: 0; min-height: 42px; align-items: center; gap: 10px; padding: 0 12px; border: 1px solid #ddceb7; border-radius: 8px; color: #53657a; background: #fffdf9; }
+.historySearch svg { width: 19px; height: 19px; flex: 0 0 19px; color: #0e614e; }
+.historySearch input, .historyFilters select, .issueFilters select { min-width: 0; min-height: 42px; border: 1px solid #ddceb7; border-radius: 8px; color: #071a2e; background: #fffdf9; font: inherit; }
+.historySearch input { flex: 1; border: 0; outline: 0; }
+.historyFilters select, .issueFilters select { padding: 0 12px; }
+.issueFilters { display: flex; flex-wrap: wrap; gap: 12px; }
+.issueFilters select { min-width: 160px; }
+.historyTableWrap { overflow: hidden; border-radius: 8px; }
+.orderHistoryHeader, .orderHistoryRow, .issueHistoryHeader, .issueHistoryRow { display: grid; min-width: 0; align-items: center; gap: 14px; padding: 0 18px; }
+.orderHistoryHeader { grid-template-columns: minmax(150px,1.2fr) minmax(150px,1.1fr) minmax(90px,.7fr) 70px minmax(120px,.85fr) minmax(120px,.9fr) 22px; }
+.orderHistoryRow { grid-template-columns: 34px minmax(116px,1.2fr) minmax(150px,1.1fr) minmax(90px,.7fr) 70px minmax(120px,.85fr) minmax(120px,.9fr) 22px; }
+.issueHistoryHeader { grid-template-columns: minmax(150px,1fr) minmax(170px,1fr) minmax(220px,1.4fr) minmax(130px,.85fr) minmax(116px,.7fr) minmax(120px,.8fr) 22px; }
+.issueHistoryRow { grid-template-columns: 34px minmax(116px,1fr) minmax(170px,1fr) minmax(220px,1.4fr) minmax(130px,.85fr) minmax(116px,.7fr) minmax(120px,.8fr) 22px; }
+.orderHistoryHeader, .issueHistoryHeader { min-height: 42px; color: #68746d; background: #f1eadc; font-size: 13px; font-weight: 800; }
+.orderHistoryHeader span:first-child, .issueHistoryHeader span:first-child { grid-column: 1; }
+.orderHistoryRow, .issueHistoryRow { min-height: 64px; border-bottom: 1px solid #e6dac6; color: #071a2e; font-size: 14px; }
+.orderHistoryRow > div, .issueHistoryRow > div, .orderHistoryRow time, .issueHistoryRow time { display: grid; min-width: 0; gap: 3px; }
+.orderHistoryRow strong, .issueHistoryRow strong { overflow: hidden; color: #071a2e; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.orderHistoryRow small, .issueHistoryRow small { color: #53657a; font-size: 13px; }
+.historyTruckIcon { display: grid; width: 28px; height: 28px; place-items: center; color: #0b85a0; }
+.historyTruckIcon svg { width: 20px; height: 20px; }
+.historyBadge { display: inline-flex; width: fit-content; min-height: 30px; align-items: center; justify-content: center; gap: 7px; padding: 5px 11px; border-radius: 999px; font-size: 13px; font-weight: 800; white-space: nowrap; }
+.historyBadge svg { width: 15px; height: 15px; }
+.historyStatusSuccess { color: #075c37; background: #ccf5d9; }
+.historyStatusInfo { color: #075ac4; background: #d5eaff; }
+.historyStatusWarning { color: #8b500e; background: #f8dfab; }
+.historyStatusDanger { color: #a61b2b; background: #f9d7dd; }
+.historyStatusNeutral { color: #4b5968; background: #e4e8ed; }
+.historyAction { color: #07563d; font-weight: 850; white-space: nowrap; }
+.historyChevron { width: 20px; height: 20px; color: #071a2e; }
+.issueType { display: inline-flex; min-width: 0; align-items: center; gap: 8px; }
+.issueType i { display: grid; width: 30px; height: 30px; flex: 0 0 30px; place-items: center; border-radius: 50%; }
+.issueType svg { width: 17px; height: 17px; }
+.issueTypeWarning { color: #d97706; background: #fde8bf; }
+.issueTypeDanger { color: #d33442; background: #f9d7dd; }
+.issueTypeInfo { color: #0f74dd; background: #e1efff; }
+.issueHistoryRow p { min-width: 0; overflow: hidden; margin: 0; color: #26394a; text-overflow: ellipsis; white-space: nowrap; }
+.historyEmpty { margin: 0; padding: 28px; color: #53657a; text-align: center; }
 @media (max-width: 900px) { .settingsGrid { grid-template-columns: 1fr; gap: 0; } }
+@media (max-width: 1180px) { .historySummaryGrid { grid-template-columns: repeat(2,minmax(0,1fr)); } .historyFilters { grid-template-columns: 1fr 1fr; } .historyTableWrap { overflow-x: auto; } .orderHistoryHeader, .orderHistoryRow { min-width: 900px; } .issueHistoryHeader, .issueHistoryRow { min-width: 1040px; } }
 @media (max-width: 900px) { .notificationRow { grid-template-columns: 50px minmax(0,1fr) 24px; gap: 12px; } .notificationReadDot { position: absolute; left: 68px; } .notificationCopy { grid-column: 2; } .notificationRow time { grid-column: 2; } .notificationRow > svg { grid-column: 3; grid-row: 1 / span 2; } }
-@media (max-width: 640px) { .heading h1 { font-size: 30px; } .card { padding: 16px; border-radius: 12px; } .cardTitle, .accountRow { align-items: flex-start; flex-direction: column; } .notificationHeading h1 { font-size: 30px; } .notificationFilters { gap: 10px; } .notificationFilters button { min-width: 0; flex: 1 1 132px; } .notificationRow { min-height: 86px; padding: 14px; } .notificationCopy strong, .notificationCopy span { white-space: normal; } .notificationRow time { font-size: 13px; } }
+@media (max-width: 640px) { .heading h1 { font-size: 30px; } .card { padding: 16px; border-radius: 12px; } .cardTitle, .accountRow { align-items: flex-start; flex-direction: column; } .notificationHeading h1, .historyHeading h1 { font-size: 30px; } .notificationFilters { gap: 10px; } .notificationFilters button { min-width: 0; flex: 1 1 132px; } .notificationRow { min-height: 86px; padding: 14px; } .notificationCopy strong, .notificationCopy span { white-space: normal; } .notificationRow time { font-size: 13px; } .historySummaryGrid, .historyFilters { grid-template-columns: 1fr; } .historyCard { padding: 16px; } .historyCardHeader { align-items: flex-start; flex-direction: column; } .issueFilters { width: 100%; } .issueFilters select { flex: 1 1 100%; } }
