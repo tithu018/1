@@ -100,7 +100,7 @@ export async function WorkspaceShell({
   const usesNovaSidebar = isLoader || isStore || isDispatcher;
 
   return (
-    <div className={`${isDriver ? styles.driverShell : styles.shell} ${usesNovaSidebar ? styles.novaShell : ""}`}>
+    <div className={`${isDriver ? styles.driverShell : styles.shell} ${usesNovaSidebar ? styles.novaShell : ""} ${isDispatcher ? styles.dispatcherShell : ""}`}>
       {!isDriver && (
         <aside className={`${styles.sidebar} ${usesNovaSidebar ? styles.novaSidebar : ""} ${isLoader ? styles.loaderSidebar : ""} ${isStore ? styles.storeSidebar : ""} ${isDispatcher ? styles.dispatcherSidebar : ""}`}>
           <Link href="/" className={styles.logo}>
@@ -118,7 +118,7 @@ export async function WorkspaceShell({
           </Link>
           <nav aria-label={`${roleLabels[role]} navigation`}>
             {navigation[role].map((item) => (
-              <Link className={item === active ? styles.active : ""} href={hrefFor(role, item)} key={item}>
+              <Link className={item === active ? styles.active : ""} href={hrefFor(role, item)} key={item} aria-current={item === active ? "page" : undefined}>
                 {usesNovaSidebar && <NavIcon item={item} />}
                 {item}
               </Link>
@@ -163,6 +163,7 @@ export async function WorkspaceShell({
             ) : null}
           </header>
         )}
+        {isDispatcher && <nav className={styles.dispatcherMobileNav} aria-label="Dispatcher mobile navigation">{navigation.dispatcher.map((item) => <Link key={item} href={hrefFor("dispatcher", item)} aria-current={item === active ? "page" : undefined}><NavIcon item={item} />{item}</Link>)}<form action={signOut}><button type="submit"><LogOut size={16} />Sign out</button></form></nav>}
         <main className={styles.main}>{children}</main>
       </div>
       {isDriver && (

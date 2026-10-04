@@ -44,3 +44,25 @@
 .publish button:disabled { cursor: not-allowed; opacity: .45; }
 @media (max-width: 1000px) { .metrics { grid-template-columns: repeat(2, 1fr); } .layout { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .metrics { grid-template-columns: 1fr; } .heading, .publish { align-items: flex-start; flex-direction: column; } .deferred article { grid-template-columns: 1fr; } }
+.page { width: min(100%, 1240px); min-width: 0; }
+.page .metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.queueToolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; }
+.queueToolbar label, .trip header strong { display: flex; align-items: center; gap: 8px; }
+.page input, .page select { min-height: 42px; padding: 9px 11px; color: #202522; background: #fffdf9; border: 1px solid #ddceb7; border-radius: 8px; min-width: 0; }
+.primary, .secondary, .publish button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; border: 1px solid #ddceb7; border-radius: 9px; padding: 10px 16px; font-weight: 650; cursor: pointer; }
+.primary { color: white; background: #215742; }
+.secondary { color: #215742; background: #fffdf9; margin-top: 14px; }
+.queueToolbar .secondary { margin-top: 0; }
+.page button:disabled { opacity: .5; cursor: default; }
+.queue { margin: 24px 0; padding: 22px; overflow-x: auto; border: 1px solid #e6dac6; border-radius: 16px; background: #fffdf9; }
+.queue h2 { font-size: 19px; margin: 0 0 20px; color: #215742; }
+.queue table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.queue th { padding: 12px; color: #68746d; background: #f1eadc; text-align: left; font-size: 11px; }
+.queue td { padding: 16px 12px; border-bottom: 1px solid #e6dac6; white-space: nowrap; }
+.trip label { display: grid; gap: 7px; margin-top: 18px; font-size: 12px; font-weight: 650; color: #52665c; }
+.trip header { flex-wrap: wrap; }
+.checkRow { display: flex; align-items: center; gap: 9px; color: #52665c; font-size: 13px; }
+.checkRow svg { color: #32805b; flex-shrink: 0; }
+.error { display: flex; align-items: center; gap: 8px; padding: 14px; color: #9e3b2a; background: #f8e5df; border-radius: 9px; }
+.page :is(a, button, input, select):focus-visible { outline: 3px solid #85aa65; outline-offset: 3px; }
+@media (max-width: 600px) { .page .metrics { gap: 10px; } .metric { padding: 12px; min-height: 100px; } .queueToolbar label { flex-wrap: wrap; } .queue { padding: 16px; } }

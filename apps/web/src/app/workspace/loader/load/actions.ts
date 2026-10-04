@@ -2,11 +2,12 @@
 
 import { prisma } from "@waypoint/database";
 import { requireRole } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 
 export async function confirmTripLoaded(tripId: string, orderIds: string[]) {
   const session = await requireRole("loader");
   if (!session.depotId || !orderIds.length) throw new Error("A loading confirmation needs at least one order.");
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const trip = await tx.trip.findFirst({ where: { id: tripId, plan: { depotId: session.depotId, status: "PUBLISHED" } }, include: { allocations: true, vehicle: true } });
     if (!trip) throw new Error("This trip is no longer available for loading.");
     if (!["ALLOCATED", "LOADED"].includes(trip.status) || trip.vehicle.isInWorkshop) throw new Error("Trip is not available for loading.");
@@ -25,6 +26,8 @@ export async function confirmTripLoaded(tripId: string, orderIds: string[]) {
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Trip", entityId: trip.id, action: "load_confirmed", payload: { orderIds, vehicleId: trip.vehicleId } } });
     return trip.id;
   }, { isolationLevel: "Serializable" });
+  revalidatePath("/workspace", "layout");
+  return result;
 }
 
 export async function confirmLoadedTrip(tripId: string, orderIds: string[], shortfallNote?: string) {

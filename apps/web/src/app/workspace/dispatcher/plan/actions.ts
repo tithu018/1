@@ -5,6 +5,8 @@ import { evaluateTrip } from "@waypoint/allocation";
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
 import { localDate, nextServiceDate, parseServiceDate } from "@/lib/operating-date";
+import { planningQueueWhere } from "@/lib/dispatcher-data";
+import { serializable } from "@/lib/transactions";
 
 type PlannedTrip = { vehicleId: string; driverId: string; orderIds: string[]; brand: "FRESH" | "STYLE" | "TECH"; district: string };
 type DeferredOrder = { orderId: string; reason: string; nextDate: string };
@@ -26,7 +28,7 @@ export async function publishAssistedPlan(trips: PlannedTrip[], deferred: Deferr
       tx.vehicle.findMany({ where: { id: { in: trips.map((trip) => trip.vehicleId) }, depotId: session.depotId } }),
       tx.account.findMany({ where: { id: { in: trips.map((trip) => trip.driverId) }, role: "DRIVER", isActive: true, depotId: session.depotId } }),
       tx.order.findMany({ where: { id: { in: accountedIds }, outlet: { depotId: session.depotId }, requestedDate: { lte: serviceDate }, status: { in: ["SUBMITTED", "CONFIRMED", "DEFERRED", "ALLOCATED", "LOADED"] } }, include: { outlet: true, allocations: { include: { plan: true } } } }),
-      tx.order.findMany({ where: { outlet: { depotId: session.depotId }, requestedDate: { lte: serviceDate }, status: { in: ["SUBMITTED", "CONFIRMED", "DEFERRED", "ALLOCATED", "LOADED"] } }, select: { id: true } })
+      tx.order.findMany({ where: planningQueueWhere(session.depotId!, serviceDate), select: { id: true } })
     ]);
     if (orders.length !== accountedIds.length || queue.some((order) => !accountedIds.includes(order.id))) throw new Error("Queue changed. Allocate or defer every eligible order.");
     if (orders.some((order) => order.allocations.some((allocation) => allocation.plan.status === "PUBLISHED" && allocation.plan.serviceDate.getTime() !== serviceDate.getTime()))) throw new Error("An order belongs to another published run.");
@@ -64,7 +66,8 @@ export async function publishAssistedPlan(trips: PlannedTrip[], deferred: Deferr
       await tx.orderStatusEvent.create({ data: { orderId: order.orderId, status: "DEFERRED", reason: `${order.reason} · moved to ${order.nextDate}` } });
       await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Order", entityId: order.orderId, action: "deferred", payload: { planId: plan.id, reason: order.reason, nextDate: order.nextDate } } });
     }
-    const recipients = await tx.account.findMany({ where: { isActive: true, OR: [{ depotId: session.depotId, role: { in: ["DISPATCHER", "LOADER"] } }, { id: { in: trips.map((trip) => trip.driverId) } }, { outletId: { in: orders.map((order) => order.outletId) } }] }, select: { id: true } });
+    const affectedDrivers = [...trips.map((trip) => trip.driverId), ...(latest?.trips.flatMap((trip) => trip.driverId ? [trip.driverId] : []) ?? [])];
+    const recipients = await tx.account.findMany({ where: { isActive: true, OR: [{ depotId: session.depotId, role: { in: ["DISPATCHER", "LOADER"] } }, { id: { in: affectedDrivers } }, { outletId: { in: orders.map((order) => order.outletId) } }] }, select: { id: true } });
     await tx.notification.createMany({ data: recipients.filter((recipient) => recipient.id !== session.accountId).map((recipient) => ({ recipientId: recipient.id, type: "PLAN", title: `Plan v${plan.version} published`, body: options.serviceDate ?? serviceDate.toISOString().slice(0, 10), entityType: "Plan", entityId: plan.id })) });
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Plan", entityId: plan.id, action: "published", payload: { version: plan.version, deferred: deferred.length } } });
     return plan.version;
@@ -76,15 +79,17 @@ export async function publishAssistedPlan(trips: PlannedTrip[], deferred: Deferr
 export async function assignTripDriver(tripId: string, driverId: string) {
   const session = await requireRole("dispatcher");
   if (!session.depotId) throw new Error("No depot assigned.");
-  await prisma.$transaction(async (tx) => {
+  await serializable(async (tx) => {
     const trip = await tx.trip.findFirst({ where: { id: tripId, plan: { depotId: session.depotId, status: "PUBLISHED" } }, include: { plan: true } });
     if (!trip || !["ALLOCATED", "LOADED"].includes(trip.status)) throw new Error("Only a trip awaiting departure can be assigned.");
     const driver = await tx.account.findFirst({ where: { id: driverId, role: "DRIVER", isActive: true, depotId: session.depotId } });
     if (!driver) throw new Error("Choose an active driver from your depot.");
+    if (trip.driverId === driverId) return;
     if (await tx.trip.count({ where: { id: { not: trip.id }, driverId, plan: { status: "PUBLISHED", serviceDate: trip.plan.serviceDate } } }) >= 2) throw new Error("Driver already has two trips on this date.");
     await tx.trip.update({ where: { id: trip.id }, data: { driverId } });
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Trip", entityId: trip.id, action: "driver_assigned", payload: { driverId, previousDriverId: trip.driverId } } });
     await tx.notification.create({ data: { recipientId: driverId, type: "PLAN", title: "Trip assigned", body: `${trip.vehicleId} · ${trip.district}`, entityType: "Trip", entityId: trip.id } });
-  }, { isolationLevel: "Serializable" });
+    if (trip.driverId) await tx.notification.create({ data: { recipientId: trip.driverId, type: "PLAN", title: "Trip reassigned", body: `${trip.vehicleId} · ${trip.district} is now assigned to another driver.`, entityType: "Trip", entityId: trip.id } });
+  });
   revalidatePath("/workspace", "layout");
 }

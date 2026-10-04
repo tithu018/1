@@ -2,11 +2,12 @@
 
 import { prisma } from "@waypoint/database";
 import { requireRole } from "@/lib/auth";
+import { revalidatePath } from "next/cache";
 
 export async function recordReceipt(orderId: string, receivedUnits: number, expectedUnits: number, outcome: "full" | "short" | "reservation", note: string) {
   const session = await requireRole("store_manager");
   if (!session.outletId || receivedUnits < 0 || receivedUnits > expectedUnits) throw new Error("Receipt quantities are invalid.");
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     const order = await tx.order.findFirst({ where: { id: orderId, outletId: session.outletId }, include: { outlet: true, receipt: true } });
     if (!order) throw new Error("This order is not available to the signed-in outlet.");
     if (expectedUnits !== order.units || !Number.isSafeInteger(receivedUnits)) throw new Error("Receipt quantities must match the order.");
@@ -28,4 +29,6 @@ export async function recordReceipt(orderId: string, receivedUnits: number, expe
     await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Order", entityId: orderId, action: "receipt_recorded", payload: { receivedUnits, expectedUnits, outcome, issueId: issue?.id ?? null, note: note.trim() || null } } });
     return { issueId: issue?.id ?? null };
   }, { isolationLevel: "Serializable" });
+  revalidatePath("/workspace", "layout");
+  return result;
 }
