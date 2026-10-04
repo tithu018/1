@@ -181,6 +181,29 @@ describe("store orders", () => {
     const saved = await order(); await login("style"); await expect(cancelStoreOrder(saved.id)).rejects.toThrow(); await expect(updateStoreOrder(saved.id, [{ lineId: "unknown", quantity: 1 }])).rejects.toThrow();
     await expect(acknowledgeDeferral(saved.id)).rejects.toThrow();
   });
+  it("persists the Store Manager lifecycle with outlet scoped receipt, issues and notifications", async () => {
+    await login("store");
+    const [product] = freshCatalog;
+    const created = await submitFreshOrder([{ code: product.code, quantity: 5 }], "Back gate after 05:30");
+    const saved = await db.order.findFirstOrThrow({ where: { id: created.id, outletId: "FRESH" }, include: { lines: true, statusEvents: true } });
+    expect(saved).toMatchObject({ outletId: "FRESH", status: "SUBMITTED", units: 5 });
+    expect(saved.statusEvents.map((event) => event.status)).toContain("SUBMITTED");
+    await updateStoreOrder(saved.id, saved.lines.map((line) => ({ lineId: line.id, quantity: 4 })));
+    expect((await db.order.findUniqueOrThrow({ where: { id: saved.id } })).units).toBe(4);
+    await db.order.update({ where: { id: saved.id }, data: { status: "DELIVERED" } });
+    const receipt = await recordReceipt(saved.id, 3, 4, "short", "One unit missing");
+    expect(receipt.issueId).toBeTruthy();
+    expect(await db.receiptRecord.findUnique({ where: { orderId: saved.id } })).toMatchObject({ expectedUnits: 4, receivedUnits: 3, outcome: "short" });
+    expect(await db.issueCase.findFirst({ where: { orderId: saved.id, order: { outletId: "FRESH" } } })).toMatchObject({ status: "REPORTED" });
+    await login("style");
+    await expect(recordReceipt(saved.id, 4, 4, "full", "")).rejects.toThrow();
+    const notice = await db.notification.create({ data: { recipientId: "store", type: "ORDER", title: "Order update", body: saved.id, entityType: "Order", entityId: saved.id } });
+    await acknowledgeNotification(notice.id);
+    expect((await db.notification.findUniqueOrThrow({ where: { id: notice.id } })).readAt).toBeNull();
+    await login("store");
+    await acknowledgeNotification(notice.id);
+    expect((await db.notification.findUniqueOrThrow({ where: { id: notice.id } })).readAt).not.toBeNull();
+  });
 });
 describe("publication, loading and departure", () => {
   it("publishes, loads, departs, delivers, confirms receipt and resolves an issue", async () => {

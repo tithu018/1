@@ -1,9 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import type { MouseEvent } from "react";
+import { useMemo, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { AlertTriangle, Bell, Box, Check, ChevronRight, Inbox, PackageCheck, Truck } from "lucide-react";
 import { displayDate } from "@/lib/format";
+import { acknowledgeNotification } from "@/lib/workflow-actions";
 import styles from "./section.module.css";
 
 type NotificationRow = {
@@ -58,7 +61,9 @@ function IconFor({ type }: { type: string }) {
 }
 
 export function NotificationsList({ notifications }: { notifications: NotificationRow[] }) {
+  const router = useRouter();
   const [activeFilter, setActiveFilter] = useState<Filter>("all");
+  const [, startTransition] = useTransition();
   const unreadCount = notifications.filter((item) => !item.readAt).length;
   const filtered = useMemo(() => notifications.filter((item) => {
     if (activeFilter === "all") return true;
@@ -72,6 +77,16 @@ export function NotificationsList({ notifications }: { notifications: Notificati
     else result.push({ label, rows: [item] });
     return result;
   }, []), [filtered]);
+
+  function openNotification(event: MouseEvent<HTMLAnchorElement>, item: NotificationRow) {
+    if (item.readAt) return;
+    event.preventDefault();
+    startTransition(async () => {
+      await acknowledgeNotification(item.id);
+      router.push(item.href);
+      router.refresh();
+    });
+  }
 
   return (
     <section className={styles.notificationsPage}>
@@ -101,7 +116,7 @@ export function NotificationsList({ notifications }: { notifications: Notificati
               <h2>{group.label}</h2>
               <div className={styles.notificationRows}>
                 {group.rows.map((item) => (
-                  <Link className={`${styles.notificationRow} ${item.readAt ? "" : styles.unreadNotification} ${styles[`notificationType${category(item.type)}`]}`} href={item.href} key={item.id}>
+                  <Link className={`${styles.notificationRow} ${item.readAt ? "" : styles.unreadNotification} ${styles[`notificationType${category(item.type)}`]}`} href={item.href} key={item.id} onClick={(event) => openNotification(event, item)}>
                     <span className={styles.notificationStatusIcon}><IconFor type={item.type} /></span>
                     <span className={styles.notificationReadDot} aria-hidden="true" />
                     <span className={styles.notificationCopy}>
