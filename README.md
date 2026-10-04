@@ -85,7 +85,7 @@ The frontend and application backend run together in the `app` container. Postgr
 ### Prerequisites
 
 - Docker Desktop with Docker Compose
-- Ports `3000` and `5433` available
+- Ports `3001` and `5433` available by default
 
 ### 1. Configure the environment
 
@@ -113,10 +113,11 @@ Docker performs the following automatically:
 
 1. Starts PostgreSQL and waits for it to become healthy.
 2. Applies all committed Prisma migrations.
-3. Starts the optimized Next.js production server.
-4. Checks application and database health.
+3. Seeds or refreshes the idempotent NOVA demonstration dataset.
+4. Starts the optimized Next.js production server.
+5. Checks application and database health.
 
-Startup does not insert sample outlets, vehicles, orders, or accounts. Existing database records are retained. For an optional local demonstration dataset, run `pnpm db:seed` explicitly.
+Compose enables `SEED_DEMO_DATA=true` by default so a new local stack immediately shows database-backed outlets, orders, trips, loading progress, issues and demo accounts. Set it to `false` in `.env` when you want migrations without demonstration records. The seed preserves an existing non-demo published plan instead of replacing operational work, and it can also be run explicitly with `pnpm db:seed`.
 
 For a new empty database, set `DISPATCHER_EMAIL`, `DISPATCHER_PASSWORD` (at least 12 characters), and optionally `DISPATCHER_NAME` and `DISPATCHER_DEPOT` (`Peliyagoda` or `Kandy`) in `.env`, then run `pnpm db:bootstrap`. This creates the two operating depots and one dispatcher account without adding sample stores or orders. Existing accounts are never overwritten.
 
@@ -128,9 +129,9 @@ New outlets require their ID, brand, district, dock and vehicle-access rules, an
 
 ### 3. Open the application
 
-Visit [http://localhost:3000](http://localhost:3000).
+Visit [http://localhost:3001](http://localhost:3001) for Docker. Local `pnpm dev` continues to use [http://localhost:3000](http://localhost:3000).
 
-The health endpoint is available at [http://localhost:3000/api/health](http://localhost:3000/api/health). A healthy response resembles:
+The Docker health endpoint is available at [http://localhost:3001/api/health](http://localhost:3001/api/health). A healthy response resembles:
 
 ```json
 {
@@ -146,6 +147,8 @@ The health endpoint is available at [http://localhost:3000/api/health](http://lo
 | Role | Email | Password |
 | --- | --- | --- |
 | Store Manager | `store@waypoint.demo` | `Store123!` |
+| Style Store Manager | `style@waypoint.demo` | `Style123!` |
+| Tech Store Manager | `tech@waypoint.demo` | `Tech123!` |
 | Dispatcher | `dispatcher@waypoint.demo` | `Dispatch123!` |
 | Loader | `loader@waypoint.demo` | `Loader123!` |
 | Driver | `driver@waypoint.demo` | `Driver123!` |
@@ -331,7 +334,7 @@ The assisted planner proposes a plan, but the Dispatcher remains responsible for
 
 PostgreSQL data is stored in the named Docker volume `waypoint-postgres`. Normal container restarts and `docker compose down` preserve that data.
 
-The optional seed script uses upserts for demonstration depots, outlets, vehicles, orders, and accounts. It is never run automatically during application startup. Operational screens render database records without fabricated fallback rows.
+The seed script uses stable demo identifiers and upserts for demonstration depots, outlets, vehicles, orders, accounts and order lines. Compose runs it when `SEED_DEMO_DATA=true`; local development can run it with `pnpm db:seed`. Operational screens render these database records without fabricated frontend fallback rows.
 
 ## Troubleshooting
 

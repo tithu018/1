@@ -98,7 +98,7 @@ function DesktopSignIn({ role, error }: Readonly<{ role: UserRole; error?: strin
         <div className={styles.artContent}>
           <p>SIGNING IN AS</p>
           <h1>{roleLabels[role]}</h1>
-
+          <span>{roleCopy[role].detail}</span>
         </div>
       </section>
       <section className={styles.formArea}>
