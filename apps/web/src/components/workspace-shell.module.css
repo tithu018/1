@@ -239,6 +239,192 @@
   background: #fffdf8;
 }
 
+.storeHeader {
+  min-height: 88px;
+  gap: 24px;
+  padding: 0 28px 0 34px;
+  border-bottom-color: #eee5d4;
+  border-top-left-radius: 30px;
+  background:
+    linear-gradient(135deg, transparent 0 28px, #fffdf8 29px) left top / 72px 100% no-repeat,
+    #fffdf8;
+  box-shadow: 0 10px 26px #2b24160d;
+}
+
+.storeHeaderSite {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 14px;
+  color: #0f2b24;
+}
+
+.storeHeaderSite > svg:first-child {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  color: #0f5a44;
+  stroke-width: 1.8;
+}
+
+.storeHeaderSite > svg:last-child {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  color: #092436;
+  stroke-width: 2.2;
+}
+
+.storeHeaderSite div {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.storeHeaderSite strong,
+.storeHeaderSite span,
+.storeIdentity strong,
+.storeIdentity small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.storeHeaderSite strong {
+  color: #071a2e;
+  font-size: 15px;
+  font-weight: 850;
+  letter-spacing: -.1px;
+}
+
+.storeHeaderSite span {
+  color: #627383;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.storeHeaderRight {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 20px;
+  margin-left: auto;
+}
+
+.storeCutoffBadge {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-radius: 14px;
+  color: #814b0c;
+  background: #f8ead0;
+  box-shadow: inset 0 1px 0 #fff8ed, 0 8px 18px #7b4c130a;
+}
+
+.storeCutoffBadge > svg {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  color: #9b620f;
+  stroke-width: 1.9;
+}
+
+.storeCutoffBadge > span {
+  display: grid;
+  gap: 2px;
+}
+
+.storeCutoffBadge small {
+  color: #8e6a3a;
+  font-size: 11px;
+  line-height: 1;
+}
+
+.storeCutoffBadge strong {
+  color: #071a2e;
+  font-size: 16px;
+  font-weight: 850;
+  line-height: 1.05;
+}
+
+.storeBell {
+  position: relative;
+  display: grid;
+  width: 50px;
+  height: 44px;
+  flex: 0 0 50px;
+  place-items: center;
+  border-left: 1px solid #d9e1e0;
+  border-right: 1px solid #d9e1e0;
+  color: #0c1e29;
+}
+
+.storeBell svg {
+  width: 21px;
+  height: 21px;
+  stroke-width: 1.9;
+}
+
+.storeBell span {
+  position: absolute;
+  top: 8px;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid #fffdf8;
+  border-radius: 50%;
+  background: #e0202d;
+}
+
+.storeProfile {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 13px;
+}
+
+.storeAvatar {
+  display: grid;
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
+  place-items: center;
+  border-radius: 50%;
+  color: #0f5a44;
+  background: #dce8de;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.storeIdentity {
+  display: grid;
+  min-width: 116px;
+  gap: 4px;
+}
+
+.storeIdentity strong {
+  color: #071a2e;
+  font-size: 15px;
+  font-weight: 850;
+  line-height: 1.05;
+}
+
+.storeIdentity small {
+  color: #4f5f6e;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.storeProfile > svg {
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
+  color: #092436;
+  stroke-width: 2.2;
+}
+
 .header div:first-child {
   display: grid;
   gap: 4px;
@@ -555,4 +741,117 @@
   .loaderMobileNav a { display:flex; min-width:88px; min-height:52px; flex-direction:column; align-items:center; justify-content:center; gap:4px; border-radius:12px; color:#68746d; font-size:11px; font-weight:700; }
   .loaderMobileNav svg { width:20px; height:20px; }
   .loaderMobileNav .active { color:#214e3b; background:#dce8de; }
+
+  .storeHeader {
+    min-height: auto;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 14px 16px;
+    border-top-left-radius: 0;
+    background: #fffdf8;
+  }
+
+  .storeHeaderSite {
+    flex: 1 1 170px;
+  }
+
+  .storeHeaderRight {
+    flex: 1 1 100%;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-left: 0;
+  }
+
+  .storeProfile {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 520px) {
+  .storeHeader {
+    align-items: flex-start;
+  }
+
+  .storeHeaderSite {
+    gap: 8px;
+  }
+
+  .storeHeaderSite > svg:first-child,
+  .storeHeaderSite > svg:last-child {
+    display: none;
+  }
+
+  .storeHeaderSite strong {
+    font-size: 13px;
+  }
+
+  .storeHeaderSite span {
+    font-size: 10px;
+  }
+
+  .storeHeaderRight {
+    display: grid;
+    grid-template-columns: auto auto minmax(0,1fr);
+    align-items: center;
+    gap: 10px;
+  }
+
+  .storeCutoffBadge {
+    min-height: 42px;
+    gap: 8px;
+    padding: 7px 10px;
+  }
+
+  .storeCutoffBadge > svg {
+    width: 19px;
+    height: 19px;
+  }
+
+  .storeCutoffBadge small {
+    font-size: 9px;
+  }
+
+  .storeCutoffBadge strong {
+    font-size: 12px;
+  }
+
+  .storeBell {
+    width: 38px;
+    height: 38px;
+    border-left: 0;
+    border-right: 0;
+  }
+
+  .storeBell span {
+    right: 8px;
+  }
+
+  .storeProfile {
+    justify-self: end;
+    gap: 8px;
+    margin-left: 0;
+  }
+
+  .storeAvatar {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+    font-size: 11px;
+  }
+
+  .storeIdentity {
+    min-width: 76px;
+  }
+
+  .storeIdentity strong {
+    font-size: 12px;
+  }
+
+  .storeIdentity small {
+    font-size: 10px;
+  }
+
+  .storeProfile > svg {
+    display: none;
+  }
 }
