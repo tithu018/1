@@ -123,9 +123,15 @@ For a new empty database, set `DISPATCHER_EMAIL`, `DISPATCHER_PASSWORD` (at leas
 
 ## Dispatcher registration
 
-Open **Registration** in the dispatcher sidebar to register a Store Manager for a Fresh, Style or Tech outlet. Registration creates a password-hashed account, links it to one outlet in the dispatcher's depot, and records an audit event. Existing unassigned outlets retain their saved master-data constraints.
+Only Dispatchers register users. Open **Registration** in the dispatcher sidebar and choose the **Depot** (Peliyagoda or Kandy); it defaults to the dispatcher's own depot. The selected depot applies to every tab:
 
-New outlets require their ID, brand, district, dock and vehicle-access rules, and delivery window. Fresh windows must end by 08:00; mall outlets require access or booking instructions. Registered managers sign in using their email and supplied initial password. Their workspace reads their outlet's actual orders, receipts, issues and notifications, and shows empty states when no records exist.
+- **Store managers** — creates a password-hashed Store Manager account linked to one Fresh, Style or Tech outlet in the selected depot. The account's depot always matches its outlet. Existing unassigned outlets retain their saved master-data constraints.
+- **Staff** — creates Driver, Loader or Dispatcher accounts for the selected depot. A Peliyagoda dispatcher can therefore set up the Kandy hub's first dispatcher, loaders and drivers.
+- **Vehicles** — registers vehicles with capacity, temperature class and fuel profile at the selected depot.
+
+The account and vehicle lists show the selected depot, and Dispatchers can activate or deactivate accounts, reset passwords and change workshop status in either depot. Every registration and change records an audit event.
+
+New outlets require their ID, brand, district, dock and vehicle-access rules, and delivery window; address and coordinates are optional but give drivers the stop address and map. District suggestions list the selected depot's existing districts. Fresh windows must end by 08:00. Mall outlets require access or booking instructions; for mall-dock access these must start with the `HH:MM-HH:MM` access window, and the delivery window must fit inside it. Registered managers sign in using their email and supplied initial password. Their workspace reads their outlet's actual orders, receipts, issues and notifications, and shows empty states when no records exist.
 
 ### 3. Open the application
 

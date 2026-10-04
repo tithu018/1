@@ -32,3 +32,6 @@
 .table input { max-width: 190px; min-height: 40px; }
 .page :is(input, select, button, summary):focus-visible { outline: 3px solid #85aa65; outline-offset: 3px; }
 @media (max-width: 700px) { .form, .card { padding: 16px; } .page header h1 { font-size: 30px; } }
+.depotBar { display: grid; gap: 8px; font-size: 14px; font-weight: 600; width: min(100%, 360px); }
+.depotBar select { min-height: 44px; border: 1px solid #cecfc5; background: white; border-radius: 6px; padding: 10px; color: #202522; }
+.depotBar small { color: #66706a; font-weight: 400; }
