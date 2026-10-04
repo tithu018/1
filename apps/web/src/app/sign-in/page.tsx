@@ -60,7 +60,6 @@ function RoleChooser() {
     <main className={styles.chooser}>
       <header className={styles.chooserTop}>
         <Link href="/" className={styles.wordmark}>
-          <Image src="/Image/logo-green-hq.png" alt="" width={66} height={36} priority />
           <span>{APP_NAME}</span>
         </Link>
         <Link href="/" className={styles.backHome}><ArrowLeft aria-hidden="true" /> Back to home</Link>
