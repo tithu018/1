@@ -654,12 +654,31 @@
   }
 
   .tableWrap {
-    overflow-x: auto;
+    overflow: hidden;
   }
 
-  .tableHeader,
+  .tableHeader {
+    display: none;
+  }
+
   .deliveryRow {
-    min-width: 760px;
+    min-width: 0;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 8px 12px;
+    padding: 14px;
+  }
+
+  .deliveryRow time,
+  .deliveryRow > span:not(.rowIcon):not(.statusBadge),
+  .statusBadge,
+  .receiveButton {
+    grid-column: 2;
+  }
+
+  .chevronButton {
+    grid-column: 3;
+    grid-row: 1 / span 5;
   }
 }
 

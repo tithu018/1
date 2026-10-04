@@ -12,6 +12,15 @@ const initialQuantities: QuantityByCode = {};
 
 function formatNumber(value: number, digits = 1) { return value.toLocaleString("en-LK", { maximumFractionDigits: digits, minimumFractionDigits: digits }); }
 
+function shortOrderReference(orderId: string) {
+  const raw = orderId.replace(/^ORD-/i, "").replace(/[^a-z0-9]/gi, "");
+  const numeric = raw.match(/\d+/g)?.join("") ?? "";
+  if (numeric.length >= 4) return `ORD-${numeric.slice(-4)}`;
+  const value = raw || orderId;
+  const hashed = [...value].reduce((sum, char) => (sum * 31 + char.charCodeAt(0)) % 9000, 0);
+  return `ORD-${1000 + hashed}`;
+}
+
 export function FreshOrderForm({ outletId, deliveryWindow, previousQuantities }: { outletId: string; deliveryWindow: string; previousQuantities: QuantityByCode }) {
   const [quantities, setQuantities] = useState<QuantityByCode>(initialQuantities);
   const [filter, setFilter] = useState<"All" | "Dry" | "Chilled">("All");
@@ -51,7 +60,7 @@ export function FreshOrderForm({ outletId, deliveryWindow, previousQuantities }:
     }
   }
 
-  if (result === "submitted") return <section className={styles.success}><span>✓</span><h1>Order submitted</h1><p>Waypoint received your order. The dispatcher will confirm it in the planning queue.</p><dl><div><dt>Order ID</dt><dd>{confirmation?.id}</dd></div><div><dt>Received by server</dt><dd>{confirmation && `${displayDate(confirmation.submittedAt)} · ${displayTime(confirmation.submittedAt)}`}</dd></div><div><dt>Cutoff</dt><dd>16:00 daily cutoff</dd></div><div><dt>Delivery</dt><dd>{confirmation ? displayDate(confirmation.requestedDate) : "Next delivery run"} · {deliveryWindow}</dd></div><div><dt>Status</dt><dd>Submitted</dd></div></dl><button onClick={() => { setResult(null); setQuantities({}); setNote(""); }}>Place another order</button></section>;
+  if (result === "submitted") return <section className={styles.success}><span>✓</span><h1>Order submitted</h1><p>Waypoint received your order. The dispatcher will confirm it in the planning queue.</p><dl><div><dt>Order ID</dt><dd>{confirmation ? shortOrderReference(confirmation.id) : ""}</dd></div><div><dt>Received by server</dt><dd>{confirmation && `${displayDate(confirmation.submittedAt)} · ${displayTime(confirmation.submittedAt)}`}</dd></div><div><dt>Cutoff</dt><dd>16:00 daily cutoff</dd></div><div><dt>Delivery</dt><dd>{confirmation ? displayDate(confirmation.requestedDate) : "Next delivery run"} · {deliveryWindow}</dd></div><div><dt>Status</dt><dd>Submitted</dd></div></dl><button onClick={() => { setResult(null); setQuantities({}); setNote(""); }}>Place another order</button></section>;
 
   return <section>
     <header className={styles.heading}><div><h1>Place order</h1><p>Delivery window: {deliveryWindow} · Order cutoff 16:00</p></div><span>Order cutoff 16:00</span></header>

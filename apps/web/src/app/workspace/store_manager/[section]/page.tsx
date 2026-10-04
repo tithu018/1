@@ -62,7 +62,7 @@ export default async function StoreSectionPage({ params }: { params: Promise<{ s
     return {
       id: item.id,
       type: item.type,
-      title: notificationTitle(item.type, item.title, item.body),
+      title: orderId && orderRef ? notificationTitle(item.type, item.title, item.body).replaceAll(orderId, orderRef) : notificationTitle(item.type, item.title, item.body),
       message: orderId && orderRef ? item.body.replaceAll(orderId, orderRef) : item.body,
       orderId,
       orderRef,

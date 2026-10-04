@@ -131,7 +131,7 @@ export function ReceiptConfirmation({ deliveries, summary }: { deliveries: Deliv
           <h1>Receive delivery</h1>
           <p>Confirm the items and quantities from delivered orders.</p>
         </div>
-        {activeDeliveries.length > 1 && <button className={styles.receiveAll} onClick={() => setSelectedId(activeDeliveries[0].id)} type="button"><PackageCheck />Receive all pending</button>}
+        {activeDeliveries.length > 1 && <button className={styles.receiveAll} onClick={() => setSelectedId(activeDeliveries[0].id)} type="button"><PackageCheck />Start receiving</button>}
       </header>
 
       <section className={styles.summaryGrid} aria-label="Delivery receipt summary">
