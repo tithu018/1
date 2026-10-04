@@ -76,6 +76,7 @@ export async function setAccountActive(_previous: { error?: string; success?: st
     await prisma.$transaction(async (tx) => {
       const account = await tx.account.findUnique({ where: { id: accountId } });
       if (!account) throw new Error("Account not found.");
+      if (account.depotId !== session.depotId) throw new Error("You can only update accounts in your depot.");
       if (account.id === session.accountId && !isActive) throw new Error("You cannot deactivate your own account.");
       if (!isActive && await tx.trip.count({ where: { driverId: account.id, plan: { status: "PUBLISHED" }, status: { in: ["ALLOCATED", "LOADED", "OUT_FOR_DELIVERY"] } } })) throw new Error("Reassign this driver's active trips first.");
       await tx.account.update({ where: { id: account.id }, data: { isActive, sessionVersion: { increment: 1 } } });
@@ -95,6 +96,7 @@ export async function resetStaffPassword(_previous: { error?: string; success?: 
     await prisma.$transaction(async (tx) => {
       const account = await tx.account.findUnique({ where: { id: String(form.get("accountId")) } });
       if (!account) throw new Error("Account not found.");
+      if (account.depotId !== session.depotId) throw new Error("You can only reset passwords for accounts in your depot.");
       if (account.id === session.accountId) throw new Error("Ask another dispatcher to reset your password.");
       await tx.account.update({ where: { id: account.id }, data: { passwordHash, sessionVersion: { increment: 1 } } });
       await tx.auditEvent.create({ data: { actorId: session.accountId, entityType: "Account", entityId: account.id, action: "password_reset" } });
